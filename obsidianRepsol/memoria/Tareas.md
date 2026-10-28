@@ -14,7 +14,7 @@
 | T-012 | Revocación individual/masiva + auditoría | Backend+Frontend | US-03 |
 | T-013 | Limpiar/regenerar `shift_entries` al editar asignaciones (limpieza de obsoletos) + patrones UI | Backend | Gen. automática ya funciona (trigger) |
 | T-014 | Festivos + eventos: UI admin | Backend+Frontend | Tablas y RLS listos |
-| T-015 | Vista Calendario (mes, leyenda, turnos, festivos) | Frontend | US-04 |
+| T-015 | ~~Vista Calendario (mes, leyenda, turnos, festivos, eventos, vacaciones)~~ | Frontend | Hecho. Vista mes mobile-first con turnos por color, festivos, eventos y vacaciones; detalle por día; skeleton/error/vacío; 2 tests de monthWeeks; verificado Playwright 375 px claro/oscuro (2026-10-28, frontend-ux) |
 | T-016 | Vacaciones: solicitud + aprobación líder + notificación | Backend+Frontend | US-05, US-06 (trigger de aprobación listo) |
 | T-017 | Centro de notificaciones + badge + Realtime | Frontend+Backend | US-09 |
 | T-018 | Web Push VAPID (Edge Function + SW) | DevOps+Frontend | Par VAPID generado (ver Comunicaciones C-005) |
@@ -33,7 +33,7 @@
 
 | ID | Tarea | Agente | Desde |
 |---|---|---|---|
-| — | Sin tareas en curso | | |
+
 
 > **Nota para otras IAs (2026-10-28):** T-030 (pass UI/UX estilo Waylet) finalizada por *frontend-ux*. Libres: T-009, T-012..T-028 (salvo T-010). Si queréis una de estas, marcadla aquí antes de empezar.
 
@@ -59,3 +59,4 @@
 | T-011 | Pantalla Acceso funcional: QR real + countdown 1 s + chip Activa/Caducada + código temporal con countdown; estados carga/error con role=alert; Playwright 375 px claro/oscuro | Frontend (frontend-ux) | 2026-10-28 |
 | T-029 | Pass UI/UX con `/ui-ux-pro-max` + Playwright: Inicio con saludo+turno de hoy (skeleton/empty/error), Login con marca+autofoco+role=alert, favicon; verificación 375 px claro/oscuro | Frontend (frontend-ux) | 2026-10-28 |
 | T-030 | Pass UI/UX estilo Waylet (sobre `index.html` de palo623): cabecera Inicio con degradado+llama+avatar+reloj en vivo+chip de estado, tarjeta de turno superpuesta con barra de progreso (soporta turno de noche), Login con cabecera de marca, esquinas de visor en QR; 10 tests verdes, Playwright 375 px claro/oscuro | Frontend (frontend-ux) | 2026-10-28 |
+| T-031 | ~~Onboarding first-login (bienvenida + tema) + seed rico de calendario~~ | Frontend | Hecho. Diálogo 3 pasos (bienvenida, cómo funciona, tema) 1 vez/dispositivo (localStorage); migración 20261028000007 con festivos 2026, 9 vacaciones y 5 eventos; turnos generados -180..+365 días (2026-10-28, frontend-ux) |

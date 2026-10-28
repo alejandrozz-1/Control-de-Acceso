@@ -23,6 +23,7 @@ const empleado: Profile = {
 };
 
 beforeEach(() => {
+  localStorage.setItem('rps-onboarding-done', '1');
   useAuthStore.setState({ session: null, profile: null, initializing: false });
 });
 

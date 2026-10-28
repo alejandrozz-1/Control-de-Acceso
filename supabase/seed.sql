@@ -86,8 +86,8 @@ insert into shift_patterns (id, name, cycle_days, definition, color) values
 on conflict do nothing;
 
 insert into shift_assignments (id, pattern_id, team_id, start_date, rotation_offset) values
-  ('00000000-0000-0000-0000-0000000000d4', '00000000-0000-0000-0000-0000000000d2', '00000000-0000-0000-0000-0000000000d0', current_date - 30, 0),
-  ('00000000-0000-0000-0000-0000000000d5', '00000000-0000-0000-0000-0000000000d3', '00000000-0000-0000-0000-0000000000d1', current_date - 30, 3)
+  ('00000000-0000-0000-0000-0000000000d4', '00000000-0000-0000-0000-0000000000d2', '00000000-0000-0000-0000-0000000000d0', current_date - 180, 0),
+  ('00000000-0000-0000-0000-0000000000d5', '00000000-0000-0000-0000-0000000000d3', '00000000-0000-0000-0000-0000000000d1', current_date - 180, 3)
 on conflict do nothing;
 
 -- ===== Festivos (nacional + comunidad) =====

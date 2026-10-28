@@ -30,3 +30,5 @@
 ```
 | YYYY-MM-DD | <agente> | <qué> | <archivo/PR/commit> | T-0xx |
 ```
+
+- **2026-10-28 · frontend-ux** · T-015/T-031: vista Calendario real (mes, leyenda M/T/N/L, festivos, eventos, vacaciones, detalle por día, skeleton/error/vacío) + onboarding first-login (diálogo 3 pasos, localStorage) + migración 20261028000007_calendar_demo_data.sql (festivos 2026, 9 vacaciones, 5 eventos) + seed con histórico de turnos -180 días. 15 tests verdes.
