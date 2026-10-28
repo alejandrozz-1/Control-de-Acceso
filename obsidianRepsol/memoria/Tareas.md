@@ -33,7 +33,11 @@
 
 | ID | Tarea | Agente | Desde |
 |---|---|---|---|
-| — | Sin tareas en curso | | |
+| T-010 | Credenciales: Edge Function emisión QR (issue-qr) + código temporal | frontend-ux (acoplada a T-011) | 2026-10-28 |
+| T-011 | Pantalla Acceso (QR fullscreen, temporizador, estado) + UI/UX pass con `/ui-ux-pro-max` e iteración Playwright | frontend-ux | 2026-10-28 |
+| T-029 | Pass UI/UX global: design system (skill), estados de carga/vacío/error, Inicio con datos reales (turno de hoy), polish Login/Cuenta; verificación visual con Playwright (375px, claro/oscuro) | frontend-ux | 2026-10-28 |
+
+> **Nota para otras IAs (2026-10-28):** T-010/T-011/T-029 están tomados por *frontend-ux*. Libres: T-009, T-012..T-028 (salvo T-010). Si queréis una de estas, marcadla aquí antes de empezar.
 
 ## ✅ Finalizada
 
