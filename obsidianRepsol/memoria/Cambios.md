@@ -20,6 +20,10 @@
 | 2026-10-28 | backend | **Fix crítico GoTrue**: usuarios seed insertados directamente tenían columnas token `NULL` en `auth.users` → `Scan error ... converting NULL to string` en login/admin (500). Normalización a `''` aplicada en BD y añadida al final de `seed.sql` | `supabase/seed.sql` + SQL directo | T-008 |
 | 2026-10-28 | devops | `.env` (valores públicos) commiteado para que CI/tests arranquen; `.env.local` sigue gitignored; BOM eliminado de ambos (rompía la CLI de Supabase) | `.env`, `.gitignore` | T-006 |
 | 2026-10-28 | devops | `auth_leaked_password_protection` no activable en plan Free (402) → R-12; email rate limit 2/h sin SMTP → R-13 | `obsidianRepsol/memoria/Estado-global.md` | — |
+| 2026-10-28 | frontend-ux | Edge Function `issue-qr`: QR firmado HMAC (`credential_id.exp.firma`, TTL 60 s, sin PII) + código temporal 8 díg. (5 min); rate limit 10/min/usuario; verificada 401 sin JWT / 200 con sesión | `supabase/functions/issue-qr/` | T-010 |
+| 2026-10-28 | frontend-ux | Servicio `access.ts` (invoke de issue-qr, errores amigables) + helpers `secondsUntil`/`formatCountdown` con test | `apps/web/src/services/access.ts`, `src/test/access.test.ts` | T-010/T-011 |
+| 2026-10-28 | frontend-ux | Pantalla Acceso funcional: QR real (lib `qrcode`, colores de marca), countdown 1 s con aria-live, chip Activa/Caducada, código temporal con countdown propio; renueva 5 s antes de caducar | `apps/web/src/pages/Acceso.tsx` | T-011 |
+| 2026-10-28 | frontend-ux | Pass UI/UX (`/ui-ux-pro-max` + iteración Playwright 375 px claro/oscuro): Inicio con saludo+fecha+turno de hoy (skeleton/empty/error role=alert), Login con barra de marca+autofoco+role=alert, `phase` opcional en PageLayout, favicon SVG | `apps/web/src/pages/{Inicio,Login}.tsx`, `components/ui/PageLayout.tsx`, `public/favicon.svg` | T-029 |
 
 ### Plantilla
 ```

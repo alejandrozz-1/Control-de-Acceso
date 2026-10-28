@@ -9,8 +9,8 @@
 | T-007 | ~~Tipos generados de BD (`database.types.ts`)~~ | Frontend/Backend | ✅ `npx supabase gen types` → `apps/web/src/services/database.types.ts` (16 tablas + funciones) |
 | T-008 | ~~Auth: login, guardas por rol, invitación por email~~ | Backend+Frontend | ✅ Login+guardas+Edge Function `invite-user` (2026-10-28). **Falta**: alta CSV y reintentar invitación free (rate limit 2/h sin SMTP) |
 | T-009 | Centro/equipos CRUD (admin) | Backend+Frontend | |
-| T-010 | Credenciales: Edge Function QR firmado + código temporal | Backend | US-02, ADR-003 |
-| T-011 | Pantalla Acceso (QR fullscreen, temporizador, estado) | Frontend | US-02 (mockup listo) |
+| T-010 | ~~Credenciales: Edge Function QR firmado + código temporal~~ | Backend+Frontend | ✅ Edge Function `issue-qr` desplegada y verificada (401 sin JWT, 200 QR firmado HMAC + temporal 8 díg.). TTL QR 60 s, temporal 300 s, rate limit 10/min/usuario (2026-10-28, frontend-ux) |
+| T-011 | ~~Pantalla Acceso (QR fullscreen, temporizador, estado)~~ | Frontend | ✅ QR real (payload firmado), countdown 1 s, chip Activa/Caducada, código temporal con su countdown, estados carga/error con role=alert; verificado con Playwright 375 px claro/oscuro (2026-10-28, frontend-ux) |
 | T-012 | Revocación individual/masiva + auditoría | Backend+Frontend | US-03 |
 | T-013 | Limpiar/regenerar `shift_entries` al editar asignaciones (limpieza de obsoletos) + patrones UI | Backend | Gen. automática ya funciona (trigger) |
 | T-014 | Festivos + eventos: UI admin | Backend+Frontend | Tablas y RLS listos |
@@ -33,11 +33,9 @@
 
 | ID | Tarea | Agente | Desde |
 |---|---|---|---|
-| T-010 | Credenciales: Edge Function emisión QR (issue-qr) + código temporal | frontend-ux (acoplada a T-011) | 2026-10-28 |
-| T-011 | Pantalla Acceso (QR fullscreen, temporizador, estado) + UI/UX pass con `/ui-ux-pro-max` e iteración Playwright | frontend-ux | 2026-10-28 |
-| T-029 | Pass UI/UX global: design system (skill), estados de carga/vacío/error, Inicio con datos reales (turno de hoy), polish Login/Cuenta; verificación visual con Playwright (375px, claro/oscuro) | frontend-ux | 2026-10-28 |
+| — | Sin tareas en curso | | |
 
-> **Nota para otras IAs (2026-10-28):** T-010/T-011/T-029 están tomados por *frontend-ux*. Libres: T-009, T-012..T-028 (salvo T-010). Si queréis una de estas, marcadla aquí antes de empezar.
+> **Nota para otras IAs (2026-10-28):** T-010/T-011/T-029 finalizadas por *frontend-ux*. Libres: T-009, T-012..T-028 (salvo T-010). Si queréis una de estas, marcadla aquí antes de empezar.
 
 ## ✅ Finalizada
 
@@ -55,3 +53,6 @@
 | T-008a | Fase 1 auth: store Zustand + `initAuth`, Login, `RequireAuth`/`RequireRole`, Cuenta con logout, admin Usuarios (listado+invitación) | Frontend | 2026-10-28 |
 | T-008b | Edge Function `invite-user` desplegada y verificada (401 sin JWT, 403 no-admin, 200 admin) | Backend | 2026-10-28 |
 | T-008c | Fix crítico: `auth.users` con tokens NULL rompía GoTrue (`Scan error ... confirmation_token`) → normalización a `''` en BD + fin del seed | Backend | 2026-10-28 |
+| T-010 | Edge Function `issue-qr` desplegada: QR firmado HMAC (TTL 60 s) + código temporal (8 díg., 5 min), rate limit 10/min/usuario; verificada (401 sin JWT, 200 con sesión) | Backend (frontend-ux) | 2026-10-28 |
+| T-011 | Pantalla Acceso funcional: QR real + countdown 1 s + chip Activa/Caducada + código temporal con countdown; estados carga/error con role=alert; Playwright 375 px claro/oscuro | Frontend (frontend-ux) | 2026-10-28 |
+| T-029 | Pass UI/UX con `/ui-ux-pro-max` + Playwright: Inicio con saludo+turno de hoy (skeleton/empty/error), Login con marca+autofoco+role=alert, favicon; verificación 375 px claro/oscuro | Frontend (frontend-ux) | 2026-10-28 |

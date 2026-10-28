@@ -15,3 +15,7 @@ android/app/build/
 # Obsidian: estado personal de sesión (el resto de .obsidian SÍ se versiona)
 obsidianRepsol/.obsidian/workspace.json
 obsidianRepsol/.obsidian/workspace-mobile.json
+
+# Capturas de Playwright MCP (auditoria local)
+.playwright-mcp/
+.playwright-mcp*.png

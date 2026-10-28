@@ -39,6 +39,7 @@ export default function Login() {
       <Paper elevation={0} sx={{ width: '100%', p: 4, border: '1px solid', borderColor: 'divider' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <Box>
+            <Box sx={{ width: 48, height: 6, borderRadius: 3, bgcolor: 'secondary.main', mb: 1.5 }} aria-hidden />
             <Typography variant="h5" component="h1" sx={{ fontWeight: 700, color: brand.blue }}>
               Control de Acceso
             </Typography>
@@ -46,7 +47,11 @@ export default function Login() {
               Inicia sesión con tu cuenta corporativa
             </Typography>
           </Box>
-          {error && <Alert severity="error">{error}</Alert>}
+          {error && (
+            <Alert severity="error" role="alert">
+              {error}
+            </Alert>
+          )}
           <Box component="form" onSubmit={onSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
               label="Email"
@@ -54,6 +59,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="username"
+              autoFocus
               required
               fullWidth
             />

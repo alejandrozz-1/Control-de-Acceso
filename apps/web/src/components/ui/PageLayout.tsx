@@ -9,7 +9,7 @@ export default function PageLayout({
   children,
 }: {
   title: string;
-  phase: string;
+  phase?: string;
   children?: React.ReactNode;
 }) {
   return (
@@ -18,9 +18,11 @@ export default function PageLayout({
         <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
           {title}
         </Typography>
-        <Typography variant="caption" color="text.secondary">
-          {phase}
-        </Typography>
+        {phase && (
+          <Typography variant="caption" color="text.secondary">
+            {phase}
+          </Typography>
+        )}
       </Box>
       {children ?? (
         <Typography color="text.secondary">Contenido pendiente de implementación.</Typography>

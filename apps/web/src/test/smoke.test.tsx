@@ -44,14 +44,14 @@ test('la ruta desconocida redirige a Inicio', () => {
   useAuthStore.setState({ session: fakeSession, profile: empleado });
   window.history.pushState({}, '', '/no-existe');
   render(<App />);
-  expect(screen.getByRole('heading', { name: 'Inicio' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Buenos días|Buenas tardes|Buenas noches/ })).toBeInTheDocument();
 });
 
 test('un empleado no puede entrar a /admin/usuarios (redirige a Inicio)', () => {
   useAuthStore.setState({ session: fakeSession, profile: empleado });
   window.history.pushState({}, '', '/admin/usuarios');
   render(<App />);
-  expect(screen.getByRole('heading', { name: 'Inicio' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Buenos días|Buenas tardes|Buenas noches/ })).toBeInTheDocument();
 });
 
 test('la página Cuenta muestra el perfil y el botón de salir', () => {
