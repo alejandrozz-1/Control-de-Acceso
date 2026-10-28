@@ -37,9 +37,11 @@
 | Área | Estado |
 |---|---|
 | Fase inicial (análisis) | ✅ Completada |
-| Desarrollo | ⬜ No iniciado (bloqueado: ver riesgos) |
-| Repo GitHub | ⚠️ Vacío, pendiente push inicial |
-| Supabase | ⚠️ MCP sin permisos de lectura/escritura |
+| Fase 0 — fundamentos (BD, scaffold, CI) | ✅ Completada (2026-10-28) |
+| Desarrollo Fase 1 (auth/roles) | ⬜ Siguiente |
+| Repo GitHub | ✅ `main` + `develop` publicados |
+| Supabase | ✅ Esquema + RLS + seed aplicados (0 ERROR advisors) |
+| PWA / Capacitor | ⬜ Fase 6 |
 
 ## Protocolo rápido para agentes (antes de tocar nada)
 1. `git pull` de tu rama.

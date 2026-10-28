@@ -114,6 +114,7 @@ Funciones helper (`security definer`, `set search_path = public` para evitar rec
 
 ## 8. Migraciones y seed
 
-- `supabase/migrations/0001_ext.sql` (pgcrypto, citext), `0002_enums.sql`, `0003_identity.sql`, `0004_calendar.sql`, `0005_access.sql`, `0006_notifications.sql`, `0007_audit_rls.sql` (RLS al final, por capas).
-- `supabase/seed.sql`: 2 centros, 3 equipos, ~20 usuarios (1 admin, 3 responsables, 16 empleados), 2 patrones rotativos, asignaciones 30 días, 10 festivos, 6 vacaciones variadas, 200 `access_logs`, 10 notificaciones, eventos corporativos. Datos ficticios, sin PII real.
-- **Bloqueo**: el MCP Supabase no tiene permisos (`list_tables` → 403). Aplicar migraciones requiere habilitar permisos en el MCP o usar la CLI con token local.
+- Migraciones con nombre estándar de Supabase CLI: `supabase/migrations/20261028000001_extensions.sql` … `20261028000008_security_hardening.sql` (orden inmutable, idempotentes).
+- **Aplicación**: el MCP no tiene permisos → `SUPABASE_ACCESS_TOKEN` en `.env.local` + `node scripts/apply-migrations.mjs` (Management API `database/query`). Cada versión queda registrada en `supabase_migrations.schema_migrations` para que un `supabase db push` futuro las reconozca.
+- `supabase/seed.sql`: 2 centros, 2 equipos, 10 usuarios (1 admin, 3 responsables, 6 empleados — todos `@test.local` / `Password123!`), 2 patrones rotativos con asignaciones, 3.564 `shift_entries` autogeneradas por trigger, 4 festivos, 3 vacaciones, 2 eventos, 60 `access_logs`, 3 notificaciones, 3 credenciales. Ids fijos hexadecimales para tests. **Datos ficticios, sin PII real; solo entornos de desarrollo/test.**
+- **Estado**: todo aplicado y verificado el 2026-10-28 (advisors: 0 ERROR, 6 WARN aceptados de helpers definer).

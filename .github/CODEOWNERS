@@ -1,0 +1,8 @@
+# Propiedad de zonas entre agentes (ver obsidianRepsol/07-Git-estrategia.md)
+# Los agentes actúan bajo la cuenta del propietario del repo hasta que cada
+# agente tenga su usuario de GitHub propio.
+* @alejandrozz-1
+
+/supabase/ @alejandrozz-1
+/.github/ @alejandrozz-1
+/obsidianRepsol/adrs/ @alejandrozz-1

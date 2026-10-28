@@ -11,3 +11,6 @@ android/app/build/
 *.log
 .vscode/
 .idea/
+# Obsidian: estado personal de sesión (el resto de .obsidian SÍ se versiona)
+obsidianRepsol/.obsidian/workspace.json
+obsidianRepsol/.obsidian/workspace-mobile.json
