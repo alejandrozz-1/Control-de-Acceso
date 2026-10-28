@@ -1,6 +1,7 @@
 node_modules/
 dist/
-.env
+# Secretos: solo .env.local (gitignored). .env (valores públicos: URL, anon key,
+# VAPID pública) SÍ se versiona para que CI y contributors arranquen sin setup.
 .env.local
 *.local
 .DS_Store

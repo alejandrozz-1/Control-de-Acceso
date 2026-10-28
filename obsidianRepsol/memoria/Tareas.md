@@ -6,8 +6,8 @@
 
 | ID | Tarea | Agente | Notas |
 |---|---|---|---|
-| T-007 | Tipos generados de BD (`database.types.ts`) en `apps/web/src/services/` | Frontend/Backend | Cliente supabase.ts ya creado; tipos pendientes (requiere `supabase gen types` con token) |
-| T-008 | Auth: login, guardas por rol, invitación por email, alta admin/CSV | Backend+Frontend | US-01 |
+| T-007 | ~~Tipos generados de BD (`database.types.ts`)~~ | Frontend/Backend | ✅ `npx supabase gen types` → `apps/web/src/services/database.types.ts` (16 tablas + funciones) |
+| T-008 | ~~Auth: login, guardas por rol, invitación por email~~ | Backend+Frontend | ✅ Login+guardas+Edge Function `invite-user` (2026-10-28). **Falta**: alta CSV y reintentar invitación free (rate limit 2/h sin SMTP) |
 | T-009 | Centro/equipos CRUD (admin) | Backend+Frontend | |
 | T-010 | Credenciales: Edge Function QR firmado + código temporal | Backend | US-02, ADR-003 |
 | T-011 | Pantalla Acceso (QR fullscreen, temporizador, estado) | Frontend | US-02 (mockup listo) |
@@ -47,3 +47,7 @@
 | T-005 | Scaffold Vite + React 19 + MUI (tema claro/oscuro Repsol) + router + BottomNav 5 destinos | Frontend | 2026-10-28 |
 | T-006 | CI `.github/workflows/ci.yml` (lint, typecheck, test, build, advisors) | DevOps | 2026-10-28 |
 | T-006b | Smoke tests (2) en verde + build 134 kB gzip | QA/Frontend | 2026-10-28 |
+| T-007 | `database.types.ts` generado con `supabase gen types` (UTF-8) | Frontend | 2026-10-28 |
+| T-008a | Fase 1 auth: store Zustand + `initAuth`, Login, `RequireAuth`/`RequireRole`, Cuenta con logout, admin Usuarios (listado+invitación) | Frontend | 2026-10-28 |
+| T-008b | Edge Function `invite-user` desplegada y verificada (401 sin JWT, 403 no-admin, 200 admin) | Backend | 2026-10-28 |
+| T-008c | Fix crítico: `auth.users` con tokens NULL rompía GoTrue (`Scan error ... confirmation_token`) → normalización a `''` en BD + fin del seed | Backend | 2026-10-28 |

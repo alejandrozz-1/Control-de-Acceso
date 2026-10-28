@@ -14,6 +14,12 @@
 | 2026-10-28 | devops | CI (lint, typecheck, test, build + advisors con secret) | `.github/workflows/ci.yml` | T-006 |
 | 2026-10-28 | devops | Par VAPID generado; `.env.example` documentado; CODEOWNERS + plantilla de PR | `.env.local`(secreto), `.env.example`, `.github/` | C-005 |
 | 2026-10-28 | backend | Fixes durante puesta en marcha: precedencia `\|\|` vs `->>` en `fn_audit`, `generate_series` 3-argos en `fn_generate_shift_entries` (ambos idempotentes ya re-aplicados) | `supabase/migrations/20261028000004_*`, `*0007_*` | T-003 |
+| 2026-10-28 | frontend | T-007: `database.types.ts` generado (`supabase gen types`, convertido a UTF-8) | `apps/web/src/services/database.types.ts` | T-007 |
+| 2026-10-28 | frontend | Fase 1 auth: store `services/auth.ts` (Zustand + `initAuth`), guardas `app/guards.tsx` (`RequireAuth`/`RequireRole`), página `Login`, `Cuenta` con perfil+logout, `admin/Usuarios` (listado + invitación), router protegido | `apps/web/src/` | T-008 |
+| 2026-10-28 | backend | Edge Function `invite-user` (verifica rol admin con service_role antes de `inviteUserByEmail`) desplegada y verificada: 401 sin/inválido JWT, 403 empleado, 200 admin | `supabase/functions/invite-user/` | T-008 |
+| 2026-10-28 | backend | **Fix crítico GoTrue**: usuarios seed insertados directamente tenían columnas token `NULL` en `auth.users` → `Scan error ... converting NULL to string` en login/admin (500). Normalización a `''` aplicada en BD y añadida al final de `seed.sql` | `supabase/seed.sql` + SQL directo | T-008 |
+| 2026-10-28 | devops | `.env` (valores públicos) commiteado para que CI/tests arranquen; `.env.local` sigue gitignored; BOM eliminado de ambos (rompía la CLI de Supabase) | `.env`, `.gitignore` | T-006 |
+| 2026-10-28 | devops | `auth_leaked_password_protection` no activable en plan Free (402) → R-12; email rate limit 2/h sin SMTP → R-13 | `obsidianRepsol/memoria/Estado-global.md` | — |
 
 ### Plantilla
 ```
