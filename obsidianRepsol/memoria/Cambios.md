@@ -24,6 +24,7 @@
 | 2026-10-28 | frontend-ux | Servicio `access.ts` (invoke de issue-qr, errores amigables) + helpers `secondsUntil`/`formatCountdown` con test | `apps/web/src/services/access.ts`, `src/test/access.test.ts` | T-010/T-011 |
 | 2026-10-28 | frontend-ux | Pantalla Acceso funcional: QR real (lib `qrcode`, colores de marca), countdown 1 s con aria-live, chip Activa/Caducada, código temporal con countdown propio; renueva 5 s antes de caducar | `apps/web/src/pages/Acceso.tsx` | T-011 |
 | 2026-10-28 | frontend-ux | Pass UI/UX (`/ui-ux-pro-max` + iteración Playwright 375 px claro/oscuro): Inicio con saludo+fecha+turno de hoy (skeleton/empty/error role=alert), Login con barra de marca+autofoco+role=alert, `phase` opcional en PageLayout, favicon SVG | `apps/web/src/pages/{Inicio,Login}.tsx`, `components/ui/PageLayout.tsx`, `public/favicon.svg` | T-029 |
+| 2026-10-28 | frontend-ux | Pass UI/UX estilo Waylet (referencia `index.html` de palo623): componente `RepsolFlame`, `brand.gradient` + feedback táctil en tema, cabecera Inicio con degradado+llama+avatar+reloj en vivo+chip de estado, barra de progreso de jornada (`shiftProgress`, soporta noche, con test), Login con cabecera de marca, esquinas de visor en QR | `apps/web/src/app/theme.ts`, `components/ui/RepsolFlame.tsx`, `pages/{Inicio,Login,Acceso}.tsx`, `src/test/access.test.ts` | T-030 |
 
 ### Plantilla
 ```

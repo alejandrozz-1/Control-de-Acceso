@@ -124,6 +124,7 @@ export default function Acceso() {
           alignItems: 'center',
           justifyContent: 'center',
           boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+          position: 'relative',
         }}
         aria-label={
           qr && qrImage
@@ -131,6 +132,26 @@ export default function Acceso() {
             : 'Generando código QR'
         }
       >
+        {/* Esquinas de visor estilo escáner (ref. index.html del compañero) */}
+        {[
+          { top: -6, left: -6, borderTop: 4, borderLeft: 4, borderRadius: '10px 0 0 0' },
+          { top: -6, right: -6, borderTop: 4, borderRight: 4, borderRadius: '0 10px 0 0' },
+          { bottom: -6, left: -6, borderBottom: 4, borderLeft: 4, borderRadius: '0 0 0 10px' },
+          { bottom: -6, right: -6, borderBottom: 4, borderRight: 4, borderRadius: '0 0 10px 0' },
+        ].map((corner, i) => (
+          <Box
+            key={i}
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              width: 26,
+              height: 26,
+              borderStyle: 'solid',
+              borderColor: brand.orange,
+              ...corner,
+            }}
+          />
+        ))}
         {qrQuery.isLoading ? (
           <CircularProgress size={48} sx={{ color: brand.blue }} />
         ) : qr && qrImage ? (

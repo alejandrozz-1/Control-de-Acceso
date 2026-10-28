@@ -7,6 +7,8 @@ export const brand = {
   red: '#E4002B',
   white: '#FFFFFF',
   ivory: '#F7F4EF',
+  /** Degradado de cabecera estilo Waylet (ref. index.html del compañero) */
+  gradient: 'linear-gradient(145deg, #FF8A00 0%, #FF5A00 45%, #E4002B 100%)',
 } as const;
 
 export const theme = createTheme({
@@ -36,7 +38,16 @@ export const theme = createTheme({
   },
   shape: { borderRadius: 12 },
   components: {
-    MuiButton: { defaultProps: { disableElevation: true } },
+    MuiButton: {
+      defaultProps: { disableElevation: true },
+      styleOverrides: {
+        root: {
+          // Feedback táctil al pulsar (ref. "tactile-btn" del index del compañero)
+          transition: 'transform 0.08s ease, background-color 0.2s ease, border-color 0.2s ease',
+          '&:active:not(:disabled)': { transform: 'scale(0.96)' },
+        },
+      },
+    },
     MuiBottomNavigationAction: {
       styleOverrides: { label: { fontSize: '0.7rem' } },
     },

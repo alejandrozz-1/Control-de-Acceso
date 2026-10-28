@@ -5,12 +5,15 @@ import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageLayout from '../components/ui/PageLayout';
+import { brand } from '../app/theme';
+import RepsolFlame from '../components/ui/RepsolFlame';
 import { useAuthStore } from '../services/auth';
 import { supabase } from '../services/supabase';
 
@@ -30,12 +33,42 @@ function greeting(name: string): string {
   return `${hello}, ${firstName}`;
 }
 
-/** Inicio: saludo + turno de hoy (datos reales de shift_entries) + acceso rápido. */
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || '??';
+}
+
+/** % de jornada transcurrido (0-100); soporta turno de noche cruzando medianoche. */
+export function shiftProgress(start: string, end: string, overnight: boolean, now: Date): number {
+  const toMin = (t: string) => {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+  const s = toMin(start);
+  const eRaw = toMin(end);
+  const duration = overnight ? (eRaw + 1440 - s) % 1440 || 1440 : eRaw - s;
+  if (duration <= 0) return 0;
+  let elapsed = now.getHours() * 60 + now.getMinutes() - s;
+  if (elapsed < 0) {
+    if (overnight) elapsed += 1440;
+    else return 0;
+  }
+  if (elapsed > duration) return 100;
+  return Math.round((elapsed / duration) * 100);
+}
+
+/** Inicio: cabecera Waylet (saludo+reloj+estado) y turno de hoy con datos reales. */
 export default function Inicio() {
   const { profile } = useAuthStore();
   const navigate = useNavigate();
+  const [now, setNow] = useState(() => new Date());
 
-  const today = new Date().toISOString().slice(0, 10);
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const today = now.toISOString().slice(0, 10);
   const shiftQuery = useQuery({
     queryKey: ['shift-today', profile?.id, today],
     enabled: !!profile,
@@ -51,83 +84,222 @@ export default function Inicio() {
     },
   });
 
-  return (
-    <PageLayout title={profile ? greeting(profile.full_name) : 'Inicio'} phase="">
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
-        {new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}
-      </Typography>
+  const centerQuery = useQuery({
+    queryKey: ['center', profile?.center_id],
+    enabled: !!profile?.center_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('centers')
+        .select('name')
+        .eq('id', profile!.center_id!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as { name: string } | null;
+    },
+  });
 
-      <Paper variant="outlined" sx={{ p: 2.5, mb: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
-          <AccessTimeIcon fontSize="small" color="primary" />
-          <Typography variant="subtitle2" component="h2">
-            Tu turno de hoy
-          </Typography>
+  const shift = shiftQuery.data;
+  const inShift = !!shift && shift.code !== 'L';
+  const progress =
+    inShift && shift.start_time && shift.end_time
+      ? shiftProgress(shift.start_time, shift.end_time, shift.overnight, now)
+      : null;
+
+  return (
+    <Box>
+      {/* Cabecera Waylet: degradado de marca, llama decorativa y reloj en vivo */}
+      <Box
+        sx={{
+          background: brand.gradient,
+          color: brand.white,
+          borderRadius: '0 0 36px 36px',
+          px: 2.5,
+          pt: 2.5,
+          pb: 8,
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: '0 10px 25px -5px rgba(255,90,0,0.25)',
+        }}
+      >
+        <Box sx={{ position: 'absolute', top: -28, right: -18, opacity: 0.15, pointerEvents: 'none' }}>
+          <RepsolFlame size={200} />
         </Box>
 
-        {!profile && <Skeleton variant="rounded" height={56} aria-label="Cargando perfil" />}
-
-        {profile && shiftQuery.isLoading && (
-          <Skeleton variant="rounded" height={56} aria-label="Cargando turno de hoy" />
-        )}
-
-        {profile && shiftQuery.isError && (
-          <Alert
-            severity="error"
-            role="alert"
-            action={
-              <Button color="inherit" size="small" onClick={() => shiftQuery.refetch()}>
-                Reintentar
-              </Button>
-            }
-          >
-            No se pudo cargar tu turno.
-          </Alert>
-        )}
-
-        {profile && shiftQuery.isSuccess && !shiftQuery.data && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'text.secondary' }}>
-            <EventBusyIcon />
-            <Box>
-              <Typography variant="body2">Hoy no tienes turno asignado.</Typography>
-              <Button size="small" onClick={() => navigate('/calendario')} sx={{ px: 0 }}>
-                Ver calendario
-              </Button>
-            </Box>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, position: 'relative' }}>
+          <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.35)', fontWeight: 700 }}>
+            {initials(profile?.full_name ?? '')}
+          </Avatar>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="caption" sx={{ opacity: 0.9 }}>
+              {centerQuery.data?.name ?? 'Control de Acceso'}
+            </Typography>
+            <Typography variant="h6" component="h1" sx={{ fontWeight: 800, lineHeight: 1.15, fontSize: '1.15rem' }}>
+              {profile ? greeting(profile.full_name) : 'Inicio'}
+            </Typography>
           </Box>
-        )}
+        </Box>
 
-        {profile && shiftQuery.data && (
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+        {/* Estado + reloj en vivo */}
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, mt: 2, position: 'relative' }}>
+          <Chip
+            size="small"
+            sx={{
+              bgcolor: 'rgba(255,255,255,0.2)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              color: brand.white,
+              fontWeight: 600,
+              '& .MuiChip-label': { display: 'flex', gap: 0.75, alignItems: 'center' },
+            }}
+            label={
+              <>
+                <Box
+                  component="span"
+                  sx={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    bgcolor: shiftQuery.isLoading ? '#cbd5e1' : inShift ? '#34D399' : '#FCD34D',
+                  }}
+                />
+                {shiftQuery.isLoading ? 'Cargando turno…' : inShift ? 'En turno' : shift ? 'Fuera de turno' : 'Sin turno hoy'}
+              </>
+            }
+          />
+          <Box
+            sx={{
+              ml: 'auto',
+              display: 'flex',
+              alignItems: 'baseline',
+              gap: 1,
+              bgcolor: 'rgba(0,0,0,0.15)',
+              borderRadius: 2,
+              px: 1.25,
+              py: 0.5,
+            }}
+          >
+            <Typography variant="caption" sx={{ opacity: 0.85 }}>
+              {now.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
+            </Typography>
+            <Typography
+              variant="body1"
+              component="p"
+              sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', letterSpacing: 1 }}
+            >
+              {now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Tarjetas superpuestas sobre la cabecera */}
+      <Box sx={{ px: 2, mt: -5, position: 'relative', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Paper
+          variant="outlined"
+          sx={{ p: 2.5, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <AccessTimeIcon fontSize="small" color="primary" />
+            <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>
+              Tu turno de hoy
+            </Typography>
+          </Box>
+
+          {!profile && <Skeleton variant="rounded" height={56} aria-label="Cargando perfil" />}
+
+          {profile && shiftQuery.isLoading && (
+            <Skeleton variant="rounded" height={56} aria-label="Cargando turno de hoy" />
+          )}
+
+          {profile && shiftQuery.isError && (
+            <Alert
+              severity="error"
+              role="alert"
+              action={
+                <Button color="inherit" size="small" onClick={() => shiftQuery.refetch()}>
+                  Reintentar
+                </Button>
+              }
+            >
+              No se pudo cargar tu turno.
+            </Alert>
+          )}
+
+          {profile && shiftQuery.isSuccess && !shift && (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'text.secondary' }}>
+              <EventBusyIcon />
+              <Box>
+                <Typography variant="body2">Hoy no tienes turno asignado.</Typography>
+                <Button size="small" onClick={() => navigate('/calendario')} sx={{ px: 0 }}>
+                  Ver calendario
+                </Button>
+              </Box>
+            </Box>
+          )}
+
+          {profile && shift && (
             <Box>
-              <Typography variant="h6" component="p" sx={{ fontWeight: 700 }}>
-                {SHIFT_LABEL[shiftQuery.data.code] ?? shiftQuery.data.code}
-              </Typography>
-              {shiftQuery.data.start_time && (
-                <Typography variant="body2" color="text.secondary">
-                  {shiftQuery.data.start_time.slice(0, 5)} – {shiftQuery.data.end_time?.slice(0, 5)}
-                  {shiftQuery.data.overnight ? ' (noche)' : ''}
-                </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
+                <Box>
+                  <Typography variant="h6" component="p" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+                    {SHIFT_LABEL[shift.code] ?? shift.code}
+                  </Typography>
+                  {shift.start_time && (
+                    <Typography variant="body2" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {shift.start_time.slice(0, 5)} – {shift.end_time?.slice(0, 5)}
+                      {shift.overnight ? ' (noche)' : ''}
+                    </Typography>
+                  )}
+                </Box>
+                <Chip
+                  size="small"
+                  color={shift.code === 'L' ? 'default' : 'secondary'}
+                  label={shift.code === 'L' ? 'Descanso' : 'En turno'}
+                />
+              </Box>
+
+              {progress !== null && (
+                <Box sx={{ mt: 1.5 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Progreso de jornada
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
+                      {progress}%
+                    </Typography>
+                  </Box>
+                  <Box sx={{ height: 8, borderRadius: 4, bgcolor: 'action.hover', overflow: 'hidden' }}>
+                    <Box
+                      sx={{
+                        width: `${progress}%`,
+                        height: '100%',
+                        background: brand.gradient,
+                        borderRadius: 4,
+                        transition: 'width 0.6s ease',
+                      }}
+                    />
+                  </Box>
+                </Box>
               )}
             </Box>
-            <Chip
-              size="small"
-              color={shiftQuery.data.code === 'L' ? 'default' : 'secondary'}
-              label={shiftQuery.data.code === 'L' ? 'Descanso' : 'En turno'}
-            />
-          </Box>
-        )}
-      </Paper>
+          )}
+        </Paper>
 
-      <Button
-        variant="contained"
-        color="secondary"
-        fullWidth
-        startIcon={<QrCodeScannerIcon />}
-        onClick={() => navigate('/acceso')}
-      >
-        Mostrar mi QR de acceso
-      </Button>
-    </PageLayout>
+        <Button
+          variant="contained"
+          fullWidth
+          startIcon={<QrCodeScannerIcon />}
+          onClick={() => navigate('/acceso')}
+          sx={{
+            background: brand.gradient,
+            py: 1.5,
+            borderRadius: 3,
+            fontWeight: 700,
+            boxShadow: '0 8px 20px -4px rgba(255,90,0,0.4)',
+          }}
+        >
+          Mostrar mi QR de acceso
+        </Button>
+      </Box>
+    </Box>
   );
 }

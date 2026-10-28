@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import { useState, type FormEvent } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { brand } from '../app/theme';
+import RepsolFlame from '../components/ui/RepsolFlame';
 import { useAuthStore } from '../services/auth';
 
 export default function Login() {
@@ -36,17 +37,40 @@ export default function Login() {
 
   return (
     <Container maxWidth="xs" sx={{ minHeight: '100dvh', display: 'flex', alignItems: 'center' }}>
-      <Paper elevation={0} sx={{ width: '100%', p: 4, border: '1px solid', borderColor: 'divider' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <Box>
-            <Box sx={{ width: 48, height: 6, borderRadius: 3, bgcolor: 'secondary.main', mb: 1.5 }} aria-hidden />
-            <Typography variant="h5" component="h1" sx={{ fontWeight: 700, color: brand.blue }}>
-              Control de Acceso
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Inicia sesión con tu cuenta corporativa
-            </Typography>
+      <Paper elevation={0} sx={{ width: '100%', overflow: 'hidden', border: '1px solid', borderColor: 'divider' }}>
+        {/* Cabecera de marca estilo Waylet */}
+        <Box
+          sx={{
+            background: brand.gradient,
+            color: brand.white,
+            px: 4,
+            pt: 3,
+            pb: 5,
+            borderRadius: '0 0 28px 28px',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <Box sx={{ position: 'absolute', top: -16, right: -10, opacity: 0.2, pointerEvents: 'none' }}>
+            <RepsolFlame size={120} />
           </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, position: 'relative' }}>
+            <RepsolFlame size={36} />
+            <Box>
+              <Typography variant="caption" sx={{ opacity: 0.9, letterSpacing: 2, textTransform: 'uppercase', display: 'block', lineHeight: 1.2 }}>
+                Repsol
+              </Typography>
+              <Typography variant="h6" component="h1" sx={{ fontWeight: 800, lineHeight: 1.1, fontSize: '1.1rem' }}>
+                Control de Acceso
+              </Typography>
+            </Box>
+          </Box>
+        </Box>
+
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 4, pt: 3.5 }}>
+          <Typography variant="body2" color="text.secondary">
+            Inicia sesión con tu cuenta corporativa
+          </Typography>
           {error && (
             <Alert severity="error" role="alert">
               {error}
