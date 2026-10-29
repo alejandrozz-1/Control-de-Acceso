@@ -18,10 +18,15 @@ export const NAV_ITEMS = [
   { label: 'Cuenta', path: '/cuenta', icon: <PersonIcon /> },
 ] as const;
 
+export function getActiveNavPath(pathname: string): string {
+  return NAV_ITEMS.find((item) => item.path === pathname)?.path ??
+    (pathname.startsWith('/cuenta/') ? '/cuenta' : '/');
+}
+
 export default function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const current = NAV_ITEMS.find((i) => i.path === pathname)?.path ?? '/';
+  const current = getActiveNavPath(pathname);
   const unread = useUnreadCount();
 
   const iconFor = (label: string, icon: React.ReactNode) =>
