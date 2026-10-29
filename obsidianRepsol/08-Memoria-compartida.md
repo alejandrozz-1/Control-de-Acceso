@@ -20,13 +20,21 @@ Bóveda **Obsidian** en `/obsidianRepsol`, versionada con Git. Es la **fuente de
 
 ## Flujo obligatorio de cada agente/subagente
 
-### Antes de empezar
+### Antes de empezar (obligatorio ANTES de tocar código de la app)
 ```
 1. git pull (tu rama / develop)
-2. Leer: 00-Home → memoria/Estado-global → memoria/Tareas → handovers recientes → ADRs implicados
-3. Añadir tu tarea como "🔄 En curso" en Tareas.md (con agente y fecha)
-4. commit -m "docs(obsidian): <agente> toma tarea <id>" && push
+2. Leer: 00-Home → memoria/Estado-global → memoria/Tareas → memoria/Comunicaciones
+   → handovers recientes → git log reciente (qué están haciendo AHORA los demás)
+   → ADRs implicados
+3. DECIDIR qué vas a hacer y escribirlo en Tareas.md, columna "Plan" de tu fila
+   "🔄 En curso" (agente + fecha + qué tocas + qué NO tocas)
+4. commit -m "docs(obsidian): <agente> toma tarea <id> — <resumen del plan>"
+   && push develop && push develop:main     ← SOLO obsidian, ANTES de tocar código
+5. Recién entonces: empezar los cambios en la app
 ```
+
+Si no está en `git log` el commit `docs(obsidian): … toma tarea …`, ese agente aún no ha
+empezado; si está, ya se sabe qué va a hacer sin preguntar.
 
 ### Al terminar
 ```

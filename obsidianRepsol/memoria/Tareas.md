@@ -31,16 +31,17 @@
 
 ## 🔄 En curso
 
-| ID | Tarea | Agente | Desde |
-|---|---|---|---|
-| T-016 | ~~Vacaciones: solicitud + aprobación líder + notificación~~ | Backend+Frontend | ✅ Solicitud con cálculo de días, anulación propia, panel «Pendientes de tu equipo» con aprobar/rechazar (RLS+trigger validan en servidor), notificación automática al decidir. Verificado Playwright: empleado→líder→notificación (2026-10-29, frontend-ux) |
-| T-017 | ~~Centro de notificaciones + badge + Realtime~~ | Frontend+Backend | ✅ Lista agrupada Hoy/Ayer, no leídas destacadas, marcar individual/todas, badge en BottomNav, realtime via postgres_changes (migración 20261029000001). Verificado con INSERT remoto sin recargar (2026-10-29, frontend-ux) |
+| ID | Tarea | Agente | Desde | Plan (qué toco / qué NO toco) |
+|---|---|---|---|---|
+
+> Ejemplo de fila: | T-0xx | Título | frontend-ux | 2026-10-29 | Toco: X, Y. NO toco: Z (depende de cliente) |
+
+> **Regla (protocolo):** esta fila se escribe y se commitea (docs(obsidian): <agente> toma tarea <id> — <plan>) **antes** de tocar código de la app. Ver [[08-Memoria-compartida]].
 
 
-> **Nota para otras IAs (2026-10-28):** T-030 (pass UI/UX estilo Waylet) finalizada por *frontend-ux*. Libres: T-009, T-012..T-028 (salvo T-010). Si queréis una de estas, marcadla aquí antes de empezar.
-
-> **Nota para otras IAs (2026-10-28):** T-010/T-011/T-029 finalizadas por *frontend-ux*. Libres: T-009, T-012..T-028 (salvo T-010). Si queréis una de estas, marcadla aquí antes de empezar.
-
+> **Notas históricas (2026-10-28, frontend-ux):** T-030 (pass UI/UX estilo Waylet) finalizada. T-010/T-011/T-029 finalizadas. Libres entonces: T-009, T-012..T-028 (salvo T-010).
+> 
+> **Nota para otras IAs (2026-10-29):** T-016/T-017 finalizadas por *frontend-ux* (ver ✅ Finalizada). Libres: T-009, T-012..T-028 (salvo T-010). Si queréis una de estas, marcadla aquí antes de empezar.
 ## ✅ Finalizada
 
 | ID | Tarea | Agente | Fecha |
@@ -62,3 +63,5 @@
 | T-029 | Pass UI/UX con `/ui-ux-pro-max` + Playwright: Inicio con saludo+turno de hoy (skeleton/empty/error), Login con marca+autofoco+role=alert, favicon; verificación 375 px claro/oscuro | Frontend (frontend-ux) | 2026-10-28 |
 | T-030 | Pass UI/UX estilo Waylet (sobre `index.html` de palo623): cabecera Inicio con degradado+llama+avatar+reloj en vivo+chip de estado, tarjeta de turno superpuesta con barra de progreso (soporta turno de noche), Login con cabecera de marca, esquinas de visor en QR; 10 tests verdes, Playwright 375 px claro/oscuro | Frontend (frontend-ux) | 2026-10-28 |
 | T-031 | ~~Onboarding first-login (bienvenida + tema) + seed rico de calendario~~ | Frontend | Hecho. Diálogo 3 pasos (bienvenida, cómo funciona, tema) 1 vez/dispositivo (localStorage); migración 20261028000007 con festivos 2026, 9 vacaciones y 5 eventos; turnos generados -180..+365 días (2026-10-28, frontend-ux) |
+| T-016 | ~~Vacaciones: solicitud + aprobación líder + notificación~~ | Backend+Frontend | 2026-10-29 — ✅ Solicitud con cálculo de días, anulación propia, panel «Pendientes de tu equipo» con aprobar/rechazar (RLS+trigger validan en servidor), notificación automática al decidir. Verificado Playwright: empleado→líder→notificación (2026-10-29, frontend-ux) |
+| T-017 | ~~Centro de notificaciones + badge + Realtime~~ | Frontend+Backend | 2026-10-29 — ✅ Lista agrupada Hoy/Ayer, no leídas destacadas, marcar individual/todas, badge en BottomNav, realtime via postgres_changes (migración 20261029000001). Verificado con INSERT remoto sin recargar (2026-10-29, frontend-ux) |
