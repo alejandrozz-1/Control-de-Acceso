@@ -15,8 +15,8 @@
 | T-013 | Limpiar/regenerar `shift_entries` al editar asignaciones (limpieza de obsoletos) + patrones UI | Backend | Gen. automática ya funciona (trigger) |
 | T-014 | Festivos + eventos: UI admin | Backend+Frontend | Tablas y RLS listos |
 | T-015 | ~~Vista Calendario (mes, leyenda, turnos, festivos, eventos, vacaciones)~~ | Frontend | Hecho. Vista mes mobile-first con turnos por color, festivos, eventos y vacaciones; detalle por día; skeleton/error/vacío; 2 tests de monthWeeks; verificado Playwright 375 px claro/oscuro (2026-10-28, frontend-ux) |
-| T-016 | Vacaciones: solicitud + aprobación líder + notificación | Backend+Frontend | US-05, US-06 (trigger de aprobación listo) |
-| T-017 | Centro de notificaciones + badge + Realtime | Frontend+Backend | US-09 |
+| T-016 | ~~Vacaciones: solicitud + aprobación líder + notificación~~ | Backend+Frontend | ✅ Solicitud con cálculo de días, anulación propia, panel «Pendientes de tu equipo» con aprobar/rechazar (RLS+trigger validan en servidor), notificación automática al decidir. Verificado Playwright: empleado→líder→notificación (2026-10-29, frontend-ux) |
+| T-017 | ~~Centro de notificaciones + badge + Realtime~~ | Frontend+Backend | ✅ Lista agrupada Hoy/Ayer, no leídas destacadas, marcar individual/todas, badge en BottomNav, realtime via postgres_changes (migración 20261029000001). Verificado con INSERT remoto sin recargar (2026-10-29, frontend-ux) |
 | T-018 | Web Push VAPID (Edge Function + SW) | DevOps+Frontend | Par VAPID generado (ver Comunicaciones C-005) |
 | T-019 | Registros de acceso + horarios entrada/salida + CSV | Backend+Frontend | US-07 |
 | T-020 | Métricas de asistencia (dashboard) | Backend+Frontend | US-10 (vista base lista) |
@@ -33,6 +33,8 @@
 
 | ID | Tarea | Agente | Desde |
 |---|---|---|---|
+| T-016 | ~~Vacaciones: solicitud + aprobación líder + notificación~~ | Backend+Frontend | ✅ Solicitud con cálculo de días, anulación propia, panel «Pendientes de tu equipo» con aprobar/rechazar (RLS+trigger validan en servidor), notificación automática al decidir. Verificado Playwright: empleado→líder→notificación (2026-10-29, frontend-ux) |
+| T-017 | ~~Centro de notificaciones + badge + Realtime~~ | Frontend+Backend | ✅ Lista agrupada Hoy/Ayer, no leídas destacadas, marcar individual/todas, badge en BottomNav, realtime via postgres_changes (migración 20261029000001). Verificado con INSERT remoto sin recargar (2026-10-29, frontend-ux) |
 
 
 > **Nota para otras IAs (2026-10-28):** T-030 (pass UI/UX estilo Waylet) finalizada por *frontend-ux*. Libres: T-009, T-012..T-028 (salvo T-010). Si queréis una de estas, marcadla aquí antes de empezar.

@@ -2,9 +2,11 @@ import Box from '@mui/material/Box';
 import { Outlet } from 'react-router-dom';
 import BottomNav from '../components/ui/BottomNav';
 import Onboarding from '../components/ui/Onboarding';
+import { useNotificationsRealtime } from '../services/notifications';
 
 /** Shell de la app: contenido + navegación inferior fija (mobile-first). */
 export default function Shell() {
+  useNotificationsRealtime();
   return (
     <>
       <Onboarding />

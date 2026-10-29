@@ -15,6 +15,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { brand } from '../app/theme';
 import PageLayout from '../components/ui/PageLayout';
+import VacacionesPanel from '../components/ui/VacacionesPanel';
 import { useAuthStore } from '../services/auth';
 import { supabase } from '../services/supabase';
 
@@ -362,6 +363,11 @@ export default function Calendario() {
             )}
           </Typography>
         ))}
+      </Paper>
+
+      {/* Solicitud y aprobación de vacaciones (T-016) */}
+      <Paper variant="outlined" sx={{ borderRadius: 3, p: 2.5, mb: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+        <VacacionesPanel />
       </Paper>
     </PageLayout>
   );

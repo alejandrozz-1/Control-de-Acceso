@@ -32,3 +32,4 @@
 ```
 
 - **2026-10-28 · frontend-ux** · T-015/T-031: vista Calendario real (mes, leyenda M/T/N/L, festivos, eventos, vacaciones, detalle por día, skeleton/error/vacío) + onboarding first-login (diálogo 3 pasos, localStorage) + migración 20261028000007_calendar_demo_data.sql (festivos 2026, 9 vacaciones, 5 eventos) + seed con histórico de turnos -180 días. 15 tests verdes.
+- **2026-10-29 · frontend-ux** · T-016/T-017: vacaciones end-to-end (solicitud+anulación+aprobación líder con notificación vía trigger) y centro de notificaciones real (lista agrupada, badge en BottomNav, realtime con postgres_changes vía migración 20261029000001). Fix: RLS exige user_id en insert; badge invalida al marcar leída. 17 tests verdes.

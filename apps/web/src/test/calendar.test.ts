@@ -1,5 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { monthWeeks } from '../pages/Calendario';
+import { inclusiveDays } from '../components/ui/VacacionesPanel';
+
+describe('inclusiveDays', () => {
+  it('cuenta días naturales inclusivos', () => {
+    expect(inclusiveDays('2026-08-03', '2026-08-14')).toBe(12);
+    expect(inclusiveDays('2026-08-03', '2026-08-03')).toBe(1);
+  });
+
+  it('devuelve 0 si end < start o fechas inválidas', () => {
+    expect(inclusiveDays('2026-08-14', '2026-08-03')).toBe(0);
+    expect(inclusiveDays('', '2026-08-03')).toBe(0);
+    expect(inclusiveDays('no-es-fecha', '2026-08-03')).toBe(0);
+  });
+});
 
 describe('monthWeeks', () => {
   it('genera 6 semanas de 7 días empezando en lunes', () => {
