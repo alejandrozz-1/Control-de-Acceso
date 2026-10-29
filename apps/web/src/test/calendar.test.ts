@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vitest';
-import { monthWeeks } from '../pages/Calendario';
+import { monthWeeks, SHIFT_COLORS } from '../pages/Calendario';
 import { inclusiveDays } from '../components/ui/VacacionesPanel';
+
+describe('SHIFT_COLORS', () => {
+  it('uses the reduced corporate palette for shift types', () => {
+    expect(SHIFT_COLORS).toEqual({
+      M: '#FF8200',
+      T: '#041E42',
+      N: '#7C3AED',
+      L: '#94A3B8',
+    });
+  });
+});
 
 describe('inclusiveDays', () => {
   it('cuenta días naturales inclusivos', () => {

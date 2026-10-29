@@ -22,7 +22,7 @@ import { supabase } from '../services/supabase';
 /** Colores por código de turno (M mañana, T tarde, N noche, L libre). */
 export const SHIFT_COLORS: Record<string, string> = {
   M: '#FF8200',
-  T: '#E4002B',
+  T: brand.blue,
   N: '#7C3AED',
   L: '#94A3B8',
 };
@@ -273,13 +273,13 @@ export default function Calendario() {
                           />
                         )}
                         {day?.holidays.length ? (
-                          <HolidayVillageIcon aria-hidden sx={{ fontSize: 12, color: isSelected ? brand.white : brand.red }} />
+                          <HolidayVillageIcon aria-hidden sx={{ fontSize: 12, color: isSelected ? brand.white : 'text.secondary' }} />
                         ) : null}
                         {day?.vacations.some((v) => v.status === 'aprobada') ? (
-                          <BeachAccessIcon aria-hidden sx={{ fontSize: 12, color: isSelected ? brand.white : '#0EA5E9' }} />
+                          <BeachAccessIcon aria-hidden sx={{ fontSize: 12, color: isSelected ? brand.white : 'text.secondary' }} />
                         ) : null}
                         {day?.events.length ? (
-                          <EventIcon aria-hidden sx={{ fontSize: 12, color: isSelected ? brand.white : brand.orange }} />
+                          <EventIcon aria-hidden sx={{ fontSize: 12, color: isSelected ? brand.white : 'text.secondary' }} />
                         ) : null}
                       </Box>
                     </Box>
@@ -291,22 +291,22 @@ export default function Calendario() {
         )}
 
         {/* Leyenda */}
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1.5, justifyContent: 'center' }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, mt: 1.25, justifyContent: 'center' }}>
           {(['M', 'T', 'N', 'L'] as const).map((code) => (
             <Chip
               key={code}
               size="small"
               variant="outlined"
               label={SHIFT_LABEL[code]}
-              sx={{ height: 24, '& .MuiChip-label': { px: 1, fontSize: '0.7rem' } }}
+              sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
               icon={
                 <Box component="span" aria-hidden sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: SHIFT_COLORS[code], ml: '6px !important' }} />
               }
             />
           ))}
-          <Chip size="small" variant="outlined" label="Festivo" sx={{ height: 24, '& .MuiChip-label': { px: 1, fontSize: '0.7rem' } }} icon={<HolidayVillageIcon sx={{ fontSize: 14, color: `${brand.red} !important` }} />} />
-          <Chip size="small" variant="outlined" label="Vacaciones" sx={{ height: 24, '& .MuiChip-label': { px: 1, fontSize: '0.7rem' } }} icon={<BeachAccessIcon sx={{ fontSize: 14, color: '#0EA5E9 !important' }} />} />
-          <Chip size="small" variant="outlined" label="Evento" sx={{ height: 24, '& .MuiChip-label': { px: 1, fontSize: '0.7rem' } }} icon={<EventIcon sx={{ fontSize: 14, color: `${brand.orange} !important` }} />} />
+          <Chip size="small" variant="outlined" label="Festivo" sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<HolidayVillageIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
+          <Chip size="small" variant="outlined" label="Vacaciones" sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<BeachAccessIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
+          <Chip size="small" variant="outlined" label="Evento" sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<EventIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
         </Box>
       </Paper>
 
@@ -326,10 +326,14 @@ export default function Calendario() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: sel.holidays.length || sel.vacations.length || sel.events.length ? 1.5 : 0 }}>
             <Box aria-hidden sx={{ width: 10, height: 36, borderRadius: 5, bgcolor: SHIFT_COLORS[sel.shift.code] }} />
             <Box>
-              <Typography variant="body2" sx={{ fontWeight: 700 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
                 {SHIFT_LABEL[sel.shift.code] ?? sel.shift.code}
-                {sel.shift.code === 'L' ? '' : sel.shift.start_time ? ` · ${sel.shift.start_time.slice(0, 5)}–${sel.shift.end_time?.slice(0, 5)}` : ''}
               </Typography>
+              {sel.shift.code !== 'L' && sel.shift.start_time && (
+                <Typography variant="body2" color="text.secondary">
+                  {sel.shift.start_time.slice(0, 5)}–{sel.shift.end_time?.slice(0, 5)}
+                </Typography>
+              )}
               {sel.shift.overnight && (
                 <Typography variant="caption" color="text.secondary">
                   Turno de noche (termina al día siguiente)
@@ -340,21 +344,21 @@ export default function Calendario() {
         )}
 
         {sel?.holidays.map((name) => (
-          <Typography key={name} variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <HolidayVillageIcon sx={{ fontSize: 16, color: brand.red }} /> Festivo: {name}
+          <Typography key={name} variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <HolidayVillageIcon sx={{ fontSize: 16 }} /> Festivo: {name}
           </Typography>
         ))}
 
         {sel?.vacations.map((v, i) => (
-          <Typography key={i} variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <BeachAccessIcon sx={{ fontSize: 16, color: '#0EA5E9' }} />
+          <Typography key={i} variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <BeachAccessIcon sx={{ fontSize: 16 }} />
             {v.type === 'vacacion' ? 'Vacaciones' : 'Permiso'} ({v.status})
           </Typography>
         ))}
 
         {sel?.events.map((e) => (
-          <Typography key={e.title} variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <EventIcon sx={{ fontSize: 16, color: brand.orange }} />
+          <Typography key={e.title} variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+            <EventIcon sx={{ fontSize: 16 }} />
             {e.title}
             {!e.all_day && (
               <Typography component="span" variant="caption" color="text.secondary">
