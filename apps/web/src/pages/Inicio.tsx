@@ -9,6 +9,9 @@ import Avatar from '@mui/material/Avatar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
+import HistoryIcon from '@mui/icons-material/History';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +27,75 @@ interface TodayShift {
   overnight: boolean;
 }
 
+type ShiftState = {
+  label: string;
+  active: boolean;
+  shift: TodayShift | null;
+};
+
 const SHIFT_LABEL: Record<string, string> = { M: 'Mañana', T: 'Tarde', N: 'Noche', L: 'Libre' };
+const ACCESS_METHOD_LABEL: Record<string, string> = {
+  qr: 'Código QR',
+  temporal: 'Código temporal',
+  nfc: 'NFC',
+  manual: 'Registro manual',
+};
+const ACCESS_SOURCE_LABEL: Record<string, string> = {
+  app: 'Aplicación',
+  torno: 'Torno de acceso',
+  manual: 'Registro manual',
+};
+
+function dateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function timeInMinutes(value: string): number {
+  const [hours, minutes] = value.split(':').map(Number);
+  return hours * 60 + minutes;
+}
+
+export function getCurrentShiftState(
+  todayShift: TodayShift | null | undefined,
+  previousShift: TodayShift | null | undefined,
+  now: Date,
+): ShiftState {
+  const currentMinute = now.getHours() * 60 + now.getMinutes();
+
+  if (
+    previousShift?.code !== undefined &&
+    previousShift.code !== 'L' &&
+    previousShift.overnight &&
+    previousShift.end_time &&
+    currentMinute < timeInMinutes(previousShift.end_time)
+  ) {
+    return { label: 'En turno', active: true, shift: previousShift };
+  }
+
+  if (!todayShift) return { label: 'Sin turno hoy', active: false, shift: null };
+  if (todayShift.code === 'L') return { label: 'Fuera de turno', active: false, shift: todayShift };
+  if (!todayShift.start_time || !todayShift.end_time) {
+    return { label: 'Turno asignado', active: false, shift: todayShift };
+  }
+
+  const start = timeInMinutes(todayShift.start_time);
+  const end = timeInMinutes(todayShift.end_time);
+  if (currentMinute < start) {
+    return { label: 'Próximo turno', active: false, shift: todayShift };
+  }
+
+  if (todayShift.overnight || end <= start) {
+    return { label: 'En turno', active: true, shift: todayShift };
+  }
+  if (currentMinute < end) {
+    return { label: 'En turno', active: true, shift: todayShift };
+  }
+
+  return { label: 'Turno finalizado', active: false, shift: todayShift };
+}
 
 function greeting(name: string): string {
   const h = new Date().getHours();
@@ -68,7 +139,8 @@ export default function Inicio() {
     return () => clearInterval(id);
   }, []);
 
-  const today = now.toISOString().slice(0, 10);
+  const today = dateKey(now);
+  const yesterday = dateKey(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1));
   const shiftQuery = useQuery({
     queryKey: ['shift-today', profile?.id, today],
     enabled: !!profile,
@@ -78,6 +150,20 @@ export default function Inicio() {
         .select('code, start_time, end_time, overnight')
         .eq('user_id', profile!.id)
         .eq('date', today)
+        .maybeSingle();
+      if (error) throw error;
+      return data as TodayShift | null;
+    },
+  });
+  const previousShiftQuery = useQuery({
+    queryKey: ['shift-yesterday', profile?.id, yesterday],
+    enabled: !!profile,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('shift_entries')
+        .select('code, start_time, end_time, overnight')
+        .eq('user_id', profile!.id)
+        .eq('date', yesterday)
         .maybeSingle();
       if (error) throw error;
       return data as TodayShift | null;
@@ -98,10 +184,44 @@ export default function Inicio() {
     },
   });
 
+  // Query for last access log
+  const [lastAccess, setLastAccess] = useState<{
+    event: string;
+    date: string;
+    hour: string;
+    method: string;
+    source: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!profile) return;
+    supabase
+      .from('access_logs')
+      .select('event, scanned_at, method, source')
+      .eq('user_id', profile.id)
+      .order('scanned_at', { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const log = data[0];
+          const date = new Date(log.scanned_at);
+          setLastAccess({
+            event: log.event === 'entrada' ? 'Entrada' : log.event === 'salida' ? 'Salida' : 'Acceso denegado',
+            date: date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }),
+            hour: date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+            method: ACCESS_METHOD_LABEL[String(log.method)] ?? 'Método desconocido',
+            source: ACCESS_SOURCE_LABEL[String(log.source)] ?? 'Punto de acceso desconocido',
+          });
+        }
+      });
+  }, [profile]);
+
   const shift = shiftQuery.data;
-  const inShift = !!shift && shift.code !== 'L';
+  const shiftState = getCurrentShiftState(shift, previousShiftQuery.data, now);
+  const todayShiftState = getCurrentShiftState(shift, null, now);
+  const isShiftStateLoading = shiftQuery.isLoading || previousShiftQuery.isLoading;
   const progress =
-    inShift && shift.start_time && shift.end_time
+    todayShiftState.active && shift?.start_time && shift.end_time
       ? shiftProgress(shift.start_time, shift.end_time, shift.overnight, now)
       : null;
 
@@ -141,41 +261,27 @@ export default function Inicio() {
 
         {/* Estado + reloj en vivo */}
         <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1, mt: 2, position: 'relative' }}>
-          <Chip
-            size="small"
-            sx={{
-              bgcolor: 'rgba(255,255,255,0.2)',
-              border: '1px solid rgba(255,255,255,0.3)',
-              color: brand.white,
-              fontWeight: 600,
-              '& .MuiChip-label': { display: 'flex', gap: 0.75, alignItems: 'center' },
-            }}
-            label={
-              <>
-                <Box
-                  component="span"
-                  sx={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: '50%',
-                    bgcolor: shiftQuery.isLoading ? '#cbd5e1' : inShift ? '#34D399' : '#FCD34D',
-                  }}
-                />
-                {shiftQuery.isLoading ? 'Cargando turno…' : inShift ? 'En turno' : shift ? 'Fuera de turno' : 'Sin turno hoy'}
-              </>
-            }
-          />
           <Box
-            sx={{
-              ml: 'auto',
-              display: 'flex',
-              alignItems: 'baseline',
-              gap: 1,
-              bgcolor: 'rgba(0,0,0,0.15)',
-              borderRadius: 2,
-              px: 1.25,
-              py: 0.5,
-            }}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            bgcolor: 'rgba(255,255,255,0.2)',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: 50,
+            color: brand.white,
+            fontWeight: 600,
+            px: 4,
+            py: 1,
+          }}
+        >
+          <Box sx={{ width: 7, height: 7, borderRadius: '50%' }}>
+            {/* empty - just the circle color */}
+          </Box>
+          {isShiftStateLoading ? 'Cargando turno…' : shiftState.label}
+        </Box>
+          <Box
+            sx={{ ml: 'auto', display: 'flex', alignItems: 'baseline', gap: 1, bgcolor: 'rgba(0,0,0,0.15)', borderRadius: 2, px: 1.25, py: 0.5 }}
           >
             <Typography variant="caption" sx={{ opacity: 0.85 }}>
               {now.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
@@ -236,7 +342,7 @@ export default function Inicio() {
             </Box>
           )}
 
-          {profile && shift && (
+          {profile && shiftQuery.isSuccess && shift && (
             <Box>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                 <Box>
@@ -252,8 +358,8 @@ export default function Inicio() {
                 </Box>
                 <Chip
                   size="small"
-                  color={shift.code === 'L' ? 'default' : 'secondary'}
-                  label={shift.code === 'L' ? 'Descanso' : 'En turno'}
+                  color={todayShiftState.active ? 'secondary' : 'default'}
+                  label={shiftQuery.isLoading ? 'Cargando…' : todayShiftState.label}
                 />
               </Box>
 
@@ -280,8 +386,69 @@ export default function Inicio() {
                   </Box>
                 </Box>
               )}
+
             </Box>
           )}
+
+        </Paper>
+
+        <Paper
+          variant="outlined"
+          sx={{ p: 2.5, borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
+        >
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+            <AccessTimeIcon fontSize="small" color="primary" />
+            <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>
+              Último acceso
+            </Typography>
+          </Box>
+
+          {lastAccess ? (
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: 1.5,
+                p: 1.5,
+                borderRadius: 2.5,
+                bgcolor: 'rgba(52,211,153,0.12)',
+              }}
+            >
+              {lastAccess.event === 'Entrada' ? (
+                <LoginIcon color="success" aria-hidden="true" />
+              ) : lastAccess.event === 'Salida' ? (
+                <LogoutIcon color="warning" aria-hidden="true" />
+              ) : (
+                <EventBusyIcon color="error" aria-hidden="true" />
+              )}
+              <Box sx={{ minWidth: 0, flex: 1 }}>
+                <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                  {lastAccess.event} registrada
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  {lastAccess.date} · {lastAccess.hour}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  Método: {lastAccess.method}
+                  {lastAccess.source !== lastAccess.method && ` · Punto de acceso: ${lastAccess.source}`}
+                </Typography>
+              </Box>
+            </Box>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No hay registros de acceso recientes.
+            </Typography>
+          )}
+
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<HistoryIcon />}
+            onClick={() => navigate('/historial-acceso')}
+            sx={{ mt: 1.5, borderRadius: 2 }}
+          >
+            Ver historial
+          </Button>
         </Paper>
 
         <Button

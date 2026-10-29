@@ -39,8 +39,9 @@
 - Área táctil mínima **48×48 px** (WCAG 2.5.5 AAA de paso); paddings de lista generosos; `safe-area-inset-bottom` para gestos Android.
 - Screens clave:
   - **Acceso**: QR a pantalla completa con fondo azul `#041E42`, botón "código temporal", estado (activa/revocada), temporizador de caducidad.
-  - **Inicio**: saludo + turno de hoy + accesos rápidos (solo vacío si no hay nada → diseño empty states).
+  - **Inicio**: saludo + turno de hoy con estado calculado a partir del horario real + tarjeta independiente de último acceso y acceso rápido al QR.
   - **Calendario**: vista mes con leyenda de color por tipo de día.
+  - **Historial de accesos**: cabecera con volver, tarjetas de entrada/salida en línea temporal y método/punto de acceso.
   - **Notificaciones**: lista con swipe marcar leída, badge en la bottom bar.
   - **Responsable**: secciones extra (métricas, registros, aprobaciones) — misma bottom bar, contenido con tabs superiores.
 
