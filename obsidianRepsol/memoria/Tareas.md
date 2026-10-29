@@ -39,6 +39,7 @@
 > Ejemplo de fila: | T-0xx | Título | frontend-ux | 2026-10-29 | Toco: X, Y. NO toco: Z (depende de cliente) |
 
 > **Regla (protocolo):** esta fila se escribe y se commitea (docs(obsidian): <agente> toma tarea <id> — <plan>) **antes** de tocar código de la app. Ver [[08-Memoria-compartida]].
+| T-032 | Notificaciones: lista de avisos con diferencia visual leído/no leído, contador en badge, acciones marca leída/todas, enlaces a calend/vac/acceso, actualización en tiempo real, mensaje cuando no hay avisos | Frontend+Backend | 2026-10-29 | Conservado de cambios locales |
 
 
 > **Notas históricas (2026-10-28, frontend-ux):** T-030 (pass UI/UX estilo Waylet) finalizada. T-010/T-011/T-029 finalizadas. Libres entonces: T-009, T-012..T-028 (salvo T-010).

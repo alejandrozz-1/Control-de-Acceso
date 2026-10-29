@@ -8,6 +8,7 @@ import Acceso from '../pages/Acceso';
 import Notificaciones from '../pages/Notificaciones';
 import Cuenta from '../pages/Cuenta';
 import AdminUsuarios from '../pages/admin/Usuarios';
+import HistorialAcceso from '../pages/HistorialAcceso';
 
 export default function AppRoutes() {
   return (
@@ -19,6 +20,7 @@ export default function AppRoutes() {
         <Route path="/acceso" element={<Acceso />} />
         <Route path="/notificaciones" element={<Notificaciones />} />
         <Route path="/cuenta" element={<Cuenta />} />
+        <Route path="/historial-acceso" element={<HistorialAcceso />} />
         <Route element={<RequireRole min="responsable" />}>
           <Route path="/admin/usuarios" element={<AdminUsuarios />} />
         </Route>

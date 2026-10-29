@@ -38,7 +38,7 @@ export const issueTemporal = () => issue<TemporalCredential>('temporal');
 
 /** Segundos restantes hasta una fecha (mínimo 0). */
 export function secondsUntil(isoDate: string, now = Date.now()): number {
-  return Math.max(0, Math.floor((new Date(isoDate).getTime() - now) / 1000));
+  return Math.max(0, Math.ceil((new Date(isoDate).getTime() - now) / 1000));
 }
 
 /** "m:ss" para el temporizador de caducidad. */

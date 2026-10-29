@@ -5,6 +5,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from '@tanstack/react-query';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
@@ -21,13 +22,13 @@ const QR_TTL_SECONDS = 60;
 
 /** Ticker de 1 s para el countdown (solo montado con un QR en pantalla). */
 function useNow(active: boolean): number {
-  const [now, setNow] = useState(() => Date.now());
+  const [, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!active) return;
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [active]);
-  return now;
+  return Date.now();
 }
 
 /** Pantalla Acceso: fondo azul Repsol, QR a pantalla completa + código temporal (US-02). */
@@ -35,9 +36,9 @@ export default function Acceso() {
   const qrQuery = useQuery<QrCredential>({
     queryKey: ['access-qr'],
     queryFn: issueQr,
-    refetchInterval: QR_TTL_SECONDS * 1000 - 5_000, // renueva 5 s antes de caducar
     retry: 1,
   });
+  const { refetch: refetchQr, isFetching: qrFetching } = qrQuery;
   const [temporal, setTemporal] = useState<{ code: string; expires_at: string } | null>(null);
   const [temporalError, setTemporalError] = useState<string | null>(null);
   const [temporalBusy, setTemporalBusy] = useState(false);
@@ -45,7 +46,20 @@ export default function Acceso() {
 
   const qr = qrQuery.data;
   const now = useNow(true);
-  const qrSeconds = qr ? secondsUntil(qr.expires_at, now) : 0;
+  const qrSeconds = qr
+    ? Math.min(QR_TTL_SECONDS, secondsUntil(qr.expires_at, now))
+    : 0;
+
+  useEffect(() => {
+    if (!qr || qrFetching || secondsUntil(qr.expires_at) === 0) return;
+
+    const delay = Math.max(0, new Date(qr.expires_at).getTime() - Date.now());
+    const timeout = window.setTimeout(() => {
+      void refetchQr();
+    }, delay);
+
+    return () => window.clearTimeout(timeout);
+  }, [qr, qrFetching, refetchQr]);
 
   useEffect(() => {
     let cancelled = false;
@@ -105,7 +119,7 @@ export default function Acceso() {
           role="alert"
           sx={{ width: '100%', maxWidth: 360 }}
           action={
-            <Button color="inherit" size="small" onClick={() => qrQuery.refetch()}>
+            <Button color="inherit" size="small" onClick={() => refetchQr()}>
               Reintentar
             </Button>
           }
@@ -116,14 +130,17 @@ export default function Acceso() {
 
       <Box
         sx={{
-          width: 272,
-          height: 272,
-          borderRadius: 3,
+          width: 288,
+          height: 288,
+          boxSizing: 'border-box',
+          p: 1.5,
+          border: `3px solid ${brand.orange}`,
+          borderRadius: 4,
           bgcolor: brand.white,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.35)',
+          boxShadow: '0 12px 36px rgba(0,0,0,0.32), 0 0 0 4px rgba(255,130,0,0.14)',
           position: 'relative',
         }}
         aria-label={
@@ -132,26 +149,6 @@ export default function Acceso() {
             : 'Generando código QR'
         }
       >
-        {/* Esquinas de visor estilo escáner (ref. index.html del compañero) */}
-        {[
-          { top: -6, left: -6, borderTop: 4, borderLeft: 4, borderRadius: '10px 0 0 0' },
-          { top: -6, right: -6, borderTop: 4, borderRight: 4, borderRadius: '0 10px 0 0' },
-          { bottom: -6, left: -6, borderBottom: 4, borderLeft: 4, borderRadius: '0 0 0 10px' },
-          { bottom: -6, right: -6, borderBottom: 4, borderRight: 4, borderRadius: '0 0 10px 0' },
-        ].map((corner, i) => (
-          <Box
-            key={i}
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              width: 26,
-              height: 26,
-              borderStyle: 'solid',
-              borderColor: brand.orange,
-              ...corner,
-            }}
-          />
-        ))}
         {qrQuery.isLoading ? (
           <CircularProgress size={48} sx={{ color: brand.blue }} />
         ) : qr && qrImage ? (
@@ -177,6 +174,25 @@ export default function Acceso() {
           </Typography>
         </Box>
       )}
+
+      <Button
+        variant="outlined"
+        startIcon={<RefreshIcon />}
+        onClick={() => void refetchQr()}
+        disabled={qrQuery.isFetching}
+        sx={{
+          color: brand.white,
+          borderColor: 'rgba(255,255,255,0.65)',
+          minWidth: 240,
+          '&:hover': { borderColor: brand.white, bgcolor: 'rgba(255,255,255,0.08)' },
+        }}
+      >
+        {qrQuery.isLoading
+          ? 'Generando código QR…'
+          : qrFetching
+            ? 'Regenerando…'
+            : 'Regenerar código QR'}
+      </Button>
 
       {temporalError && (
         <Alert severity="error" variant="filled" role="alert" sx={{ maxWidth: 360 }}>
