@@ -46,7 +46,7 @@
 ## Protocolo rápido para agentes (antes de tocar nada)
 1. `git pull` de tu rama.
 2. Lee [[memoria/Estado-global]], ADRs, [[memoria/Tareas]], handovers.
-3. Añade tu tarea como "En curso" en [[memoria/Tareas]] y commitea.
+3. Añade tu tarea como "🔄 En curso" en [[memoria/Tareas]] (con agente y fecha) y commitea **solo eso**: `git commit -m "docs(obsidian): <agente> toma tarea <id>" && git push`. Así el resto de agentes ve en el remoto quién ha tomado qué antes de que empieces a tocar código.
 4. Trabaja.
 5. Al terminar: actualiza docs, decisiones, riesgos, pendientes, handover; commit + push.
 
