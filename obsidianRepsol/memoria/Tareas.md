@@ -35,7 +35,7 @@
 |---|---|---|---|---|
 | T-014 | Festivos + eventos: UI admin | frontend-ux | 2026-10-29 | **Toco:** nueva ruta `/admin/festivos` (RequireRole responsable+) con alta/baja de festivos (nacional/comunidad) y eventos corporativos, enlace desde Cuenta; estados vacío/error; tests de helpers de fecha. **NO toco:** RLS/migraciones (holidays_write y events_write ya existen y son admin-only), seed, BottomNav (5 destinos fijos). |
 | T-012 | Revocación de credenciales (individual/masiva) + auditoría | frontend-ux | 2026-10-29 | **Toco:** ruta `/admin/credenciales` (listado con usuario+estado, selección múltiple, revocar con confirmación; el trigger `fn_notify_credential_revoked` y `audit_logs` ya notifican/registran), enlace desde Cuenta. **NO toco:** Edge Function `issue-qr` (ADR-003 intacto), RLS/migraciones, pantalla Acceso del empleado. |
-| T-033 | Rediseño de Cuenta y destinos de configuración | frontend | 2026-10-29 | **Toco:** pantalla Cuenta, rutas/páginas de perfil, idioma, seguridad y ayuda, validación y pruebas de cambio de contraseña. **NO toco:** esquema/RLS, Edge Functions, roles ni otros destinos de navegación. |
+| T-033 | Rediseño de Cuenta y destinos de configuración | frontend | 2026-10-29 | **Toco:** pantalla Cuenta, rutas/páginas de perfil, idioma, seguridad y ayuda, selección de Cuenta en BottomNav para rutas anidadas, validación y pruebas de cambio de contraseña. **NO toco:** esquema/RLS, Edge Functions, roles ni otros destinos de navegación. |
 
 > Ejemplo de fila: | T-0xx | Título | frontend-ux | 2026-10-29 | Toco: X, Y. NO toco: Z (depende de cliente) |
 
