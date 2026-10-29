@@ -1,6 +1,6 @@
 # Estado global del proyecto
 
-> Última actualización: 2026-10-28 (sesión 2) — por: coordinador
+> Última actualización: 2026-10-29 — por: frontend-ux (antes: 2026-10-28 sesión 2, coordinador)
 
 ## Salud general
 🟡 Fase 0 completada + Fase 1 (auth) en marcha: login/guardas/invitación funcionales. Pendiente: cuota email free (2/h sin SMTP), alta CSV, CRUD centros/equipos.
@@ -14,7 +14,7 @@ Definición completa en [[10-Riesgos]].
 | R-02 | Formato de QR esperado por tornos Repsol desconocido | 🟡 Verificar en Fase 2 (ADR-003) |
 | R-03 | Escala >5.000 | 🟡 Índices + triggers listos; MV de métricas en Fase 5 |
 | R-06 | Assets/tipografía de marca sin confirmar | 🟡 Pendiente cliente |
-| R-08 | Conflictos entre agentes | ⚪ No aplica todavía (un solo agente activo) |
+| R-08 | Conflictos entre agentes | 🟡 Activo: trabajo paralelo real (palo623 + frontend-ux). Mitigación: protocolo de toma de tarea con commit aislado `docs(obsidian): <agente> toma tarea <id>` antes de tocar código (ver [[08-Memoria-compartida]]) |
 | R-10 | Free tier Supabase | ⚪ Vigilar en Fase 5 |
 | R-11 | Clave privada VAPID y token Supabase deben vivir solo en secretos (Vercel/GitHub), nunca en el repo | 🟡 Acción del usuario (ver C-005) |
 | R-12 | `password_hibp_enabled` (leaked password protection) **no activable: plan Free** (Management API → 402 "Pro Plans and up"). Mitigación: `password_min_length=6` por defecto + validación de fuerza en el frontend al crear/invitar usuarios; reevaluar al subir de plan | 🟡 Aceptado (plan Free) |
@@ -37,9 +37,9 @@ Definición completa en [[10-Riesgos]].
 | Componente | Estado |
 |---|---|
 | Supabase `bipcvxetgypugwnbhmwm` (eu-central-1) | ✅ 16 tablas, RLS 16/16, advisors **0 ERROR** / 6 WARN aceptados + 1 WARN plan free (R-12), seed aplicado |
-| Migraciones | ✅ 8 archivos `2026102800000X_*.sql`, idempotentes, vía `node scripts/apply-migrations.mjs` |
-| Edge Functions | ✅ `invite-user` desplegada (verificada: 401/403/200) |
+| Migraciones | ✅ 10 archivos `20261028*_*.sql` + `20261029000001`, idempotentes, vía `node scripts/apply-migrations.mjs` (incluye datos de calendario y realtime de notificaciones) |
+| Edge Functions | ✅ `invite-user` (401/403/200) e `issue-qr` (401 sin JWT, 200 con sesión; QR HMAC TTL 60 s) desplegadas |
 | Auth (GoTrue) | ✅ Login verificado con usuarios seed. **Lección**: insertar usuarios directamente en `auth.users` exige normalizar columnas token a `''` (NULL → `Scan error` en GoTrue) — ya en el seed |
-| App web (apps/web) | ✅ `lint+typecheck+test+build` en verde (5 tests); build 230 kB gzip (R-14) |
+| App web (apps/web) | ✅ `lint+typecheck+test+build` en verde (17 tests); build ~245 kB gzip (R-14). Fases 1-4 en marcha: auth, Acceso (QR), Calendario, Vacaciones, Notificaciones realtime |
 | CI | ✅ `ci.yml` en develop/main (advisors con secret, si no → skip) |
 | PWA / Capacitor | ⬜ Fases 6 |
