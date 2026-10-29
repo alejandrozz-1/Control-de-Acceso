@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import { beforeEach } from 'vitest';
+import { afterEach, beforeEach, vi } from 'vitest';
 import type { Session } from '@supabase/supabase-js';
 import App from '../App';
 import { useAuthStore, type Profile } from '../services/auth';
+import { supabase } from '../services/supabase';
 
 const fakeSession = { user: { id: 'u1' } } as Session;
 
@@ -25,6 +26,10 @@ const empleado: Profile = {
 beforeEach(() => {
   localStorage.setItem('rps-onboarding-done', '1');
   useAuthStore.setState({ session: null, profile: null, initializing: false });
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 test('sin sesión muestra la pantalla de login', () => {
@@ -56,9 +61,23 @@ test('un empleado no puede entrar a /admin/usuarios (redirige a Inicio)', () => 
 });
 
 test('la página Cuenta muestra el perfil y el botón de salir', () => {
+  vi.spyOn(supabase, 'from').mockImplementation(() => {
+    const query = {
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      order: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+    };
+    return query as never;
+  });
   useAuthStore.setState({ session: fakeSession, profile: empleado });
   window.history.pushState({}, '', '/cuenta');
   render(<App />);
   expect(screen.getByText('Eva Empleada')).toBeInTheDocument();
+  expect(screen.getByText('Credencial')).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /Mi perfil/ })).toHaveAttribute('href', '/cuenta/perfil');
+  expect(screen.getByRole('link', { name: /Notificaciones/ })).toHaveAttribute('href', '/notificaciones');
+  expect(screen.getByRole('link', { name: /Seguridad/ })).toHaveAttribute('href', '/cuenta/seguridad');
   expect(screen.getByRole('button', { name: 'Cerrar sesión' })).toBeInTheDocument();
 });

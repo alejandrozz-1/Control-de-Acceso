@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { RequireAuth, RequireRole } from './guards';
 import Shell from './Shell';
@@ -9,6 +10,21 @@ import Notificaciones from '../pages/Notificaciones';
 import Cuenta from '../pages/Cuenta';
 import AdminUsuarios from '../pages/admin/Usuarios';
 import HistorialAcceso from '../pages/HistorialAcceso';
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+
+const Perfil = lazy(() => import('../pages/account/Perfil'));
+const Idioma = lazy(() => import('../pages/account/Idioma'));
+const Seguridad = lazy(() => import('../pages/account/Seguridad'));
+const Ayuda = lazy(() => import('../pages/account/Ayuda'));
+
+function AccountPageFallback() {
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }} role="status" aria-label="Cargando sección">
+      <CircularProgress />
+    </Box>
+  );
+}
 
 export default function AppRoutes() {
   return (
@@ -20,6 +36,10 @@ export default function AppRoutes() {
         <Route path="/acceso" element={<Acceso />} />
         <Route path="/notificaciones" element={<Notificaciones />} />
         <Route path="/cuenta" element={<Cuenta />} />
+        <Route path="/cuenta/perfil" element={<Suspense fallback={<AccountPageFallback />}><Perfil /></Suspense>} />
+        <Route path="/cuenta/idioma" element={<Suspense fallback={<AccountPageFallback />}><Idioma /></Suspense>} />
+        <Route path="/cuenta/seguridad" element={<Suspense fallback={<AccountPageFallback />}><Seguridad /></Suspense>} />
+        <Route path="/cuenta/ayuda" element={<Suspense fallback={<AccountPageFallback />}><Ayuda /></Suspense>} />
         <Route path="/historial-acceso" element={<HistorialAcceso />} />
         <Route element={<RequireRole min="responsable" />}>
           <Route path="/admin/usuarios" element={<AdminUsuarios />} />
