@@ -20,11 +20,13 @@ export function RequireAuth({ children }: { children?: ReactNode }) {
   return <>{children ?? <Outlet />}</>;
 }
 
-/** Requiere sesión + rol mínimo (no decidido → /login; sin permiso → /. */
+/** Requiere sesión + rol mínimo (perfil aún cargando → spinner; sin permiso → /). */
 export function RequireRole({ min, children }: { min: Role; children?: ReactNode }) {
-  const { session, profile, initializing } = useAuthStore();
+  const { session, profile, initializing, profileLoaded } = useAuthStore();
   if (initializing) return <Loading />;
   if (!session) return <Navigate to="/login" replace />;
+  // El profile llega después del primer render de la sesión; sin esto, cargar /admin/* a pulso rebotaría en /
+  if (!profileLoaded) return <Loading />;
   if (!hasRole(profile, min)) return <Navigate to="/" replace />;
   return <>{children ?? <Outlet />}</>;
 }

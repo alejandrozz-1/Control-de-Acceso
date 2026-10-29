@@ -11,6 +11,8 @@ interface AuthState {
   profile: Profile | null;
   /** true mientras se resuelve la sesión inicial (evita parpadeos al recargar) */
   initializing: boolean;
+  /** true cuando el profile ya se resolvió (aunque sea null): distingue "cargando" de "sin perfil" */
+  profileLoaded: boolean;
   setSession: (s: Session | null) => void;
   setProfile: (p: Profile | null) => void;
   signIn: (email: string, password: string) => Promise<void>;
@@ -21,6 +23,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   session: null,
   profile: null,
   initializing: true,
+  profileLoaded: false,
   setSession: (session) => set({ session }),
   setProfile: (profile) => set({ profile }),
   signIn: async (email, password) => {
@@ -31,13 +34,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
   signOut: async () => {
     await supabase.auth.signOut();
-    set({ session: null, profile: null });
+    set({ session: null, profile: null, profileLoaded: false });
   },
 }));
 
 async function loadProfile(userId: string) {
   const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
   useAuthStore.getState().setProfile(data ?? null);
+  useAuthStore.setState({ profileLoaded: true });
 }
 
 let started = false;

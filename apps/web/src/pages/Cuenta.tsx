@@ -61,9 +61,17 @@ export default function Cuenta() {
 
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
         {hasRole(profile, 'responsable') && (
-          <Button component={RouterLink} to="/admin/usuarios" variant="outlined">
-            Gestionar usuarios
-          </Button>
+          <>
+            <Button component={RouterLink} to="/admin/usuarios" variant="outlined">
+              Gestionar usuarios
+            </Button>
+            <Button component={RouterLink} to="/admin/credenciales" variant="outlined">
+              Credenciales de acceso
+            </Button>
+            <Button component={RouterLink} to="/admin/festivos" variant="outlined">
+              Festivos y eventos
+            </Button>
+          </>
         )}
         <Button variant="contained" color="error" onClick={onLogout}>
           Cerrar sesión
