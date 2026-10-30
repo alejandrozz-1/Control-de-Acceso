@@ -1,15 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { monthWeeks, SHIFT_COLORS } from '../pages/Calendario';
+import { getShiftColor, monthWeeks, SHIFT_COLORS, SHIFT_DARK_COLORS } from '../pages/Calendario';
 import { inclusiveDays } from '../components/ui/VacacionesPanel';
 
 describe('SHIFT_COLORS', () => {
-  it('uses the reduced corporate palette for shift types', () => {
+  it('uses a contrast-aware Repsol palette in light and dark modes', () => {
     expect(SHIFT_COLORS).toEqual({
-      M: '#FF8200',
-      T: '#041E42',
-      N: '#7C3AED',
-      L: '#94A3B8',
+      M: '#B85C00',
+      T: '#C00027',
+      N: '#6D28D9',
+      L: '#0077A8',
     });
+    expect(SHIFT_DARK_COLORS).toEqual({
+      M: '#FF9D33',
+      T: '#FF526B',
+      N: '#B794F4',
+      L: '#58C7F3',
+    });
+    expect(getShiftColor('T', 'light')).toBe('#C00027');
+    expect(getShiftColor('T', 'dark')).toBe('#FF526B');
+    expect(getShiftColor('unknown', 'dark')).toBe(SHIFT_COLORS.L);
   });
 });
 

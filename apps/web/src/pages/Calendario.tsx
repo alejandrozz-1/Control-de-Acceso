@@ -25,11 +25,22 @@ import { useI18n } from '../i18n/I18nProvider';
 
 /** Colores por código de turno (M mañana, T tarde, N noche, L libre). */
 export const SHIFT_COLORS: Record<string, string> = {
-  M: '#FF8200',
-  T: brand.blue,
-  N: '#7C3AED',
-  L: '#94A3B8',
+  M: '#B85C00',
+  T: '#C00027',
+  N: '#6D28D9',
+  L: '#0077A8',
 };
+
+export const SHIFT_DARK_COLORS: Record<string, string> = {
+  M: '#FF9D33',
+  T: '#FF526B',
+  N: '#B794F4',
+  L: '#58C7F3',
+};
+
+export function getShiftColor(code: string, mode: 'light' | 'dark'): string {
+  return (mode === 'dark' ? SHIFT_DARK_COLORS[code] : SHIFT_COLORS[code]) ?? SHIFT_COLORS.L;
+}
 
 const DAY_MS = 86_400_000;
 
@@ -362,8 +373,7 @@ export default function Calendario() {
                               width: day.shift.code === 'L' ? 6 : 8,
                               height: day.shift.code === 'L' ? 6 : 8,
                               borderRadius: '50%',
-                              bgcolor: isSelected ? brand.white : SHIFT_COLORS[day.shift.code],
-                              opacity: day.shift.code === 'L' ? 0.7 : 1,
+                              bgcolor: (theme) => isSelected ? brand.white : getShiftColor(day.shift!.code, theme.palette.mode),
                             }}
                           />
                         )}
@@ -395,7 +405,17 @@ export default function Calendario() {
               label={t(SHIFT_LABEL[code])}
               sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
               icon={
-                <Box component="span" aria-hidden sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: SHIFT_COLORS[code], ml: '6px !important' }} />
+                <Box
+                  component="span"
+                  aria-hidden
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: (theme) => getShiftColor(code, theme.palette.mode),
+                    ml: '6px !important',
+                  }}
+                />
               }
             />
           ))}
@@ -419,7 +439,15 @@ export default function Calendario() {
 
         {sel?.shift && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: sel.holidays.length || sel.vacations.length || sel.events.length ? 1.5 : 0 }}>
-            <Box aria-hidden sx={{ width: 10, height: 36, borderRadius: 5, bgcolor: SHIFT_COLORS[sel.shift.code] }} />
+            <Box
+              aria-hidden
+              sx={{
+                width: 10,
+                height: 36,
+                borderRadius: 5,
+                bgcolor: (theme) => getShiftColor(sel.shift!.code, theme.palette.mode),
+              }}
+            />
             <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
                 {t(SHIFT_LABEL[sel.shift.code] ?? sel.shift.code)}
