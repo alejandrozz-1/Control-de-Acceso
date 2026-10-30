@@ -5,11 +5,9 @@ import Typography from '@mui/material/Typography';
 /** Página-base de las secciones (mobile-first). */
 export default function PageLayout({
   title,
-  phase,
   children,
 }: {
   title: string;
-  phase?: string;
   children?: React.ReactNode;
 }) {
   return (
@@ -18,11 +16,6 @@ export default function PageLayout({
         <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
           {title}
         </Typography>
-        {phase && (
-          <Typography variant="caption" color="text.secondary">
-            {phase}
-          </Typography>
-        )}
       </Box>
       {children ?? (
         <Typography color="text.secondary">Contenido pendiente de implementación.</Typography>

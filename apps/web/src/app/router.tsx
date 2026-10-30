@@ -43,7 +43,7 @@ export default function AppRoutes() {
         <Route path="/cuenta/seguridad" element={<Suspense fallback={<AccountPageFallback />}><Seguridad /></Suspense>} />
         <Route path="/cuenta/ayuda" element={<Suspense fallback={<AccountPageFallback />}><Ayuda /></Suspense>} />
         <Route path="/historial-acceso" element={<HistorialAcceso />} />
-        <Route element={<RequireRole min="responsable" />}>
+        <Route element={<RequireRole min="admin" />}>
           <Route path="/admin/usuarios" element={<AdminUsuarios />} />
           <Route path="/admin/festivos" element={<AdminFestivos />} />
           <Route path="/admin/credenciales" element={<AdminCredenciales />} />

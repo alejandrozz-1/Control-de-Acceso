@@ -78,7 +78,7 @@ export default function AdminUsuarios() {
   }
 
   return (
-    <PageLayout title="Usuarios" phase="Fase 1 · admin">
+    <PageLayout title="Usuarios">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography variant="body2" color="text.secondary">
           {isLoading ? 'Cargando…' : `${profiles?.length ?? 0} usuarios`}
@@ -92,7 +92,7 @@ export default function AdminUsuarios() {
       {ok && <Alert severity="success" sx={{ mb: 2 }}>{ok}</Alert>}
 
       <Paper variant="outlined">
-        <Table size="small">
+        <Table size="small" sx={{ '& th, & td': { px: 1, py: 1.25 } }}>
           <TableHead>
             <TableRow>
               <TableCell>Nombre</TableCell>
@@ -105,7 +105,7 @@ export default function AdminUsuarios() {
             {profiles?.map((p) => (
               <TableRow key={p.id}>
                 <TableCell>{p.full_name}</TableCell>
-                <TableCell sx={{ wordBreak: 'break-all' }}>{p.email}</TableCell>
+                <TableCell sx={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{p.email}</TableCell>
                 <TableCell>
                   <Chip size="small" label={ROLE_LABEL[p.role] ?? p.role} color={p.role === 'admin' ? 'primary' : 'default'} />
                 </TableCell>

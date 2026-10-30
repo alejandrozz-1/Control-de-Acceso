@@ -90,16 +90,34 @@ export default function Calendario() {
     },
   });
 
+  const centerQuery = useQuery({
+    queryKey: ['cal-center', profile?.center_id],
+    enabled: !!profile?.center_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('centers')
+        .select('comunidad')
+        .eq('id', profile!.center_id!)
+        .maybeSingle();
+      if (error) throw error;
+      return data as { comunidad: string | null } | null;
+    },
+  });
+  const comunidad = centerQuery.data?.comunidad ?? null;
+
   const holidaysQuery = useQuery({
-    queryKey: ['cal-holidays', monthStart],
+    queryKey: ['cal-holidays', monthStart, comunidad],
+    enabled: !centerQuery.isLoading,
     queryFn: async () => {
       const { data, error } = await supabase
         .from('holidays')
-        .select('name, date, scope')
+        .select('name, date, scope, comunidad')
         .gte('date', monthStart)
         .lte('date', monthEnd);
       if (error) throw error;
-      return data as { name: string; date: string; scope: string }[];
+      return (data as { name: string; date: string; scope: string; comunidad: string | null }[]).filter(
+        (h) => h.scope === 'nacional' || (h.scope === 'comunidad' && h.comunidad === comunidad),
+      );
     },
   });
 
@@ -133,8 +151,9 @@ export default function Calendario() {
   });
 
   const isLoading =
+    centerQuery.isLoading ||
     shiftsQuery.isLoading || holidaysQuery.isLoading || eventsQuery.isLoading || vacationsQuery.isLoading;
-  const isError = shiftsQuery.isError || holidaysQuery.isError || eventsQuery.isError || vacationsQuery.isError;
+  const isError = centerQuery.isError || shiftsQuery.isError || holidaysQuery.isError || eventsQuery.isError || vacationsQuery.isError;
 
   const byDate = new Map<ISODate, DayData>();
   const put = (date: ISODate) => {
@@ -177,7 +196,7 @@ export default function Calendario() {
           <IconButton size="small" aria-label="Mes anterior" onClick={() => shiftMonth(-1)}>
             <ChevronLeftIcon />
           </IconButton>
-          <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, textTransform: 'capitalize' }} aria-live="polite">
+          <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, '&::first-letter': { textTransform: 'uppercase' } }} aria-live="polite">
             {monthLabel}
           </Typography>
           <IconButton size="small" aria-label="Mes siguiente" onClick={() => shiftMonth(1)}>
@@ -312,7 +331,7 @@ export default function Calendario() {
 
       {/* Detalle del día seleccionado */}
       <Paper variant="outlined" sx={{ borderRadius: 3, p: 2.5, boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }} aria-live="polite">
-        <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700, textTransform: 'capitalize', mb: 1.5 }}>
+        <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700, '&::first-letter': { textTransform: 'uppercase' }, mb: 1.5 }}>
           {selLabel}
         </Typography>
 

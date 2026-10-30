@@ -226,7 +226,7 @@ export default function Acceso() {
       )}
 
       <Typography variant="caption" sx={{ opacity: 0.7, textAlign: 'center', maxWidth: 320 }}>
-        Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.
+        Muéstralo en el lector del torno para registrar tu entrada o salida.
       </Typography>
     </Box>
   );

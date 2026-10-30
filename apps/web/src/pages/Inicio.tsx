@@ -266,9 +266,7 @@ export default function Inicio() {
             py: 1,
           }}
         >
-          <Box sx={{ width: 7, height: 7, borderRadius: '50%' }}>
-            {/* empty - just the circle color */}
-          </Box>
+          <Box sx={{ width: 7, height: 7, borderRadius: '50%', bgcolor: shiftState.active ? '#1FA971' : 'rgba(255,255,255,0.55)' }} />
           {isShiftStateLoading ? 'Cargando turno…' : shiftState.label}
         </Box>
           <Box
