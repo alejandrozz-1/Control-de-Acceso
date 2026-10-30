@@ -39,6 +39,40 @@ export const theme = createTheme({
   },
   shape: { borderRadius: 12 },
   components: {
+    MuiCssBaseline: {
+      styleOverrides: (muiTheme) => ({
+        '*::-webkit-scrollbar': {
+          width: 10,
+          height: 10,
+        },
+        '*::-webkit-scrollbar-button': {
+          display: 'none',
+          width: 0,
+          height: 0,
+          background: 'transparent',
+        },
+        '*::-webkit-scrollbar-button:single-button:vertical:decrement, *::-webkit-scrollbar-button:single-button:vertical:increment, *::-webkit-scrollbar-button:single-button:horizontal:decrement, *::-webkit-scrollbar-button:single-button:horizontal:increment': {
+          display: 'none',
+          width: 0,
+          height: 0,
+        },
+        '*::-webkit-scrollbar-track': {
+          backgroundColor: muiTheme.palette.background.paper,
+        },
+        '*::-webkit-scrollbar-thumb': {
+          background: `linear-gradient(180deg, ${brand.orange}, ${brand.red})`,
+          backgroundClip: 'padding-box',
+          border: `3px solid ${muiTheme.palette.background.paper}`,
+          borderRadius: 999,
+        },
+        '@supports not selector(::-webkit-scrollbar)': {
+          '*': {
+            scrollbarColor: `${muiTheme.palette.secondary.main} ${muiTheme.palette.background.paper}`,
+            scrollbarWidth: 'thin',
+          },
+        },
+      }),
+    },
     MuiButton: {
       defaultProps: { disableElevation: true },
       styleOverrides: {

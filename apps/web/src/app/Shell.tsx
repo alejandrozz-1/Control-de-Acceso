@@ -14,7 +14,7 @@ export default function Shell() {
       <Box
         component="main"
         sx={{
-          pb: 'calc(72px + env(safe-area-inset-bottom))',
+          pb: 'calc(112px + env(safe-area-inset-bottom))',
           minHeight: '100dvh',
           position: 'relative',
         }}
