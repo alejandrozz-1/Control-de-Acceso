@@ -82,7 +82,7 @@ test('la página Cuenta muestra el perfil y el botón de salir', () => {
   });
   useAuthStore.setState({ session: fakeSession, profile: empleado, profileLoaded: true });
   render(<App />);
-  fireEvent.click(screen.getByRole('button', { name: 'Cuenta' }));
+  fireEvent.click(screen.getByRole('link', { name: 'Abrir cuenta' }));
   expect(screen.getByText('Eva Empleada')).toBeInTheDocument();
   expect(screen.getByText('Credencial')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Mi perfil/ })).toHaveAttribute('href', '/cuenta/perfil');
