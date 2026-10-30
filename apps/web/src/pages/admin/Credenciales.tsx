@@ -107,7 +107,7 @@ export default function AdminCredenciales() {
   const allSelected = selectableActive.length > 0 && selectableActive.every((r) => selected.has(r.id));
 
   return (
-    <PageLayout title="Credenciales" phase="Fase 2 · admin">
+    <PageLayout title="Credenciales">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
         <Typography variant="body2" color="text.secondary" aria-live="polite">
           {list.isLoading ? t('Cargando…') : `${rows.length} ${t('credenciales')} · ${selectableActive.length} ${t('activas')}`}

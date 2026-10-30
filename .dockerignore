@@ -1,0 +1,16 @@
+.git
+.github
+node_modules
+**/node_modules
+**/dist
+.env.local
+*.local
+supabase/.temp
+supabase/.branches
+playwright-mcp*
+.playwright-mcp
+.playwright-mcp*
+*.log
+obsidianRepsol
+.vscode
+.idea

@@ -1,0 +1,16 @@
+# App web (SPA servida por nginx).
+#   docker compose up --build      -> http://localhost:8080
+# Variables de build: las toma de .env (públicas) o del entorno.
+# Para apuntar a Supabase local: `npx supabase start` y sobrescribe las VITE_*.
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+        VITE_VAPID_PUBLIC_KEY: ${VITE_VAPID_PUBLIC_KEY}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    restart: unless-stopped

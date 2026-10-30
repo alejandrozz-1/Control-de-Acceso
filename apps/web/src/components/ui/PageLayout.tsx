@@ -6,11 +6,9 @@ import { useI18n } from '../../i18n/I18nProvider';
 /** Página-base de las secciones (mobile-first). */
 export default function PageLayout({
   title,
-  phase,
   children,
 }: {
   title: string;
-  phase?: string;
   children?: React.ReactNode;
 }) {
   const { t } = useI18n();
@@ -21,11 +19,6 @@ export default function PageLayout({
         <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
           {t(title)}
         </Typography>
-        {phase && (
-          <Typography variant="caption" color="text.secondary">
-            {t(phase)}
-          </Typography>
-        )}
       </Box>
       {children ?? (
         <Typography color="text.secondary">{t('Contenido pendiente de implementación.')}</Typography>

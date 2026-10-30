@@ -2,7 +2,6 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import type { Session } from '@supabase/supabase-js';
 import App from '../App';
-import { normalizePublicUrl } from '../app/publicUrl';
 import { useAuthStore, type Profile } from '../services/auth';
 import { supabase } from '../services/supabase';
 
@@ -62,21 +61,20 @@ test('la navegación inferior traduce Calendario al catalán', async () => {
   });
 });
 
-test('la navegación interna mantiene la URL pública en la página inicial', () => {
+test('la navegación interna actualiza la URL', () => {
   useAuthStore.setState({ session: fakeSession, profile: empleado, profileLoaded: true });
   render(<App />);
   fireEvent.click(screen.getByRole('button', { name: 'Calendario' }));
   expect(screen.getByRole('heading', { name: 'Calendario' })).toBeInTheDocument();
-  expect(window.location.pathname).toBe('/');
+  expect(window.location.pathname).toBe('/calendario');
 });
 
-test('una URL interna al abrir la app se normaliza a la inicial', () => {
+test('una URL interna abre esa ruta directamente', () => {
   useAuthStore.setState({ session: fakeSession, profile: empleado, profileLoaded: true });
-  window.history.pushState({}, '', '/admin/usuarios');
-  normalizePublicUrl();
+  window.history.pushState({}, '', '/calendario');
   render(<App />);
-  expect(screen.getByRole('heading', { name: /Buenos días|Buenas tardes|Buenas noches/ })).toBeInTheDocument();
-  expect(window.location.pathname).toBe('/');
+  expect(screen.getByRole('heading', { name: 'Calendario' })).toBeInTheDocument();
+  expect(window.location.pathname).toBe('/calendario');
 });
 
 test('la página Cuenta muestra el perfil y el botón de salir', () => {

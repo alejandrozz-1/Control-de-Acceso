@@ -32,7 +32,7 @@ import { useColorScheme } from '@mui/material/styles';
 import appPackage from '../../../../package.json';
 import { brand } from '../app/theme';
 import PageLayout from '../components/ui/PageLayout';
-import { hasRole, useAuthStore } from '../services/auth';
+import { useAuthStore } from '../services/auth';
 import { supabase } from '../services/supabase';
 import { getIntlLocale } from '../i18n/catalog';
 import { useI18n } from '../i18n/I18nProvider';
@@ -379,7 +379,7 @@ export default function Cuenta() {
           </List>
         </Paper>
 
-        {hasRole(profile, 'responsable') && (
+        {profile?.role === 'admin' && (
           <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 4 }}>
             <Typography variant="subtitle1" component="h2" sx={{ mb: 1, fontWeight: 800 }}>
               {t('Administración')}

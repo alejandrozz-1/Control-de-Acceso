@@ -884,7 +884,7 @@ const additionalMessages: Partial<Record<Locale, Record<string, string>>> = {
     'La credencial relacionada ya no está disponible.': 'La credencial relacionada ja no està disponible.',
     'Código QR de acceso, caduca en': 'Codi QR d’accés, caduca en', 'Generando código QR': 'Generant el codi QR',
     'No se pudo generar tu QR.': 'No s’ha pogut generar el teu QR.', 'Código temporal': 'Codi temporal',
-    'Usar código temporal': 'Utilitzar un codi temporal', 'Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.': 'Mostra’l al lector en entrar. L’accés es registra automàticament.',
+    'Usar código temporal': 'Utilitzar un codi temporal', 'Muéstralo en el lector del torno para registrar tu entrada o salida.': 'Mostra’l al lector del torn per registrar l’entrada o la sortida.',
     'No se pudo cargar el centro asignado.': 'No s’ha pogut carregar el centre assignat.',
   },
   en: {
@@ -906,7 +906,7 @@ const additionalMessages: Partial<Record<Locale, Record<string, string>>> = {
     'La credencial relacionada ya no está disponible.': 'The related credential is no longer available.',
     'Código QR de acceso, caduca en': 'Access QR code, expires in', 'Generando código QR': 'Generating QR code',
     'No se pudo generar tu QR.': 'Could not generate your QR code.', 'Usar código temporal': 'Use temporary code',
-    'Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.': 'Show it at the reader when entering. Access is recorded automatically.',
+    'Muéstralo en el lector del torno para registrar tu entrada o salida.': 'Show it at the turnstile reader to register your entry or exit.',
     'No se pudo cargar el centro asignado.': 'Could not load the assigned site.',
   },
   fr: {
@@ -928,7 +928,7 @@ const additionalMessages: Partial<Record<Locale, Record<string, string>>> = {
     'La credencial relacionada ya no está disponible.': 'Le badge associé n’est plus disponible.',
     'Código QR de acceso, caduca en': 'Code QR d’accès, expire dans', 'Generando código QR': 'Génération du code QR',
     'No se pudo generar tu QR.': 'Impossible de générer votre QR.', 'Usar código temporal': 'Utiliser un code temporaire',
-    'Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.': 'Présentez-le au lecteur à l’entrée. L’accès est enregistré automatiquement.',
+    'Muéstralo en el lector del torno para registrar tu entrada o salida.': 'Présentez-le au lecteur du tourniquet pour enregistrer votre entrée ou votre sortie.',
     'No se pudo cargar el centro asignado.': 'Impossible de charger le site attribué.',
   },
   de: {
@@ -950,7 +950,7 @@ const additionalMessages: Partial<Record<Locale, Record<string, string>>> = {
     'La credencial relacionada ya no está disponible.': 'Der zugehörige Ausweis ist nicht mehr verfügbar.',
     'Código QR de acceso, caduca en': 'Zugangs-QR-Code, läuft ab in', 'Generando código QR': 'QR-Code wird erstellt',
     'No se pudo generar tu QR.': 'Dein QR-Code konnte nicht erstellt werden.', 'Usar código temporal': 'Temporären Code verwenden',
-    'Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.': 'Zeige ihn beim Betreten am Lesegerät vor. Der Zugang wird automatisch erfasst.',
+    'Muéstralo en el lector del torno para registrar tu entrada o salida.': 'Zeige ihn am Drehkreuzlesegerät vor, um deinen Ein- oder Austritt zu erfassen.',
     'No se pudo cargar el centro asignado.': 'Zugewiesener Standort konnte nicht geladen werden.',
   },
   pt: {
@@ -972,7 +972,7 @@ const additionalMessages: Partial<Record<Locale, Record<string, string>>> = {
     'La credencial relacionada ya no está disponible.': 'A credencial relacionada já não está disponível.',
     'Código QR de acceso, caduca en': 'Código QR de acesso, expira em', 'Generando código QR': 'A gerar código QR',
     'No se pudo generar tu QR.': 'Não foi possível gerar o teu QR.', 'Usar código temporal': 'Utilizar código temporário',
-    'Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.': 'Apresenta-o no leitor ao entrar. O acesso é registado automaticamente.',
+    'Muéstralo en el lector del torno para registrar tu entrada o salida.': 'Mostre-o no leitor da catraca para registar a sua entrada ou saída.',
     'No se pudo cargar el centro asignado.': 'Não foi possível carregar o local atribuído.',
   },
   ar: {
@@ -994,7 +994,7 @@ const additionalMessages: Partial<Record<Locale, Record<string, string>>> = {
     'La credencial relacionada ya no está disponible.': 'بطاقة الدخول المرتبطة غير متاحة الآن.',
     'Código QR de acceso, caduca en': 'رمز QR للدخول، ينتهي خلال', 'Generando código QR': 'جارٍ إنشاء رمز QR',
     'No se pudo generar tu QR.': 'تعذر إنشاء رمز QR الخاص بك.', 'Usar código temporal': 'استخدام رمز مؤقت',
-    'Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.': 'اعرضه على القارئ عند الدخول. سيتم تسجيل الدخول تلقائيًا.',
+    'Muéstralo en el lector del torno para registrar tu entrada o salida.': 'اعرضه على قارئ الدوران لتسجيل دخولك أو خروجك.',
     'No se pudo cargar el centro asignado.': 'تعذر تحميل الموقع المعيّن.',
   },
   no: {
@@ -1016,7 +1016,7 @@ const additionalMessages: Partial<Record<Locale, Record<string, string>>> = {
     'La credencial relacionada ya no está disponible.': 'Det tilknyttede adgangskortet er ikke lenger tilgjengelig.',
     'Código QR de acceso, caduca en': 'Adgangs-QR-kode, utløper om', 'Generando código QR': 'Genererer QR-kode',
     'No se pudo generar tu QR.': 'Kunne ikke generere QR-koden din.', 'Usar código temporal': 'Bruk midlertidig kode',
-    'Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.': 'Vis den i leseren ved inngang. Adgangen registreres automatisk.',
+    'Muéstralo en el lector del torno para registrar tu entrada o salida.': 'Vis den i leseren ved slusen for å registrere inngang eller utgang.',
     'No se pudo cargar el centro asignado.': 'Kunne ikke laste det tildelte arbeidsstedet.',
   },
   it: {
@@ -1038,7 +1038,7 @@ const additionalMessages: Partial<Record<Locale, Record<string, string>>> = {
     'La credencial relacionada ya no está disponible.': 'Il badge associato non è più disponibile.',
     'Código QR de acceso, caduca en': 'Codice QR di accesso, scade tra', 'Generando código QR': 'Generazione codice QR',
     'No se pudo generar tu QR.': 'Impossibile generare il tuo QR.', 'Usar código temporal': 'Usa codice temporaneo',
-    'Muéstralo en el lector al entrar. El acceso queda registrado automáticamente.': 'Mostralo al lettore all’ingresso. L’accesso viene registrato automaticamente.',
+    'Muéstralo en el lector del torno para registrar tu entrada o salida.': 'Mostralo al lettore del tornello per registrare l’ingresso o l’uscita.',
     'No se pudo cargar el centro asignado.': 'Impossibile caricare la sede assegnata.',
   },
 };
