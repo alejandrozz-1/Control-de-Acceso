@@ -24,6 +24,8 @@ import { useState } from 'react';
 import PageLayout from '../../components/ui/PageLayout';
 import { supabase } from '../../services/supabase';
 import { useAuthStore } from '../../services/auth';
+import { getIntlLocale } from '../../i18n/catalog';
+import { useI18n } from '../../i18n/I18nProvider';
 
 interface CredentialRow {
   id: string;
@@ -49,6 +51,8 @@ export function revokeErrorText(m: unknown): string {
 
 /** T-012: revocación individual/masiva de credenciales (auditoría y notificación las hace el trigger en servidor). */
 export default function AdminCredenciales() {
+  const { locale, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
   const qc = useQueryClient();
   const uid = useAuthStore((s) => s.session?.user.id);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -83,7 +87,7 @@ export default function AdminCredenciales() {
     },
     onSuccess: (_d, ids) => {
       void qc.invalidateQueries({ queryKey: ['admin-credentials'] });
-      setOk(ids.length > 1 ? `${ids.length} credenciales revocadas` : 'Credencial revocada');
+      setOk(ids.length > 1 ? `${ids.length} ${t('credenciales revocadas')}` : t('Credencial revocada'));
       setSelected(new Set());
       setConfirmBulk(false);
       setConfirmOne(null);
@@ -106,7 +110,7 @@ export default function AdminCredenciales() {
     <PageLayout title="Credenciales">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
         <Typography variant="body2" color="text.secondary" aria-live="polite">
-          {list.isLoading ? 'Cargando…' : `${rows.length} credenciales · ${selectableActive.length} activas`}
+          {list.isLoading ? t('Cargando…') : `${rows.length} ${t('credenciales')} · ${selectableActive.length} ${t('activas')}`}
         </Typography>
         {selectableActive.length > 0 && (
           <Button
@@ -114,30 +118,30 @@ export default function AdminCredenciales() {
             sx={{ whiteSpace: 'nowrap' }}
             onClick={() => setSelected(allSelected ? new Set() : new Set(selectableActive.map((r) => r.id)))}
           >
-            {allSelected ? 'Deseleccionar' : 'Seleccionar activas'}
+            {allSelected ? t('Deseleccionar') : t('Seleccionar activas')}
           </Button>
         )}
       </Box>
 
       {ok && <Alert severity="success" sx={{ mb: 1.5 }} onClose={() => setOk(null)}>{ok}</Alert>}
-      {revoke.isError && <Alert severity="error" role="alert" sx={{ mb: 1.5 }}>{revokeErrorText(revoke.error)}</Alert>}
+      {revoke.isError && <Alert severity="error" role="alert" sx={{ mb: 1.5 }}>{t(revokeErrorText(revoke.error))}</Alert>}
 
       {list.isLoading && (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-          {[0, 1, 2].map((i) => <Skeleton key={i} variant="rounded" height={64} aria-label={`Cargando credencial ${i + 1}`} />)}
+          {[0, 1, 2].map((i) => <Skeleton key={i} variant="rounded" height={64} aria-label={`${t('Cargando credencial')} ${i + 1}`} />)}
         </Box>
       )}
 
       {list.isError && (
-        <Alert severity="error" role="alert" action={<Button color="inherit" size="small" onClick={() => list.refetch()}>Reintentar</Button>}>
-          No se pudieron cargar las credenciales.
+        <Alert severity="error" role="alert" action={<Button color="inherit" size="small" onClick={() => list.refetch()}>{t('Reintentar')}</Button>}>
+          {t('No se pudieron cargar las credenciales.')}
         </Alert>
       )}
 
       {list.isSuccess && rows.length === 0 && (
         <Box sx={{ textAlign: 'center', py: 5, color: 'text.secondary' }}>
           <QrCodeIcon sx={{ fontSize: 48, opacity: 0.4 }} />
-          <Typography variant="body2" sx={{ mt: 1 }}>Aún no se ha emitido ninguna credencial.</Typography>
+          <Typography variant="body2" sx={{ mt: 1 }}>{t('Aún no se ha emitido ninguna credencial.')}</Typography>
         </Box>
       )}
 
@@ -155,7 +159,7 @@ export default function AdminCredenciales() {
                     isActive ? (
                       <IconButton
                         size="small"
-                        aria-label={`Revocar credencial de ${r.user?.full_name ?? ''}`}
+                        aria-label={`${t('Revocar credencial de')} ${r.user?.full_name ?? ''}`}
                         color="error"
                         onClick={() => setConfirmOne(r)}
                       >
@@ -178,7 +182,7 @@ export default function AdminCredenciales() {
                         disabled={!isActive}
                         tabIndex={-1}
                         disableRipple
-                        slotProps={{ input: { 'aria-label': `Seleccionar credencial de ${r.user?.full_name ?? ''}` } }}
+                        slotProps={{ input: { 'aria-label': `${t('Seleccionar credencial de')} ${r.user?.full_name ?? ''}` } }}
                       />
                     </ListItemIcon>
                     <ListItemText
@@ -187,14 +191,14 @@ export default function AdminCredenciales() {
                           {r.kind === 'temporal' ? <PinIcon sx={{ fontSize: 15 }} /> : <QrCodeIcon sx={{ fontSize: 15 }} />}
                           <Typography variant="body2" sx={{ fontWeight: 600 }}>{r.user?.full_name ?? '—'}</Typography>
                           <Chip size="small" label={KIND_LABEL[r.kind] ?? r.kind} sx={{ height: 18, fontSize: '0.65rem' }} variant="outlined" />
-                          <Chip size="small" color={STATUS_COLOR[r.status] ?? 'default'} label={r.status} sx={{ height: 18, fontSize: '0.65rem' }} />
+                          <Chip size="small" color={STATUS_COLOR[r.status] ?? 'default'} label={t(r.status)} sx={{ height: 18, fontSize: '0.65rem' }} />
                         </Box>
                       }
                       secondary={
                         <Box component="span" sx={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {r.user?.email}
-                          {' · '}{new Date(r.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
-                          {r.revoked_at && ` · revocada ${new Date(r.revoked_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}`}
+                          {' · '}{new Date(r.created_at).toLocaleDateString(intlLocale, { day: 'numeric', month: 'short' })}
+                          {r.revoked_at && ` · ${t('revocada')} ${new Date(r.revoked_at).toLocaleDateString(intlLocale, { day: 'numeric', month: 'short' })}`}
                         </Box>
                       }
                     />
@@ -208,37 +212,39 @@ export default function AdminCredenciales() {
 
       {/* Revocación masiva */}
       <Dialog open={confirmBulk} onClose={() => setConfirmBulk(false)} maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700 }}>Revocar {activeSelected.length} credenciales</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('Revocar')} {activeSelected.length} {t('credenciales')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2">
-            Dejarán de funcionar <strong>al instante</strong> (el QR caduca en cuanto se revoca). Las personas afectadas recibirán una notificación.
+            {t('Dejarán de funcionar al instante (el QR caduca en cuanto se revoca). Las personas afectadas recibirán una notificación.')}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setConfirmBulk(false)}>Cancelar</Button>
+          <Button onClick={() => setConfirmBulk(false)}>{t('Cancelar')}</Button>
           <Button color="error" variant="contained" disabled={revoke.isPending} onClick={() => revoke.mutate(activeSelected.map((r) => r.id))}>
-            Revocar
+            {t('Revocar')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Revocación individual */}
       <Dialog open={!!confirmOne} onClose={() => setConfirmOne(null)} maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700 }}>Revocar credencial</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('Revocar credencial')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2">
-            {confirmOne?.user?.full_name} dejará de poder usar su {KIND_LABEL[confirmOne?.kind ?? 'qr']} al instante y recibirá una notificación.
+            {t('{name} dejará de poder usar su {kind} al instante y recibirá una notificación.')
+              .replace('{name}', confirmOne?.user?.full_name ?? '')
+              .replace('{kind}', t(KIND_LABEL[confirmOne?.kind ?? 'qr']))}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setConfirmOne(null)}>Cancelar</Button>
+          <Button onClick={() => setConfirmOne(null)}>{t('Cancelar')}</Button>
           <Button
             color="error"
             variant="contained"
             disabled={revoke.isPending}
             onClick={() => confirmOne && revoke.mutate([confirmOne.id])}
           >
-            Revocar
+            {t('Revocar')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -252,10 +258,10 @@ export default function AdminCredenciales() {
             border: '1px solid', borderColor: 'divider', alignItems: 'center',
           }}
           role="region"
-          aria-label="Acciones sobre la selección"
+          aria-label={t('Acciones sobre la selección')}
         >
           <Typography variant="body2" sx={{ fontWeight: 600, flexGrow: 1 }}>{activeSelected.length} seleccionadas</Typography>
-          <Button size="small" onClick={() => setSelected(new Set())}>Limpiar</Button>
+          <Button size="small" onClick={() => setSelected(new Set())}>{t('Limpiar')}</Button>
           <Button size="small" color="error" variant="contained" startIcon={<BlockIcon />} onClick={() => setConfirmBulk(true)}>
             Revocar
           </Button>

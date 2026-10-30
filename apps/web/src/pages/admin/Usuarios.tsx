@@ -20,6 +20,7 @@ import { useState, type FormEvent } from 'react';
 import PageLayout from '../../components/ui/PageLayout';
 import { supabase } from '../../services/supabase';
 import type { Database } from '../../services/database.types';
+import { useI18n } from '../../i18n/I18nProvider';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -30,6 +31,7 @@ const ROLE_LABEL: Record<string, string> = {
 };
 
 export default function AdminUsuarios() {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
@@ -60,20 +62,20 @@ export default function AdminUsuarios() {
       if (error) throw error;
       if (data?.error) {
         const messages: Record<string, string> = {
-          ese_email_ya_existe: 'Ese email ya tiene cuenta',
-          limite_invitaciones_alcanzado: 'Límite de invitaciones alcanzado (plan free: 2/hora). Inténtalo más tarde o configura SMTP.',
-          sin_permiso: 'Solo un administrador puede invitar usuarios',
+          ese_email_ya_existe: t('Ese email ya tiene cuenta'),
+          limite_invitaciones_alcanzado: t('Límite de invitaciones alcanzado (plan free: 2/hora). Inténtalo más tarde o configura SMTP.'),
+          sin_permiso: t('Solo un administrador puede invitar usuarios'),
         };
-        throw new Error(messages[data.error] ?? 'No se pudo enviar la invitación');
+        throw new Error(messages[data.error] ?? t('No se pudo enviar la invitación'));
       }
-      setOk(`Invitación enviada a ${email}`);
+      setOk(`${t('Invitación enviada a')} ${email}`);
       setOpen(false);
       setEmail('');
       setFullName('');
       setRole('empleado');
       void refetch();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error inesperado');
+      setError(err instanceof Error ? err.message : t('Error inesperado'));
     }
   }
 
@@ -81,10 +83,10 @@ export default function AdminUsuarios() {
     <PageLayout title="Usuarios">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
         <Typography variant="body2" color="text.secondary">
-          {isLoading ? 'Cargando…' : `${profiles?.length ?? 0} usuarios`}
+          {isLoading ? t('Cargando…') : `${profiles?.length ?? 0} ${t('usuarios')}`}
         </Typography>
         <Button variant="contained" onClick={() => setOpen(true)}>
-          Invitar usuario
+          {t('Invitar usuario')}
         </Button>
       </Box>
 
@@ -95,10 +97,10 @@ export default function AdminUsuarios() {
         <Table size="small" sx={{ '& th, & td': { px: 1, py: 1.25 } }}>
           <TableHead>
             <TableRow>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Rol</TableCell>
-              <TableCell>Estado</TableCell>
+              <TableCell>{t('Nombre')}</TableCell>
+              <TableCell>{t('Email')}</TableCell>
+              <TableCell>{t('Rol')}</TableCell>
+              <TableCell>{t('Estado')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -107,7 +109,7 @@ export default function AdminUsuarios() {
                 <TableCell>{p.full_name}</TableCell>
                 <TableCell sx={{ wordBreak: 'break-word', overflowWrap: 'anywhere' }}>{p.email}</TableCell>
                 <TableCell>
-                  <Chip size="small" label={ROLE_LABEL[p.role] ?? p.role} color={p.role === 'admin' ? 'primary' : 'default'} />
+                  <Chip size="small" label={t(ROLE_LABEL[p.role] ?? p.role)} color={p.role === 'admin' ? 'primary' : 'default'} />
                 </TableCell>
                 <TableCell>{p.status}</TableCell>
               </TableRow>
@@ -117,21 +119,21 @@ export default function AdminUsuarios() {
       </Paper>
 
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>Invitar usuario</DialogTitle>
+        <DialogTitle>{t('Invitar usuario')}</DialogTitle>
         <DialogContent>
           <Box component="form" id="invite-form" onSubmit={onInvite} sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField label="Nombre completo" value={fullName} onChange={(e) => setFullName(e.target.value)} required fullWidth />
-            <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth />
-            <TextField label="Rol" select value={role} onChange={(e) => setRole(e.target.value)} fullWidth>
-              <MenuItem value="empleado">Empleado</MenuItem>
-              <MenuItem value="responsable">Responsable</MenuItem>
-              <MenuItem value="admin">Administrador</MenuItem>
+            <TextField label={t('Nombre completo')} value={fullName} onChange={(e) => setFullName(e.target.value)} required fullWidth />
+            <TextField label={t('Email')} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required fullWidth />
+            <TextField label={t('Rol')} select value={role} onChange={(e) => setRole(e.target.value)} fullWidth>
+              <MenuItem value="empleado">{t('Empleado')}</MenuItem>
+              <MenuItem value="responsable">{t('Responsable')}</MenuItem>
+              <MenuItem value="admin">{t('Administrador')}</MenuItem>
             </TextField>
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancelar</Button>
-          <Button type="submit" form="invite-form" variant="contained">Enviar invitación</Button>
+          <Button onClick={() => setOpen(false)}>{t('Cancelar')}</Button>
+          <Button type="submit" form="invite-form" variant="contained">{t('Enviar invitación')}</Button>
         </DialogActions>
       </Dialog>
     </PageLayout>

@@ -14,6 +14,7 @@ import AdminFestivos from '../pages/admin/Festivos';
 import AdminCredenciales from '../pages/admin/Credenciales';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useI18n } from '../i18n/I18nProvider';
 
 const Perfil = lazy(() => import('../pages/account/Perfil'));
 const Idioma = lazy(() => import('../pages/account/Idioma'));
@@ -21,8 +22,9 @@ const Seguridad = lazy(() => import('../pages/account/Seguridad'));
 const Ayuda = lazy(() => import('../pages/account/Ayuda'));
 
 function AccountPageFallback() {
+  const { t } = useI18n();
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }} role="status" aria-label="Cargando sección">
+    <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }} role="status" aria-label={t('Cargando sección')}>
       <CircularProgress />
     </Box>
   );

@@ -9,7 +9,10 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from '@tanstack/react-query';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { brand } from '../app/theme';
+import { supabase } from '../services/supabase';
+import { getNotificationTargetFromState } from './notificationPresentation';
 import {
   formatCountdown,
   issueQr,
@@ -17,6 +20,7 @@ import {
   secondsUntil,
   type QrCredential,
 } from '../services/access';
+import { useI18n } from '../i18n/I18nProvider';
 
 const QR_TTL_SECONDS = 60;
 
@@ -33,10 +37,28 @@ function useNow(active: boolean): number {
 
 /** Pantalla Acceso: fondo azul Repsol, QR a pantalla completa + código temporal (US-02). */
 export default function Acceso() {
+  const { t } = useI18n();
+  const location = useLocation();
+  const target = getNotificationTargetFromState(location.state);
+  const credentialTarget = target?.kind === 'credential' ? target : null;
   const qrQuery = useQuery<QrCredential>({
     queryKey: ['access-qr'],
     queryFn: issueQr,
     retry: 1,
+  });
+  const credentialQuery = useQuery({
+    queryKey: ['notification-credential', credentialTarget?.id],
+    enabled: !!credentialTarget,
+    queryFn: async () => {
+      if (!credentialTarget) return null;
+      const { data, error } = await supabase
+        .from('access_credentials')
+        .select('status')
+        .eq('id', credentialTarget.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
   });
   const { refetch: refetchQr, isFetching: qrFetching } = qrQuery;
   const [temporal, setTemporal] = useState<{ code: string; expires_at: string } | null>(null);
@@ -84,7 +106,7 @@ export default function Acceso() {
       const t = await issueTemporal();
       setTemporal({ code: t.code, expires_at: t.expires_at });
     } catch (err) {
-      setTemporalError(err instanceof Error ? err.message : 'Error inesperado');
+      setTemporalError(err instanceof Error ? err.message : t('Error inesperado'));
     } finally {
       setTemporalBusy(false);
     }
@@ -109,8 +131,29 @@ export default function Acceso() {
       }}
     >
       <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
-        Tu credencial de acceso
+        {t('Tu credencial de acceso')}
       </Typography>
+
+      {credentialTarget && credentialQuery.isLoading && (
+        <Alert severity="info" sx={{ width: '100%', maxWidth: 360 }}>
+          {t('Consultando la credencial relacionada…')}
+        </Alert>
+      )}
+      {credentialTarget && credentialQuery.data && (
+        <Alert severity={credentialQuery.data.status === 'revocada' ? 'warning' : 'info'} sx={{ width: '100%', maxWidth: 360 }}>
+          {t('Credencial relacionada:')} {t(credentialQuery.data.status)}
+        </Alert>
+      )}
+      {credentialTarget && credentialQuery.isError && (
+        <Alert severity="error" sx={{ width: '100%', maxWidth: 360 }}>
+          {t('No se pudo consultar la credencial relacionada.')}
+        </Alert>
+      )}
+      {credentialTarget && !credentialQuery.isLoading && !credentialQuery.isError && !credentialQuery.data && (
+        <Alert severity="warning" sx={{ width: '100%', maxWidth: 360 }}>
+          {t('La credencial relacionada ya no está disponible.')}
+        </Alert>
+      )}
 
       {qrQuery.isError && (
         <Alert
@@ -120,11 +163,11 @@ export default function Acceso() {
           sx={{ width: '100%', maxWidth: 360 }}
           action={
             <Button color="inherit" size="small" onClick={() => refetchQr()}>
-              Reintentar
+              {t('Reintentar')}
             </Button>
           }
         >
-          No se pudo generar tu QR.
+          {t('No se pudo generar tu QR.')}
         </Alert>
       )}
 
@@ -145,8 +188,8 @@ export default function Acceso() {
         }}
         aria-label={
           qr && qrImage
-            ? `Código QR de acceso, caduca en ${formatCountdown(qrSeconds)}`
-            : 'Generando código QR'
+            ? `${t('Código QR de acceso, caduca en')} ${formatCountdown(qrSeconds)}`
+            : t('Generando código QR')
         }
       >
         {qrQuery.isLoading ? (
@@ -162,7 +205,7 @@ export default function Acceso() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Chip
             size="small"
-            label={qrSeconds > 0 ? 'Activa' : 'Caducada'}
+            label={t(qrSeconds > 0 ? 'Activa' : 'Caducada')}
             sx={{
               bgcolor: qrSeconds > 0 ? '#1FA971' : brand.orange,
               color: qrSeconds > 0 ? brand.white : brand.blue,
@@ -170,7 +213,7 @@ export default function Acceso() {
             }}
           />
           <Typography variant="body2" sx={{ fontVariantNumeric: 'tabular-nums', opacity: 0.9 }} aria-live="polite">
-            Caduca en {formatCountdown(qrSeconds)}
+            {t('Caduca en')} {formatCountdown(qrSeconds)}
           </Typography>
         </Box>
       )}
@@ -188,10 +231,10 @@ export default function Acceso() {
         }}
       >
         {qrQuery.isLoading
-          ? 'Generando código QR…'
+          ? t('Generando código QR…')
           : qrFetching
-            ? 'Regenerando…'
-            : 'Regenerar código QR'}
+            ? t('Regenerando…')
+            : t('Regenerar código QR')}
       </Button>
 
       {temporalError && (
@@ -206,7 +249,7 @@ export default function Acceso() {
             {temporal.code}
           </Typography>
           <Typography variant="body2" sx={{ opacity: 0.85 }}>
-            Código temporal · caduca en {formatCountdown(temporalSeconds)}
+            {t('Código temporal')} · {t('Caduca en')} {formatCountdown(temporalSeconds)}
           </Typography>
         </Box>
       ) : (
@@ -221,12 +264,12 @@ export default function Acceso() {
             '&:hover': { borderColor: brand.white, bgcolor: 'rgba(255,255,255,0.08)' },
           }}
         >
-          {temporalBusy ? 'Generando…' : 'Usar código temporal'}
+          {temporalBusy ? t('Generando…') : t('Usar código temporal')}
         </Button>
       )}
 
       <Typography variant="caption" sx={{ opacity: 0.7, textAlign: 'center', maxWidth: 320 }}>
-        Muéstralo en el lector del torno para registrar tu entrada o salida.
+        {t('Muéstralo en el lector del torno para registrar tu entrada o salida.')}
       </Typography>
     </Box>
   );

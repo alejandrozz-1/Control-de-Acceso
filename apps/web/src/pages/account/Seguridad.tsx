@@ -16,6 +16,7 @@ import AccountSubpage from './AccountSubpage';
 import { useAuthStore } from '../../services/auth';
 import { supabase } from '../../services/supabase';
 import { checkPasswordPolicy } from './passwordPolicy';
+import { useI18n } from '../../i18n/I18nProvider';
 
 const POLICY_LABELS = [
   ['minLength', 'Al menos 10 caracteres'],
@@ -30,6 +31,7 @@ const ALLOWED_SYMBOLS = '! @ # $ % ^ & * ( ) _ - + = [ ] { } : ; , ? / | ~';
 
 export default function Seguridad() {
   const { profile } = useAuthStore();
+  const { t } = useI18n();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmation, setConfirmation] = useState('');
@@ -48,19 +50,19 @@ export default function Seguridad() {
     setSuccess(null);
 
     if (!profile?.email) {
-      setError('No se encontró el correo de la cuenta para verificar tu contraseña actual.');
+      setError(t('No se encontró el correo de la cuenta para verificar tu contraseña actual.'));
       return;
     }
     if (!Object.values(policy).every(Boolean)) {
-      setError('La nueva contraseña no cumple todos los requisitos indicados.');
+      setError(t('La nueva contraseña no cumple todos los requisitos indicados.'));
       return;
     }
     if (newPassword !== confirmation) {
-      setError('La confirmación no coincide con la nueva contraseña.');
+      setError(t('La confirmación no coincide con la nueva contraseña.'));
       return;
     }
     if (newPassword === currentPassword) {
-      setError('La nueva contraseña debe ser diferente de la actual.');
+      setError(t('La nueva contraseña debe ser diferente de la actual.'));
       return;
     }
 
@@ -73,24 +75,24 @@ export default function Seguridad() {
       if (verifyError) {
         setError(
           verifyError.message === 'Invalid login credentials'
-            ? 'La contraseña actual no es correcta.'
-            : 'No se pudo verificar la contraseña actual. Inténtalo de nuevo.',
+            ? t('La contraseña actual no es correcta.')
+            : t('No se pudo verificar la contraseña actual. Inténtalo de nuevo.'),
         );
         return;
       }
 
       const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
       if (updateError) {
-        setError('No se pudo actualizar la contraseña. Comprueba los requisitos e inténtalo de nuevo.');
+        setError(t('No se pudo actualizar la contraseña. Comprueba los requisitos e inténtalo de nuevo.'));
         return;
       }
 
       setCurrentPassword('');
       setNewPassword('');
       setConfirmation('');
-      setSuccess('Tu contraseña se ha actualizado correctamente.');
+      setSuccess(t('Tu contraseña se ha actualizado correctamente.'));
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'No se pudo cambiar la contraseña.');
+      setError(submitError instanceof Error ? t(submitError.message) : t('No se pudo cambiar la contraseña.'));
     } finally {
       setBusy(false);
     }
@@ -102,14 +104,14 @@ export default function Seguridad() {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
           <LockOutlinedIcon color="primary" />
           <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
-            Cambiar contraseña
+            {t('Cambiar contraseña')}
           </Typography>
         </Box>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Para confirmar el cambio, primero tendrás que verificar tu contraseña actual.
+          {t('Para confirmar el cambio, primero tendrás que verificar tu contraseña actual.')}
         </Typography>
         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
-          Símbolos aceptados: {ALLOWED_SYMBOLS}
+          {t('Símbolos aceptados:')} {ALLOWED_SYMBOLS}
         </Typography>
 
         {error && <Alert severity="error" role="alert" sx={{ mb: 2 }}>{error}</Alert>}
@@ -117,7 +119,7 @@ export default function Seguridad() {
 
         <Box component="form" onSubmit={onSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <TextField
-            label="Contraseña actual"
+            label={t('Contraseña actual')}
             type="password"
             autoComplete="current-password"
             value={currentPassword}
@@ -126,16 +128,16 @@ export default function Seguridad() {
             fullWidth
           />
           <TextField
-            label="Nueva contraseña"
+            label={t('Nueva contraseña')}
             type="password"
             autoComplete="new-password"
             value={newPassword}
             onChange={(event) => setNewPassword(event.target.value)}
             required
             fullWidth
-            helperText="Se comprueban los requisitos mientras escribes."
+            helperText={t('Se comprueban los requisitos mientras escribes.')}
           />
-          <List dense disablePadding aria-label="Requisitos de la contraseña">
+          <List dense disablePadding           aria-label={t('Requisitos de la contraseña')}>
             {POLICY_LABELS.map(([key, label]) => {
               const isValid = policy[key];
               const Icon = isValid ? CheckCircleOutlineIcon : RadioButtonUncheckedIcon;
@@ -145,7 +147,7 @@ export default function Seguridad() {
                     <Icon fontSize="small" />
                   </ListItemIcon>
                   <ListItemText
-                    primary={label}
+                    primary={t(label)}
                     slotProps={{ primary: { variant: 'body2', color: isValid ? 'text.primary' : 'text.secondary' } }}
                   />
                 </ListItem>
@@ -153,7 +155,7 @@ export default function Seguridad() {
             })}
           </List>
           <TextField
-            label="Repite la nueva contraseña"
+            label={t('Repite la nueva contraseña')}
             type="password"
             autoComplete="new-password"
             value={confirmation}
@@ -162,7 +164,7 @@ export default function Seguridad() {
             fullWidth
           />
           <Button type="submit" variant="contained" disabled={busy} sx={{ minHeight: 48, borderRadius: 3 }}>
-            {busy ? 'Actualizando…' : 'Cambiar contraseña'}
+            {busy ? t('Actualizando…') : t('Cambiar contraseña')}
           </Button>
         </Box>
       </Paper>

@@ -3,10 +3,12 @@ import CircularProgress from '@mui/material/CircularProgress';
 import type { ReactNode } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { hasRole, useAuthStore, type Role } from '../services/auth';
+import { useI18n } from '../i18n/I18nProvider';
 
 function Loading() {
+  const { t } = useI18n();
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }} role="status" aria-label="Cargando">
+    <Box sx={{ display: 'flex', justifyContent: 'center', pt: 8 }} role="status" aria-label={t('Cargando')}>
       <CircularProgress />
     </Box>
   );

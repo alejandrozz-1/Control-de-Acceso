@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { supabase } from './supabase';
 import { useAuthStore } from './auth';
@@ -15,22 +15,51 @@ export interface AppNotification {
 
 const KEY = 'notifications';
 const UNREAD_KEY = 'notifications-unread';
+export const NOTIFICATIONS_PAGE_SIZE = 20;
 
-/** Últimas 50 notificaciones del usuario (RLS filtra por user_id). */
+interface NotificationCursor {
+  createdAt: string;
+  id: string;
+}
+
+interface NotificationPage {
+  items: AppNotification[];
+  nextCursor: NotificationCursor | null;
+}
+
+/** Carga notificaciones por páginas estables, manteniendo el orden con inserciones en tiempo real. */
 export function useNotifications() {
   const uid = useAuthStore((s) => s.session?.user.id);
-  return useQuery({
-    queryKey: [KEY, uid],
+  return useInfiniteQuery({
+    queryKey: [KEY, uid, 'infinite'],
     enabled: !!uid,
-    queryFn: async () => {
-      const { data, error } = await supabase
+    initialPageParam: null as NotificationCursor | null,
+    queryFn: async ({ pageParam }): Promise<NotificationPage> => {
+      let query = supabase
         .from('notifications')
         .select('id, type, title, body, data, read_at, created_at')
         .order('created_at', { ascending: false })
-        .limit(50);
+        .order('id', { ascending: false });
+
+      if (pageParam) {
+        query = query.or(
+          `created_at.lt.${pageParam.createdAt},and(created_at.eq.${pageParam.createdAt},id.lt.${pageParam.id})`,
+        );
+      }
+
+      const { data, error } = await query.limit(NOTIFICATIONS_PAGE_SIZE);
       if (error) throw error;
-      return data as AppNotification[];
+      const items = data as AppNotification[];
+      const last = items.at(-1);
+      return {
+        items,
+        nextCursor:
+          items.length === NOTIFICATIONS_PAGE_SIZE && last
+            ? { createdAt: last.created_at, id: last.id }
+            : null,
+      };
     },
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 }
 
@@ -77,6 +106,20 @@ export function useMarkAllRead() {
         .from('notifications')
         .update({ read_at: new Date().toISOString() })
         .is('read_at', null);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: [KEY] });
+      void qc.invalidateQueries({ queryKey: [UNREAD_KEY] });
+    },
+  });
+}
+
+export function useDeleteNotification() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('notifications').delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

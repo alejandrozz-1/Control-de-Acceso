@@ -7,6 +7,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Typography from '@mui/material/Typography';
+import { useI18n } from '../../i18n/I18nProvider';
 
 export const NAV_ITEMS = [
   { label: 'Inicio', path: '/', icon: <HomeIcon /> },
@@ -21,6 +22,7 @@ export function getActiveNavPath(pathname: string): string | null {
 export default function BottomNav() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { t } = useI18n();
   const current = getActiveNavPath(pathname);
 
   return (
@@ -39,7 +41,7 @@ export default function BottomNav() {
     >
       <Box
         component="nav"
-        aria-label="Navegación principal"
+        aria-label={t('Navegación principal')}
         sx={{
           height: 72,
           maxWidth: 600,
@@ -67,13 +69,13 @@ export default function BottomNav() {
           >
             {item.icon}
             <Typography variant="caption" sx={{ fontWeight: current === item.path ? 700 : 500 }}>
-              {item.label}
+              {t(item.label)}
             </Typography>
           </ButtonBase>
         ))}
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-end', pb: 1.25 }}>
           <Typography variant="caption" sx={{ color: current === '/acceso' ? 'primary.main' : 'text.secondary', fontWeight: current === '/acceso' ? 700 : 500 }}>
-            Acceso
+            {t('Acceso')}
           </Typography>
         </Box>
         {NAV_ITEMS.slice(1, 2).map((item) => (
@@ -92,13 +94,13 @@ export default function BottomNav() {
           >
             {item.icon}
             <Typography variant="caption" sx={{ fontWeight: current === item.path ? 700 : 500 }}>
-              {item.label}
+              {t(item.label)}
             </Typography>
           </ButtonBase>
         ))}
         <Fab
           color="secondary"
-          aria-label="Acceso"
+          aria-label={t('Acceso')}
           aria-current={current === '/acceso' ? 'page' : undefined}
           onClick={() => navigate('/acceso')}
           sx={{

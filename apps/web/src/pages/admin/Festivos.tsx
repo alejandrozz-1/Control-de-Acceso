@@ -22,6 +22,8 @@ import { useState, type FormEvent } from 'react';
 import { brand } from '../../app/theme';
 import PageLayout from '../../components/ui/PageLayout';
 import { supabase } from '../../services/supabase';
+import { getIntlLocale } from '../../i18n/catalog';
+import { useI18n } from '../../i18n/I18nProvider';
 
 interface HolidayRow { id: string; name: string; date: string; scope: string; comunidad: string | null }
 interface EventRow { id: string; title: string; description: string | null; starts_at: string; ends_at: string | null; all_day: boolean }
@@ -81,6 +83,8 @@ function EmptyState({ icon, children }: { icon: React.ReactNode; children: React
 
 /** T-014: alta/baja de festivos y eventos corporativos (RLS admin-only ya existente). */
 export default function AdminFestivos() {
+  const { locale, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
   const qc = useQueryClient();
   const [hDialog, setHDialog] = useState(false);
   const [eDialog, setEDialog] = useState(false);
@@ -168,9 +172,9 @@ export default function AdminFestivos() {
   const errText = (m: unknown) => {
     if (!m) return null;
     const s = String(m);
-    if (s.includes('row-level security') || s.includes('403')) return 'Solo un administrador puede modificar estos datos';
-    if (s.includes('duplicate') || s.includes('23505')) return 'Ese registro ya existe';
-    return 'No se pudo guardar. Inténtalo de nuevo.';
+    if (s.includes('row-level security') || s.includes('403')) return t('Solo un administrador puede modificar estos datos');
+    if (s.includes('duplicate') || s.includes('23505')) return t('Ese registro ya existe');
+    return t('No se pudo guardar. Inténtalo de nuevo.');
   };
 
   return (
@@ -184,33 +188,33 @@ export default function AdminFestivos() {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <HolidayVillageIcon fontSize="small" color="primary" />
-            <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>Festivos</Typography>
+            <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>{t('Festivos')}</Typography>
           </Box>
-          <Button size="small" startIcon={<AddIcon />} onClick={() => setHDialog(true)}>Añadir</Button>
+          <Button size="small" startIcon={<AddIcon />} onClick={() => setHDialog(true)}>{t('Añadir')}</Button>
         </Box>
 
-        {holidays.isLoading && <Skeleton variant="rounded" height={72} aria-label="Cargando festivos" />}
+        {holidays.isLoading && <Skeleton variant="rounded" height={72} aria-label={t('Cargando festivos')} />}
         {holidays.isError && (
-          <Alert severity="error" role="alert" action={<Button color="inherit" size="small" onClick={() => holidays.refetch()}>Reintentar</Button>}>
-            No se pudo cargar la lista de festivos.
+          <Alert severity="error" role="alert" action={<Button color="inherit" size="small" onClick={() => holidays.refetch()}>{t('Reintentar')}</Button>}>
+            {t('No se pudo cargar la lista de festivos.')}
           </Alert>
         )}
         {holidays.isSuccess && holidays.data.length === 0 && (
-          <EmptyState icon={<HolidayVillageIcon sx={{ fontSize: 40, opacity: 0.4 }} />}>No hay festivos configurados.</EmptyState>
+          <EmptyState icon={<HolidayVillageIcon sx={{ fontSize: 40, opacity: 0.4 }} />}>{t('No hay festivos configurados.')}</EmptyState>
         )}
         {(holidays.data ?? []).map((h) => (
           <Box key={h.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, py: 0.75, borderBottom: '1px solid', borderColor: 'divider' }}>
             <Typography variant="body2" sx={{ flexGrow: 1, minWidth: 0, fontWeight: 500 }}>{h.name}</Typography>
             <Chip
               size="small"
-              label={h.comunidad ? `${SCOPE_LABEL[h.scope] ?? h.scope} · ${h.comunidad}` : SCOPE_LABEL[h.scope] ?? h.scope}
+              label={h.comunidad ? `${t(SCOPE_LABEL[h.scope] ?? h.scope)} · ${h.comunidad}` : t(SCOPE_LABEL[h.scope] ?? h.scope)}
               variant="outlined"
               sx={{ height: 20, fontSize: '0.68rem', flexShrink: 0 }}
             />
             <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
-              {new Date(`${h.date}T12:00:00`).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: '2-digit' })}
+              {new Date(`${h.date}T12:00:00`).toLocaleDateString(intlLocale, { day: 'numeric', month: 'short', year: '2-digit' })}
             </Typography>
-            <IconButton size="small" aria-label={`Eliminar festivo ${h.name}`} onClick={() => setConfirm({ kind: 'holiday', id: h.id, label: h.name })}>
+            <IconButton size="small" aria-label={`${t('Eliminar festivo')} ${h.name}`} onClick={() => setConfirm({ kind: 'holiday', id: h.id, label: h.name })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Box>
@@ -222,30 +226,30 @@ export default function AdminFestivos() {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <EventIcon fontSize="small" sx={{ color: brand.orange }} />
-            <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>Eventos corporativos</Typography>
+            <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>{t('Eventos corporativos')}</Typography>
           </Box>
-          <Button size="small" startIcon={<AddIcon />} onClick={() => setEDialog(true)}>Añadir</Button>
+          <Button size="small" startIcon={<AddIcon />} onClick={() => setEDialog(true)}>{t('Añadir')}</Button>
         </Box>
 
-        {events.isLoading && <Skeleton variant="rounded" height={72} aria-label="Cargando eventos" />}
+        {events.isLoading && <Skeleton variant="rounded" height={72} aria-label={t('Cargando eventos')} />}
         {events.isError && (
-          <Alert severity="error" role="alert" action={<Button color="inherit" size="small" onClick={() => events.refetch()}>Reintentar</Button>}>
-            No se pudieron cargar los eventos.
+          <Alert severity="error" role="alert" action={<Button color="inherit" size="small" onClick={() => events.refetch()}>{t('Reintentar')}</Button>}>
+            {t('No se pudieron cargar los eventos.')}
           </Alert>
         )}
         {events.isSuccess && events.data.length === 0 && (
-          <EmptyState icon={<EventIcon sx={{ fontSize: 40, opacity: 0.4 }} />}>No hay eventos corporativos.</EmptyState>
+          <EmptyState icon={<EventIcon sx={{ fontSize: 40, opacity: 0.4 }} />}>{t('No hay eventos corporativos.')}</EmptyState>
         )}
         {(events.data ?? []).map((ev) => (
           <Box key={ev.id} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, py: 0.75, borderBottom: '1px solid', borderColor: 'divider' }}>
             <Box sx={{ flexGrow: 1, minWidth: 0 }}>
               <Typography variant="body2" sx={{ fontWeight: 500 }}>{ev.title}</Typography>
               <Typography variant="caption" color="text.secondary">
-                {new Date(ev.starts_at).toLocaleString('es-ES', { day: 'numeric', month: 'short', year: '2-digit', hour: ev.all_day ? undefined : '2-digit', minute: ev.all_day ? undefined : '2-digit' })}
-                {ev.all_day ? ' · todo el día' : ''}
+                {new Date(ev.starts_at).toLocaleString(intlLocale, { day: 'numeric', month: 'short', year: '2-digit', hour: ev.all_day ? undefined : '2-digit', minute: ev.all_day ? undefined : '2-digit' })}
+                {ev.all_day ? ` · ${t('todo el día')}` : ''}
               </Typography>
             </Box>
-            <IconButton size="small" aria-label={`Eliminar evento ${ev.title}`} onClick={() => setConfirm({ kind: 'event', id: ev.id, label: ev.title })}>
+            <IconButton size="small" aria-label={`${t('Eliminar evento')} ${ev.title}`} onClick={() => setConfirm({ kind: 'event', id: ev.id, label: ev.title })}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Box>
@@ -254,74 +258,74 @@ export default function AdminFestivos() {
 
       {/* Alta festivo */}
       <Dialog open={hDialog} onClose={() => setHDialog(false)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700 }}>Nuevo festivo</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('Nuevo festivo')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '12px !important' }}>
-          <TextField label="Nombre" value={hName} onChange={(e) => setHName(e.target.value)} size="small" required />
-          <TextField label="Fecha" type="date" value={hDate} onChange={(e) => setHDate(e.target.value)} size="small" required
+          <TextField label={t('Nombre')} value={hName} onChange={(e) => setHName(e.target.value)} size="small" required />
+          <TextField label={t('Fecha')} type="date" value={hDate} onChange={(e) => setHDate(e.target.value)} size="small" required
             slotProps={{ inputLabel: { shrink: true } }} />
-          <TextField label="Ámbito" select value={hScope} onChange={(e) => setHScope(e.target.value)} size="small">
-            <MenuItem value="nacional">Nacional</MenuItem>
-            <MenuItem value="comunidad">Comunidad</MenuItem>
-            <MenuItem value="centro">Centro</MenuItem>
+          <TextField label={t('Ámbito')} select value={hScope} onChange={(e) => setHScope(e.target.value)} size="small">
+            <MenuItem value="nacional">{t('Nacional')}</MenuItem>
+            <MenuItem value="comunidad">{t('Comunidad')}</MenuItem>
+            <MenuItem value="centro">{t('Centro')}</MenuItem>
           </TextField>
           {hScope === 'comunidad' && (
-            <TextField label="Comunidad (ej. madrid)" value={hCom} onChange={(e) => setHCom(e.target.value)} size="small" />
+            <TextField label={t('Comunidad (ej. madrid)')} value={hCom} onChange={(e) => setHCom(e.target.value)} size="small" />
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button onClick={() => setHDialog(false)}>Cancelar</Button>
+          <Button onClick={() => setHDialog(false)}>{t('Cancelar')}</Button>
           <Button variant="contained" disabled={!hName.trim() || !hDate || createHoliday.isPending} onClick={onHolidaySubmit}>
-            Guardar
+            {t('Guardar')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Alta evento */}
       <Dialog open={eDialog} onClose={() => setEDialog(false)} fullWidth maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700 }}>Nuevo evento</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('Nuevo evento')}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '12px !important' }}>
-          <TextField label="Título" value={eTitle} onChange={(e) => setETitle(e.target.value)} size="small" required />
-          <TextField label="Descripción (opcional)" value={eDesc} onChange={(e) => setEDesc(e.target.value)} size="small" multiline minRows={2} />
+          <TextField label={t('Título')} value={eTitle} onChange={(e) => setETitle(e.target.value)} size="small" required />
+          <TextField label={t('Descripción (opcional)')} value={eDesc} onChange={(e) => setEDesc(e.target.value)} size="small" multiline minRows={2} />
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Switch checked={eAllDay} onChange={(e) => setEAllDay(e.target.checked)} slotProps={{ input: { 'aria-label': 'Todo el día' } }} />
-            <Typography variant="body2">Todo el día</Typography>
+            <Switch checked={eAllDay} onChange={(e) => setEAllDay(e.target.checked)} slotProps={{ input: { 'aria-label': t('Todo el día') } }} />
+            <Typography variant="body2">{t('Todo el día')}</Typography>
           </Box>
-          <TextField label="Fecha" type="date" value={eDate} onChange={(e) => setEDate(e.target.value)} size="small" required
+          <TextField label={t('Fecha')} type="date" value={eDate} onChange={(e) => setEDate(e.target.value)} size="small" required
             slotProps={{ inputLabel: { shrink: true } }} />
           {!eAllDay && (
             <Box sx={{ display: 'flex', gap: 2 }}>
-              <TextField label="Inicio" type="time" value={eStart} onChange={(e) => setEStart(e.target.value)} size="small" fullWidth
+              <TextField label={t('Inicio')} type="time" value={eStart} onChange={(e) => setEStart(e.target.value)} size="small" fullWidth
                 slotProps={{ inputLabel: { shrink: true } }} />
-              <TextField label="Fin (opcional)" type="time" value={eEnd} onChange={(e) => setEEnd(e.target.value)} size="small" fullWidth
+              <TextField label={t('Fin (opcional)')} type="time" value={eEnd} onChange={(e) => setEEnd(e.target.value)} size="small" fullWidth
                 slotProps={{ inputLabel: { shrink: true } }} />
             </Box>
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5 }}>
-          <Button onClick={() => setEDialog(false)}>Cancelar</Button>
+          <Button onClick={() => setEDialog(false)}>{t('Cancelar')}</Button>
           <Button variant="contained" disabled={!eTitle.trim() || !eDate || createEvent.isPending} onClick={onEventSubmit}>
-            Guardar
+            {t('Guardar')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Confirmación de borrado */}
       <Dialog open={!!confirm} onClose={() => setConfirm(null)} maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700 }}>¿Eliminar?</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('¿Eliminar?')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2">
-            Se eliminará «{confirm?.label}». Esta acción queda registrada en la auditoría.
+            {t('Se eliminará «{item}». Esta acción queda registrada en la auditoría.').replace('{item}', confirm?.label ?? '')}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setConfirm(null)}>Cancelar</Button>
+          <Button onClick={() => setConfirm(null)}>{t('Cancelar')}</Button>
           <Button
             color="error"
             variant="contained"
             disabled={remove.isPending}
             onClick={() => confirm && remove.mutate({ kind: confirm.kind, id: confirm.id })}
           >
-            Eliminar
+            {t('Eliminar')}
           </Button>
         </DialogActions>
       </Dialog>

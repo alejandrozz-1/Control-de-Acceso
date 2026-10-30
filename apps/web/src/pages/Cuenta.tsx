@@ -34,6 +34,8 @@ import { brand } from '../app/theme';
 import PageLayout from '../components/ui/PageLayout';
 import { useAuthStore } from '../services/auth';
 import { supabase } from '../services/supabase';
+import { getIntlLocale } from '../i18n/catalog';
+import { useI18n } from '../i18n/I18nProvider';
 
 const ROLE_LABEL: Record<string, string> = {
   empleado: 'Empleado',
@@ -54,9 +56,9 @@ function initials(name: string): string {
   return `${first?.[0] ?? ''}${second?.[0] ?? ''}`.toUpperCase() || '—';
 }
 
-function formatAccessDate(value: string | undefined): string {
+function formatAccessDate(value: string | undefined, locale: string): string {
   if (!value) return 'Sin accesos registrados';
-  return new Date(value).toLocaleString('es-ES', {
+  return new Date(value).toLocaleString(locale, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
@@ -67,6 +69,8 @@ function formatAccessDate(value: string | undefined): string {
 
 export default function Cuenta() {
   const { profile, signOut } = useAuthStore();
+  const { locale, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
   const { mode, setMode } = useColorScheme();
   const [error, setError] = useState<string | null>(null);
 
@@ -123,36 +127,36 @@ export default function Cuenta() {
     try {
       await signOut();
     } catch {
-      setError('No se pudo cerrar sesión. Inténtalo de nuevo.');
+      setError(t('No se pudo cerrar sesión. Inténtalo de nuevo.'));
     }
   }
 
   const centerName = !profile
-    ? 'Cargando…'
+    ? t('Cargando…')
     : centerQuery.isError
-      ? 'No se pudo cargar'
-      : centerQuery.data?.name ?? 'Sin centro asignado';
-  const roleName = profile ? ROLE_LABEL[profile.role] ?? profile.role : 'Cargando…';
+      ? t('No se pudo cargar')
+      : centerQuery.data?.name ?? t('Sin centro asignado');
+  const roleName = profile ? t(ROLE_LABEL[profile.role] ?? profile.role) : t('Cargando…');
   const credential = credentialQuery.data;
   const credentialActive =
     credential?.status === 'activa' &&
     (!credential.expires_at || new Date(credential.expires_at).getTime() > Date.now());
   const credentialLabel = !profile
-    ? 'Cargando…'
+    ? t('Cargando…')
     : credentialQuery.isError
-      ? 'No se pudo comprobar'
+      ? t('No se pudo comprobar')
       : !credential
-        ? 'Sin credencial emitida'
+        ? t('Sin credencial emitida')
         : credentialActive
-          ? 'Credencial activa'
+          ? t('Credencial activa')
           : credential.status === 'revocada'
-            ? 'Credencial revocada'
-            : 'Credencial caducada';
+            ? t('Credencial revocada')
+            : t('Credencial caducada');
   const lastAccessLabel = !profile || lastAccessQuery.isLoading
-    ? 'Cargando…'
+    ? t('Cargando…')
     : lastAccessQuery.isError
-      ? 'No se pudo cargar'
-      : formatAccessDate(lastAccessQuery.data?.scanned_at);
+      ? t('No se pudo cargar')
+      : formatAccessDate(lastAccessQuery.data?.scanned_at, intlLocale);
 
   return (
     <PageLayout title="Cuenta">
@@ -170,7 +174,7 @@ export default function Cuenta() {
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, position: 'relative' }}>
             <Avatar
-              aria-label={`Avatar de ${profile?.full_name ?? 'usuario'}`}
+              aria-label={`${t('Avatar de')} ${profile?.full_name ?? t('usuario')}`}
               sx={{
                 width: 64,
                 height: 64,
@@ -185,15 +189,15 @@ export default function Cuenta() {
             </Avatar>
             <Box sx={{ minWidth: 0 }}>
               <Typography variant="h6" component="h2" sx={{ fontWeight: 800, lineHeight: 1.2 }}>
-                {profile?.full_name ?? 'Cargando perfil…'}
+                {profile?.full_name ?? t('Cargando perfil…')}
               </Typography>
               <Typography variant="body2" sx={{ mt: 0.5, opacity: 0.92 }}>
-                {roleName} · {profile?.employee_code ?? 'Sin ID de empleado'}
+                {roleName} · {profile?.employee_code ?? t('Sin ID de empleado')}
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 1 }}>
                 <LocationOnIcon fontSize="small" />
                 <Typography variant="body2" sx={{ overflowWrap: 'anywhere' }}>
-                  {centerQuery.isLoading ? 'Cargando centro…' : centerName}
+                  {centerQuery.isLoading ? t('Cargando centro…') : centerName}
                 </Typography>
               </Box>
             </Box>
@@ -216,11 +220,11 @@ export default function Cuenta() {
                   ]);
                 }}
               >
-                Reintentar
+                {t('Reintentar')}
               </Button>
             }
           >
-            No se ha podido cargar toda la información de tu cuenta.
+            {t('No se ha podido cargar toda la información de tu cuenta.')}
           </Alert>
         )}
 
@@ -232,7 +236,7 @@ export default function Cuenta() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <QrCode2Icon color="primary" />
               <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 800 }}>
-                Credencial
+                {t('Credencial')}
               </Typography>
             </Box>
             {credentialQuery.isLoading ? (
@@ -256,15 +260,15 @@ export default function Cuenta() {
 
           <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(3, 1fr)' }, gap: 2 }}>
             <Box>
-              <Typography variant="caption" color="text.secondary">Centro</Typography>
+              <Typography variant="caption" color="text.secondary">{t('Centro')}</Typography>
               <Typography variant="body2" sx={{ fontWeight: 700 }}>{centerName}</Typography>
             </Box>
             <Box>
-              <Typography variant="caption" color="text.secondary">Nivel de acceso</Typography>
+              <Typography variant="caption" color="text.secondary">{t('Nivel de acceso')}</Typography>
               <Typography variant="body2" sx={{ fontWeight: 700 }}>{roleName}</Typography>
             </Box>
             <Box sx={{ gridColumn: { xs: '1 / -1', sm: 'auto' } }}>
-              <Typography variant="caption" color="text.secondary">Último acceso</Typography>
+              <Typography variant="caption" color="text.secondary">{t('Último acceso')}</Typography>
               <Typography variant="body2" sx={{ fontWeight: 700 }}>
                 {lastAccessLabel}
               </Typography>
@@ -277,7 +281,7 @@ export default function Cuenta() {
             startIcon={<QrCode2Icon />}
             sx={{ mt: 1.5, px: 0, minHeight: 48 }}
           >
-            Abrir credencial
+            {t('Abrir credencial')}
           </Button>
         </Paper>
 
@@ -286,7 +290,7 @@ export default function Cuenta() {
           sx={{ borderRadius: 4, overflow: 'hidden', boxShadow: '0 4px 18px rgba(4,30,66,0.06)' }}
         >
           <Typography variant="subtitle1" component="h2" sx={{ px: 2.5, pt: 2, fontWeight: 800 }}>
-            Configuración
+            {t('Configuración')}
           </Typography>
           <List disablePadding sx={{ py: 1 }}>
             {settings.map(({ label, to, Icon }, index) => (
@@ -307,8 +311,8 @@ export default function Cuenta() {
                   <ListItemIcon sx={{ minWidth: 42, color: 'primary.main' }}>
                     <Icon />
                   </ListItemIcon>
-                  <ListItemText primary={label} slotProps={{ primary: { sx: { fontWeight: 600 } } }} />
-                  <ArrowForwardIosIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                  <ListItemText primary={t(label)} slotProps={{ primary: { sx: { fontWeight: 600 } } }} />
+                  <ArrowForwardIosIcon sx={{ fontSize: 14, color: 'text.secondary', transform: locale === 'ar' ? 'scaleX(-1)' : undefined }} />
                 </ListItemButton>
               </ListItem>
             ))}
@@ -321,14 +325,14 @@ export default function Cuenta() {
                   <DarkModeIcon />
                 </ListItemIcon>
                 <ListItemText
-                  primary="Modo oscuro"
-                  secondary="Azul marino y acentos Repsol"
+                  primary={t('Modo oscuro')}
+                  secondary={t('Azul marino y acentos Repsol')}
                   slotProps={{ primary: { sx: { fontWeight: 600 } }, secondary: { variant: 'caption' } }}
                 />
                 <Switch
                   checked={mode === 'dark'}
                   onChange={(_, checked) => setMode(checked ? 'dark' : 'light')}
-                  slotProps={{ input: { 'aria-label': 'Modo oscuro' } }}
+                  slotProps={{ input: { 'aria-label': t('Modo oscuro') } }}
                 />
               </Box>
             </ListItem>
@@ -340,11 +344,11 @@ export default function Cuenta() {
           sx={{ p: 2.5, borderRadius: 4, boxShadow: '0 4px 18px rgba(4,30,66,0.06)' }}
         >
           <Typography variant="subtitle1" component="h2" sx={{ mb: 1.5, fontWeight: 800 }}>
-            Información
+            {t('Información')}
           </Typography>
           <List disablePadding>
             {[
-              { label: 'ID empleado', value: profile?.employee_code ?? 'No asignado', Icon: BadgeIcon },
+              { label: 'ID empleado', value: profile?.employee_code ?? t('No asignado'), Icon: BadgeIcon },
               { label: 'Rol', value: roleName, Icon: AdminPanelSettingsIcon },
               { label: 'Centro asignado', value: centerName, Icon: LocationOnIcon },
               { label: 'Versión de la aplicación', value: `v${appPackage.version}`, Icon: AccessTimeIcon },
@@ -359,7 +363,7 @@ export default function Cuenta() {
                   <Icon fontSize="small" />
                 </ListItemIcon>
                 <ListItemText
-                  primary={label}
+                  primary={t(label)}
                   secondary={value}
                   slotProps={{
                     primary: { variant: 'caption', color: 'text.secondary' },
@@ -378,16 +382,16 @@ export default function Cuenta() {
         {profile?.role === 'admin' && (
           <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 4 }}>
             <Typography variant="subtitle1" component="h2" sx={{ mb: 1, fontWeight: 800 }}>
-              Administración
+              {t('Administración')}
             </Typography>
             <Button component={RouterLink} to="/admin/usuarios" variant="outlined" fullWidth>
-              Gestionar usuarios
+              {t('Gestionar usuarios')}
             </Button>
             <Button component={RouterLink} to="/admin/credenciales" variant="outlined" fullWidth sx={{ mt: 1 }}>
-              Credenciales de acceso
+              {t('Credenciales de acceso')}
             </Button>
             <Button component={RouterLink} to="/admin/festivos" variant="outlined" fullWidth sx={{ mt: 1 }}>
-              Festivos y eventos
+              {t('Festivos y eventos')}
             </Button>
           </Paper>
         )}
@@ -400,7 +404,7 @@ export default function Cuenta() {
           onClick={onLogout}
           sx={{ minHeight: 52, borderRadius: 3, fontWeight: 700 }}
         >
-          Cerrar sesión
+          {t('Cerrar sesión')}
         </Button>
       </Box>
     </PageLayout>

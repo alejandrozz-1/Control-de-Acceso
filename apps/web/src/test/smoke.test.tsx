@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import type { Session } from '@supabase/supabase-js';
 import App from '../App';
@@ -47,6 +47,18 @@ test('con sesión el shell separa la navegación inferior de las acciones superi
   }
   expect(screen.getByRole('link', { name: 'Abrir notificaciones' })).toHaveAttribute('href', '/notificaciones');
   expect(screen.getByRole('link', { name: 'Abrir cuenta' })).toHaveAttribute('href', '/cuenta');
+});
+
+test('la navegación inferior traduce Calendario al catalán', async () => {
+  useAuthStore.setState({
+    session: fakeSession,
+    profile: { ...empleado, locale: 'ca' },
+    profileLoaded: true,
+  });
+  render(<App />);
+  await waitFor(() => {
+    expect(screen.getByText('Calendari')).toBeInTheDocument();
+  });
 });
 
 test('la navegación interna actualiza la URL', () => {

@@ -10,10 +10,12 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { brand } from '../app/theme';
 import RepsolFlame from '../components/ui/RepsolFlame';
 import { useAuthStore } from '../services/auth';
+import { useI18n } from '../i18n/I18nProvider';
 
 export default function Login() {
   const { session, initializing, signIn } = useAuthStore();
   const navigate = useNavigate();
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ export default function Login() {
                 Repsol
               </Typography>
               <Typography variant="h6" component="h1" sx={{ fontWeight: 800, lineHeight: 1.1, fontSize: '1.1rem' }}>
-                Control de Acceso
+                {t('Control de Acceso')}
               </Typography>
             </Box>
           </Box>
@@ -69,16 +71,16 @@ export default function Login() {
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3, p: 4, pt: 3.5 }}>
           <Typography variant="body2" color="text.secondary">
-            Inicia sesión con tu cuenta corporativa
+            {t('Inicia sesión con tu cuenta corporativa')}
           </Typography>
           {error && (
             <Alert severity="error" role="alert">
-              {error}
+              {t(error)}
             </Alert>
           )}
           <Box component="form" onSubmit={onSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <TextField
-              label="Email"
+              label={t('Email')}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -88,7 +90,7 @@ export default function Login() {
               fullWidth
             />
             <TextField
-              label="Contraseña"
+              label={t('Contraseña')}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -97,7 +99,7 @@ export default function Login() {
               fullWidth
             />
             <Button type="submit" variant="contained" disabled={busy} fullWidth>
-              {busy ? 'Entrando…' : 'Entrar'}
+              {busy ? t('Entrando…') : t('Entrar')}
             </Button>
           </Box>
         </Box>
