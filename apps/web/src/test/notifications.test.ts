@@ -6,7 +6,9 @@ import {
   getNotificationNavigation,
   getNotificationTargetFromState,
   groupNotifications,
+  translateNotificationText,
 } from '../pages/notificationPresentation';
+import { translate } from '../i18n/catalog';
 
 function notification(
   createdAt: string,
@@ -85,7 +87,7 @@ test('enlaza solicitudes, eventos y credenciales con su sección y elemento asoc
   }));
   expect(vacation).toEqual({
     path: '/calendario',
-    label: 'Ver en calendario',
+    label: 'Ver calendario',
     state: { notificationTarget: { kind: 'vacation', id: 'request-42' } },
   });
 
@@ -106,4 +108,13 @@ test('enlaza solicitudes, eventos y credenciales con su sección y elemento asoc
   });
   expect(getNotificationTargetFromState(vacation?.state)).toEqual({ kind: 'vacation', id: 'request-42' });
   expect(getNotificationTargetFromState({ notificationTarget: { kind: 'other', id: 'x' } })).toBeNull();
+});
+
+test('traduce los mensajes automáticos de vacaciones con fechas localizadas', () => {
+  const source = 'Tu solicitud del 27/11/2026 al 01/12/2026';
+  const translated = translateNotificationText(source, 'en-GB', (key) => translate('en', key));
+
+  expect(translated).toBe('Your request from 27 Nov 2026 to 1 Dec 2026');
+  expect(translateNotificationText('Comentario personalizado', 'en-GB', (key) => translate('en', key)))
+    .toBe('Comentario personalizado');
 });

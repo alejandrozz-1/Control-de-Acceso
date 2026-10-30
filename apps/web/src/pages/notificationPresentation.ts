@@ -35,7 +35,7 @@ export function getNotificationNavigation(notification: AppNotification): Notifi
     const requestId = dataId(notification, 'request_id');
     return {
       path: '/calendario',
-      label: 'Ver en calendario',
+      label: 'Ver calendario',
       ...(requestId ? { state: { notificationTarget: { kind: 'vacation' as const, id: requestId } } } : {}),
     };
   }
@@ -43,7 +43,7 @@ export function getNotificationNavigation(notification: AppNotification): Notifi
     const eventId = dataId(notification, 'event_id');
     return {
       path: '/calendario',
-      label: 'Ver en calendario',
+      label: 'Ver calendario',
       ...(eventId ? { state: { notificationTarget: { kind: 'event' as const, id: eventId } } } : {}),
     };
   }
@@ -154,6 +154,24 @@ export function formatNotificationDetailDate(iso: string, locale = 'es-ES'): str
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+export function translateNotificationText(
+  text: string,
+  locale: string,
+  t: (key: string) => string,
+): string {
+  const vacationRequest = text.match(/^Tu solicitud del (\d{2})\/(\d{2})\/(\d{4}) al (\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!vacationRequest) return t(text);
+
+  const [, startDay, startMonth, startYear, endDay, endMonth, endYear] = vacationRequest;
+  const formatDate = (day: string, month: string, year: string) =>
+    new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric' }).format(
+      new Date(Number(year), Number(month) - 1, Number(day), 12),
+    );
+  return t('Tu solicitud del {startDate} al {endDate}')
+    .replace('{startDate}', formatDate(startDay, startMonth, startYear))
+    .replace('{endDate}', formatDate(endDay, endMonth, endYear));
 }
 
 export function getNotificationTypeLabel(type: AppNotification['type']): string {

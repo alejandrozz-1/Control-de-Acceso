@@ -41,6 +41,7 @@ import {
   getNotificationNavigation,
   getNotificationTypeLabel,
   groupNotifications,
+  translateNotificationText,
 } from './notificationPresentation';
 import { getIntlLocale } from '../i18n/catalog';
 import { useI18n } from '../i18n/I18nProvider';
@@ -187,7 +188,7 @@ function NotificationCard({
               overflowWrap: 'anywhere',
             }}
           >
-            {t(notification.title)}
+            {translateNotificationText(notification.title, intlLocale, t)}
           </Typography>
           {notification.body && (
             <Typography
@@ -202,7 +203,7 @@ function NotificationCard({
                 overflowWrap: 'anywhere',
               }}
             >
-              {t(notification.body)}
+              {translateNotificationText(notification.body, intlLocale, t)}
             </Typography>
           )}
 
@@ -258,7 +259,7 @@ function NotificationCard({
             <Tooltip title={t('Eliminar notificación')}>
               <span>
                 <IconButton
-                  aria-label={`${t('Eliminar')} «${notification.title}»`}
+                  aria-label={`${t('Eliminar')} «${translateNotificationText(notification.title, intlLocale, t)}»`}
                   onClick={() => onDelete(notification)}
                   disabled={deleting}
                   sx={{ minWidth: 40, minHeight: 40, color: 'text.secondary' }}
@@ -518,7 +519,7 @@ export default function Notificaciones() {
         {detail && (
           <>
             <DialogTitle id="notification-detail-title" sx={{ fontWeight: 800, pr: 7 }}>
-              {t(detail.title)}
+              {translateNotificationText(detail.title, intlLocale, t)}
             </DialogTitle>
             <DialogContent dividers>
               <Stack spacing={1.5}>
@@ -532,7 +533,9 @@ export default function Notificaciones() {
                   }}
                 />
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-                  {detail.body ? t(detail.body) : t('Esta notificación no incluye más detalles.')}
+                  {detail.body
+                    ? translateNotificationText(detail.body, intlLocale, t)
+                    : t('Esta notificación no incluye más detalles.')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {formatNotificationDetailDate(detail.created_at, intlLocale)}
@@ -560,7 +563,10 @@ export default function Notificaciones() {
         </DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary">
-            {t('Se eliminará «{title}». Esta acción no se puede deshacer.').replace('{title}', pendingDelete?.title ?? '')}
+            {t('Se eliminará «{title}». Esta acción no se puede deshacer.').replace(
+              '{title}',
+              pendingDelete ? translateNotificationText(pendingDelete.title, intlLocale, t) : '',
+            )}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>

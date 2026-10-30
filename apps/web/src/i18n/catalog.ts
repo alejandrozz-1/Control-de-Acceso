@@ -1285,6 +1285,65 @@ const notificationActionMessages: Partial<Record<Locale, Record<string, string>>
   it: { 'Marcar leída': 'Segna come letta', 'Cargar más notificaciones': 'Carica altre notifiche' },
 };
 
+const notificationContentMessages: Partial<Record<Locale, Record<string, string>>> = {
+  ca: {
+    'Tu solicitud del {startDate} al {endDate}': 'La teva sol·licitud del {startDate} al {endDate}',
+    'Jornada de seguridad': 'Jornada de seguretat',
+    'Inscripción abierta hasta el viernes': 'Inscripció oberta fins divendres',
+    'Cambio de turno': 'Canvi de torn',
+    'Tu turno de mañana pasa a tarde el lunes': 'El teu torn de matí passa a tarda dilluns',
+  },
+  en: {
+    'Tu solicitud del {startDate} al {endDate}': 'Your request from {startDate} to {endDate}',
+    'Jornada de seguridad': 'Safety day',
+    'Inscripción abierta hasta el viernes': 'Registration is open until Friday',
+    'Cambio de turno': 'Shift change',
+    'Tu turno de mañana pasa a tarde el lunes': 'Your morning shift changes to the afternoon shift on Monday',
+  },
+  fr: {
+    'Tu solicitud del {startDate} al {endDate}': 'Votre demande du {startDate} au {endDate}',
+    'Jornada de seguridad': 'Journée de la sécurité',
+    'Inscripción abierta hasta el viernes': 'Les inscriptions sont ouvertes jusqu’à vendredi',
+    'Cambio de turno': 'Changement de service',
+    'Tu turno de mañana pasa a tarde el lunes': 'Votre service du matin passe à l’après-midi lundi',
+  },
+  de: {
+    'Tu solicitud del {startDate} al {endDate}': 'Dein Antrag vom {startDate} bis zum {endDate}',
+    'Jornada de seguridad': 'Sicherheitstag',
+    'Inscripción abierta hasta el viernes': 'Anmeldung bis Freitag möglich',
+    'Cambio de turno': 'Schichtwechsel',
+    'Tu turno de mañana pasa a tarde el lunes': 'Deine Frühschicht wird am Montag zur Spätschicht',
+  },
+  pt: {
+    'Tu solicitud del {startDate} al {endDate}': 'O teu pedido de {startDate} a {endDate}',
+    'Jornada de seguridad': 'Jornada de segurança',
+    'Inscripción abierta hasta el viernes': 'Inscrições abertas até sexta-feira',
+    'Cambio de turno': 'Alteração de turno',
+    'Tu turno de mañana pasa a tarde el lunes': 'O teu turno da manhã passa para a tarde na segunda-feira',
+  },
+  ar: {
+    'Tu solicitud del {startDate} al {endDate}': 'طلبك من {startDate} إلى {endDate}',
+    'Jornada de seguridad': 'يوم السلامة',
+    'Inscripción abierta hasta el viernes': 'التسجيل مفتوح حتى يوم الجمعة',
+    'Cambio de turno': 'تغيير المناوبة',
+    'Tu turno de mañana pasa a tarde el lunes': 'ستتحول مناوبتك الصباحية إلى مسائية يوم الاثنين',
+  },
+  no: {
+    'Tu solicitud del {startDate} al {endDate}': 'Forespørselen din fra {startDate} til {endDate}',
+    'Jornada de seguridad': 'Sikkerhetsdag',
+    'Inscripción abierta hasta el viernes': 'Påmeldingen er åpen til fredag',
+    'Cambio de turno': 'Vaktbytte',
+    'Tu turno de mañana pasa a tarde el lunes': 'Morgenvakten din endres til kveldsvakt på mandag',
+  },
+  it: {
+    'Tu solicitud del {startDate} al {endDate}': 'La tua richiesta dal {startDate} al {endDate}',
+    'Jornada de seguridad': 'Giornata della sicurezza',
+    'Inscripción abierta hasta el viernes': 'Iscrizioni aperte fino a venerdì',
+    'Cambio de turno': 'Cambio turno',
+    'Tu turno de mañana pasa a tarde el lunes': 'Il tuo turno mattutino passa al pomeriggio lunedì',
+  },
+};
+
 const workflowMessages: Partial<Record<Locale, Record<string, string>>> = {
   ca: {
     'No se pudo cargar tu turno.': 'No s’ha pogut carregar el teu torn.', 'No se ha podido cerrar sesión. Inténtalo de nuevo.': 'No s’ha pogut tancar la sessió. Torna-ho a provar.',
@@ -1713,7 +1772,8 @@ export function isLocale(value: unknown): value is Locale {
 export function translate(locale: Locale, key: string): string {
   return messagesByLocale[locale][key] ?? supplementalMessages[locale]?.[key] ??
     additionalMessages[locale]?.[key] ?? accountMessages[locale]?.[key] ??
-    notificationActionMessages[locale]?.[key] ?? workflowMessages[locale]?.[key] ??
+    notificationActionMessages[locale]?.[key] ?? notificationContentMessages[locale]?.[key] ??
+    workflowMessages[locale]?.[key] ??
     navigationMessages[locale]?.[key] ?? closingMessages[locale]?.[key] ??
     calendarSectionMessages[locale]?.[key] ??
     messagesByLocale.es[key] ?? key;

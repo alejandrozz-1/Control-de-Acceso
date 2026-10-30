@@ -160,10 +160,30 @@ test('abre la solicitud de vacaciones relacionada desde su notificación', () =>
   };
   renderNotifications();
 
-  fireEvent.click(screen.getByRole('button', { name: 'Ver en calendario' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Ver calendario' }));
 
   expect(screen.getByTestId('target-route')).toHaveTextContent('Calendario relacionado');
   expect(screen.getByTestId('current-route')).toHaveTextContent(
     '/calendario{"notificationTarget":{"kind":"vacation","id":"request-42"}}',
   );
+});
+
+test('traduce los datos automáticos y la acción de calendario con el idioma seleccionado', () => {
+  window.localStorage.setItem('rps-locale', 'en');
+  mocks.notifications.data = {
+    pages: [{
+      items: [{
+        ...item,
+        body: 'Tu solicitud del 27/11/2026 al 01/12/2026',
+        data: { request_id: 'request-42' },
+      }],
+      nextCursor: null,
+    }],
+  };
+  renderNotifications();
+
+  expect(screen.getByRole('heading', { name: 'Vacation approved' })).toBeInTheDocument();
+  expect(screen.getByText('Your request from 27 Nov 2026 to 1 Dec 2026')).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'View calendar' }));
+  expect(screen.getByTestId('target-route')).toHaveTextContent('Calendario relacionado');
 });
