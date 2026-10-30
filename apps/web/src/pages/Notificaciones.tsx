@@ -42,6 +42,8 @@ import {
   getNotificationTypeLabel,
   groupNotifications,
 } from './notificationPresentation';
+import { getIntlLocale } from '../i18n/catalog';
+import { useI18n } from '../i18n/I18nProvider';
 
 const TYPE_ICON: Record<AppNotification['type'], typeof InfoOutlinedIcon> = {
   turno: EventAvailableOutlinedIcon,
@@ -85,6 +87,8 @@ function NotificationCard({
   markingRead: boolean;
   deleting: boolean;
 }) {
+  const { locale, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
   const isUnread = !notification.read_at;
   const category = getNotificationCategory(notification);
   const Icon = TYPE_ICON[notification.type];
@@ -115,8 +119,8 @@ function NotificationCard({
         <Box sx={{ position: 'relative', flexShrink: 0, pt: 0.25 }}>
           {isUnread && (
             <Box
-              aria-label="No leída"
-              title="No leída"
+              aria-label={t('No leída')}
+              title={t('No leída')}
               sx={{
                 position: 'absolute',
                 zIndex: 1,
@@ -154,7 +158,7 @@ function NotificationCard({
           >
             <Chip
               size="small"
-              label={category}
+              label={t(category)}
               sx={{
                 height: 23,
                 fontWeight: 700,
@@ -165,7 +169,7 @@ function NotificationCard({
             <Chip
               size="small"
               variant="outlined"
-              label={isUnread ? 'Sin leer' : 'Leída'}
+              label={t(isUnread ? 'Sin leer' : 'Leída')}
               sx={{
                 height: 23,
                 borderColor: isUnread ? 'rgba(76, 141, 255, 0.5)' : 'divider',
@@ -183,7 +187,7 @@ function NotificationCard({
               overflowWrap: 'anywhere',
             }}
           >
-            {notification.title}
+            {t(notification.title)}
           </Typography>
           {notification.body && (
             <Typography
@@ -198,7 +202,7 @@ function NotificationCard({
                 overflowWrap: 'anywhere',
               }}
             >
-              {notification.body}
+              {t(notification.body)}
             </Typography>
           )}
 
@@ -210,11 +214,11 @@ function NotificationCard({
             <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center' }}>
               <AccessTimeIcon sx={{ fontSize: 15, color: 'text.secondary' }} />
               <Typography variant="caption" color="text.secondary">
-                {formatNotificationDate(notification.created_at)}
+                {formatNotificationDate(notification.created_at, intlLocale)}
               </Typography>
             </Stack>
             <Typography variant="caption" color="text.secondary">
-              {getNotificationTypeLabel(notification.type)}
+              {t(getNotificationTypeLabel(notification.type))}
             </Typography>
           </Stack>
 
@@ -229,7 +233,7 @@ function NotificationCard({
               onClick={() => onOpen(notification)}
               sx={{ minHeight: 40, px: 1, textTransform: 'none', fontWeight: 700 }}
             >
-              Ver detalle
+              {t('Ver detalle')}
             </Button>
             {getNotificationNavigation(notification) && (
               <Button
@@ -237,7 +241,7 @@ function NotificationCard({
                 onClick={() => onNavigate(notification)}
                 sx={{ minHeight: 40, px: 1, textTransform: 'none' }}
               >
-                {getNotificationNavigation(notification)?.label}
+                {t(getNotificationNavigation(notification)?.label ?? '')}
               </Button>
             )}
             {isUnread && (
@@ -248,13 +252,13 @@ function NotificationCard({
                 disabled={markingRead}
                 sx={{ minHeight: 40, px: 1, textTransform: 'none' }}
               >
-                Marcar leída
+                {t('Marcar leída')}
               </Button>
             )}
-            <Tooltip title="Eliminar notificación">
+            <Tooltip title={t('Eliminar notificación')}>
               <span>
                 <IconButton
-                  aria-label={`Eliminar «${notification.title}»`}
+                  aria-label={`${t('Eliminar')} «${notification.title}»`}
                   onClick={() => onDelete(notification)}
                   disabled={deleting}
                   sx={{ minWidth: 40, minHeight: 40, color: 'text.secondary' }}
@@ -271,6 +275,8 @@ function NotificationCard({
 }
 
 export default function Notificaciones() {
+  const { locale, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
   const navigate = useNavigate();
   const list = useNotifications();
   const markRead = useMarkRead();
@@ -322,14 +328,14 @@ export default function Notificaciones() {
           >
             <Box>
               <Typography variant="body2" color="rgba(255,255,255,0.72)">
-                Tu actividad, siempre al día
+                {t('Tu actividad, siempre al día')}
               </Typography>
               <Typography variant="h6" sx={{ mt: 0.25, color: brand.white, fontWeight: 800 }}>
                 {list.isSuccess
                   ? unread > 0
-                    ? `${unread} ${unread === 1 ? 'aviso pendiente' : 'avisos pendientes'}`
-                    : 'Todo al día'
-                  : 'Centro de avisos'}
+                    ? `${unread} ${t(unread === 1 ? 'aviso pendiente' : 'avisos pendientes')}`
+                    : t('Todo al día')
+                  : t('Centro de avisos')}
               </Typography>
             </Box>
             <Avatar
@@ -361,19 +367,19 @@ export default function Notificaciones() {
                 '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
               }}
             >
-              {markAll.isPending ? 'Actualizando…' : 'Marcar todas como leídas'}
+              {markAll.isPending ? t('Actualizando…') : t('Marcar todas como leídas')}
             </Button>
           )}
         </Card>
 
         {mutationError && (
           <Alert severity="error" role="alert">
-            No se pudo actualizar la notificación. Inténtalo de nuevo.
+            {t('No se pudo actualizar la notificación. Inténtalo de nuevo.')}
           </Alert>
         )}
 
         {list.isLoading && (
-          <Stack spacing={1.25} aria-label="Cargando notificaciones">
+          <Stack spacing={1.25} aria-label={t('Cargando notificaciones')}>
             {[0, 1, 2].map((item) => (
               <Card key={item} variant="outlined" sx={{ p: 2, borderRadius: 3 }}>
                 <Stack direction="row" spacing={1.5} sx={{ alignItems: 'flex-start' }}>
@@ -396,11 +402,11 @@ export default function Notificaciones() {
             role="alert"
             action={
               <Button color="inherit" size="small" onClick={() => void list.refetch()}>
-                Reintentar
+                {t('Reintentar')}
               </Button>
             }
           >
-            No se pudieron cargar las notificaciones.
+            {t('No se pudieron cargar las notificaciones.')}
           </Alert>
         )}
 
@@ -431,10 +437,10 @@ export default function Notificaciones() {
               <NotificationsActiveOutlinedIcon sx={{ fontSize: 32 }} />
             </Avatar>
             <Typography variant="h6" sx={{ fontWeight: 800 }}>
-              Bandeja despejada
+              {t('No tienes notificaciones')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 320, mx: 'auto', mt: 0.75 }}>
-              Cuando haya novedades sobre turnos, accesos o vacaciones, aparecerán aquí.
+              {t('Las notificaciones importantes aparecerán aquí.')}
             </Typography>
           </Card>
         )}
@@ -448,7 +454,7 @@ export default function Notificaciones() {
                   component="h2"
                   sx={{ color: 'text.secondary', fontWeight: 800, letterSpacing: 1 }}
                 >
-                  {group.label}
+                  {t(group.label)}
                 </Typography>
                 <Box sx={{ flex: 1, height: '1px', bgcolor: 'divider' }} />
                 <Typography variant="caption" color="text.secondary">
@@ -482,11 +488,11 @@ export default function Notificaciones() {
                 size="small"
                 onClick={() => void list.fetchNextPage()}
               >
-                Reintentar
+                {t('Reintentar')}
               </Button>
             }
           >
-            No se pudieron cargar más notificaciones.
+            {t('No se pudieron cargar más notificaciones.')}
           </Alert>
         )}
 
@@ -497,7 +503,7 @@ export default function Notificaciones() {
             disabled={list.isFetchingNextPage}
             sx={{ minHeight: 48, borderRadius: 3, textTransform: 'none', fontWeight: 700 }}
           >
-            {list.isFetchingNextPage ? 'Cargando…' : 'Cargar más notificaciones'}
+            {list.isFetchingNextPage ? t('Cargando…') : t('Cargar más notificaciones')}
           </Button>
         )}
       </Stack>
@@ -512,13 +518,13 @@ export default function Notificaciones() {
         {detail && (
           <>
             <DialogTitle id="notification-detail-title" sx={{ fontWeight: 800, pr: 7 }}>
-              {detail.title}
+              {t(detail.title)}
             </DialogTitle>
             <DialogContent dividers>
               <Stack spacing={1.5}>
                 <Chip
                   size="small"
-                  label={`${getNotificationCategory(detail)} · ${getNotificationTypeLabel(detail.type)}`}
+                  label={`${t(getNotificationCategory(detail))} · ${t(getNotificationTypeLabel(detail.type))}`}
                   sx={{
                     alignSelf: 'flex-start',
                     color: CATEGORY_COLOR[getNotificationCategory(detail)].color,
@@ -526,16 +532,16 @@ export default function Notificaciones() {
                   }}
                 />
                 <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
-                  {detail.body || 'Esta notificación no incluye más detalles.'}
+                  {detail.body ? t(detail.body) : t('Esta notificación no incluye más detalles.')}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {formatNotificationDetailDate(detail.created_at)}
+                  {formatNotificationDetailDate(detail.created_at, intlLocale)}
                 </Typography>
               </Stack>
             </DialogContent>
             <DialogActions sx={{ p: 2 }}>
               <Button onClick={() => setDetail(null)} sx={{ minHeight: 44 }}>
-                Cerrar
+                {t('Cerrar')}
               </Button>
             </DialogActions>
           </>
@@ -550,11 +556,11 @@ export default function Notificaciones() {
         aria-labelledby="delete-notification-title"
       >
         <DialogTitle id="delete-notification-title" sx={{ fontWeight: 800 }}>
-          ¿Eliminar notificación?
+          {t('¿Eliminar notificación?')}
         </DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary">
-            Se eliminará «{pendingDelete?.title}». Esta acción no se puede deshacer.
+            {t('Se eliminará «{title}». Esta acción no se puede deshacer.').replace('{title}', pendingDelete?.title ?? '')}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
@@ -563,7 +569,7 @@ export default function Notificaciones() {
             disabled={deleteNotification.isPending}
             sx={{ minHeight: 44 }}
           >
-            Cancelar
+            {t('Cancelar')}
           </Button>
           <Button
             variant="contained"
@@ -572,7 +578,7 @@ export default function Notificaciones() {
             disabled={deleteNotification.isPending}
             sx={{ minHeight: 44 }}
           >
-            {deleteNotification.isPending ? 'Eliminando…' : 'Eliminar'}
+            {deleteNotification.isPending ? t('Eliminando…') : t('Eliminar')}
           </Button>
         </DialogActions>
       </Dialog>

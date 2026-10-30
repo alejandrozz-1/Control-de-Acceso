@@ -137,8 +137,8 @@ export function getNotificationCategory(notification: AppNotification): Notifica
   return 'Informativa';
 }
 
-export function formatNotificationDate(iso: string): string {
-  return new Date(iso).toLocaleString('es-ES', {
+export function formatNotificationDate(iso: string, locale = 'es-ES'): string {
+  return new Date(iso).toLocaleString(locale, {
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
@@ -146,8 +146,8 @@ export function formatNotificationDate(iso: string): string {
   });
 }
 
-export function formatNotificationDetailDate(iso: string): string {
-  return new Date(iso).toLocaleString('es-ES', {
+export function formatNotificationDetailDate(iso: string, locale = 'es-ES'): string {
+  return new Date(iso).toLocaleString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',

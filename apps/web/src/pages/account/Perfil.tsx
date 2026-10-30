@@ -18,9 +18,11 @@ import { useQuery } from '@tanstack/react-query';
 import AccountSubpage from './AccountSubpage';
 import { useAuthStore } from '../../services/auth';
 import { supabase } from '../../services/supabase';
+import { useI18n } from '../../i18n/I18nProvider';
 
 export default function Perfil() {
   const { profile } = useAuthStore();
+  const { t } = useI18n();
   const centerQuery = useQuery({
     queryKey: ['account-profile-center', profile?.center_id],
     enabled: !!profile?.center_id,
@@ -59,11 +61,11 @@ export default function Perfil() {
           role="alert"
           action={
             <Button color="inherit" size="small" onClick={() => void centerQuery.refetch()}>
-              Reintentar
+              {t('Reintentar')}
             </Button>
           }
         >
-          No se pudo cargar el centro asignado.
+          {t('No se pudo cargar el centro asignado.')}
         </Alert>
       )}
       <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 4 }}>
@@ -73,10 +75,10 @@ export default function Perfil() {
           </Avatar>
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
-              Información personal
+              {t('Información personal')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              Los datos los gestiona el administrador de tu organización.
+              {t('Los datos los gestiona el administrador de tu organización.')}
             </Typography>
           </Box>
         </Box>
@@ -92,8 +94,8 @@ export default function Perfil() {
                 <Icon fontSize="small" />
               </ListItemIcon>
               <ListItemText
-                primary={label}
-                secondary={value}
+                primary={t(label)}
+                secondary={t(value)}
                 slotProps={{
                   primary: { variant: 'caption', color: 'text.secondary' },
                   secondary: {

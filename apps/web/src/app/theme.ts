@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles';
+import { createTheme, type Direction, type ThemeOptions } from '@mui/material/styles';
 
 /** Tokens de marca Repsol (ver obsidianRepsol/04-Diseno-UX-UI.md) */
 export const brand = {
@@ -11,8 +11,9 @@ export const brand = {
   gradient: 'linear-gradient(145deg, #FF8A00 0%, #FF5A00 45%, #E4002B 100%)',
 } as const;
 
-export const theme = createTheme({
+const themeOptions: ThemeOptions = {
   cssVariables: { colorSchemeSelector: 'data-mui-color-scheme' },
+  direction: 'ltr' as Direction,
   colorSchemes: {
     light: {
       palette: {
@@ -87,4 +88,10 @@ export const theme = createTheme({
       styleOverrides: { label: { fontSize: '0.7rem' } },
     },
   },
-});
+};
+
+export function createAppTheme(direction: Direction = 'ltr') {
+  return createTheme({ ...themeOptions, direction });
+}
+
+export const theme = createAppTheme();

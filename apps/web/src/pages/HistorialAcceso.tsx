@@ -18,6 +18,8 @@ import { brand } from '../app/theme';
 import { useAuthStore } from '../services/auth';
 import type { Tables } from '../services/database.types';
 import { supabase } from '../services/supabase';
+import { getIntlLocale } from '../i18n/catalog';
+import { useI18n } from '../i18n/I18nProvider';
 
 type AccessLog = Pick<Tables<'access_logs'>, 'id' | 'event' | 'method' | 'source' | 'scanned_at'>;
 
@@ -34,15 +36,15 @@ const SOURCE_LABELS: Record<AccessLog['source'], string> = {
   manual: 'Registro manual',
 };
 
-function formatAccessDate(value: string) {
+function formatAccessDate(value: string, locale: string) {
   const date = new Date(value);
   return {
-    date: date.toLocaleDateString('es-ES', {
+    date: date.toLocaleDateString(locale, {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
     }),
-    time: date.toLocaleTimeString('es-ES', {
+    time: date.toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit',
     }),
@@ -50,6 +52,8 @@ function formatAccessDate(value: string) {
 }
 
 export default function HistorialAcceso() {
+  const { locale, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
   const { profile } = useAuthStore();
   const navigate = useNavigate();
   const historyQuery = useQuery({
@@ -78,19 +82,19 @@ export default function HistorialAcceso() {
         onClick={goBack}
         sx={{ mb: 2, ml: -1, borderRadius: 2 }}
       >
-        Volver
+        {t('Volver')}
       </Button>
 
       <Box sx={{ mb: 3 }}>
         <Typography variant="h4" component="h1" sx={{ fontWeight: 800, color: brand.blue }}>
-          Historial de accesos
+          {t('Historial de accesos')}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
-          Consulta tus entradas y salidas registradas
+          {t('Consulta tus entradas y salidas registradas')}
         </Typography>
       </Box>
 
-      {!profile && <Alert severity="info">Inicia sesión para consultar tu historial.</Alert>}
+      {!profile && <Alert severity="info">{t('Inicia sesión para consultar tu historial.')}</Alert>}
 
       {historyQuery.isLoading && profile && (
         <Box sx={{ display: 'grid', gap: 1.5 }}>
@@ -105,11 +109,11 @@ export default function HistorialAcceso() {
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={() => void historyQuery.refetch()}>
-              Reintentar
+              {t('Reintentar')}
             </Button>
           }
         >
-          No se pudo cargar el historial de accesos.
+          {t('No se pudo cargar el historial de accesos.')}
         </Alert>
       )}
 
@@ -125,10 +129,10 @@ export default function HistorialAcceso() {
         >
           <AccessTimeIcon sx={{ color: brand.orange, fontSize: 36, mb: 1 }} />
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-            Todavía no hay accesos registrados
+            {t('Todavía no hay accesos registrados')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-            Tus entradas y salidas aparecerán aquí.
+            {t('Tus entradas y salidas aparecerán aquí.')}
           </Typography>
         </Paper>
       )}
@@ -136,7 +140,7 @@ export default function HistorialAcceso() {
       {historyQuery.isSuccess && logs.length > 0 && (
         <Box
           component="ol"
-          aria-label="Registros de acceso"
+          aria-label={t('Registros de acceso')}
           sx={{
             listStyle: 'none',
             m: 0,
@@ -158,10 +162,10 @@ export default function HistorialAcceso() {
           {logs.map((log) => {
             const denied = log.event === 'denegado';
             const entry = log.event === 'entrada';
-            const label = denied ? 'Acceso denegado' : entry ? 'Entrada' : 'Salida';
+            const label = t(denied ? 'Acceso denegado' : entry ? 'Entrada' : 'Salida');
             const color = denied ? brand.red : entry ? '#1FA971' : brand.orange;
             const Icon = denied ? BlockIcon : entry ? LoginIcon : LogoutIcon;
-            const formatted = formatAccessDate(log.scanned_at);
+            const formatted = formatAccessDate(log.scanned_at, intlLocale);
 
             return (
               <Box
@@ -214,7 +218,7 @@ export default function HistorialAcceso() {
                       {formatted.date} · {formatted.time}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
-                      Método: {METHOD_LABELS[log.method]} · Punto de acceso: {SOURCE_LABELS[log.source]}
+                      {t('Método:')} {t(METHOD_LABELS[log.method])} · {t('Punto de acceso:')} {t(SOURCE_LABELS[log.source])}
                     </Typography>
                   </CardContent>
                 </Card>

@@ -20,6 +20,8 @@ import VacacionesPanel from '../components/ui/VacacionesPanel';
 import { useAuthStore } from '../services/auth';
 import { supabase } from '../services/supabase';
 import { getNotificationTargetFromState } from './notificationPresentation';
+import { getIntlLocale } from '../i18n/catalog';
+import { useI18n } from '../i18n/I18nProvider';
 
 /** Colores por código de turno (M mañana, T tarde, N noche, L libre). */
 export const SHIFT_COLORS: Record<string, string> = {
@@ -67,6 +69,8 @@ function iso(d: Date): ISODate {
 /** Calendario mobile-first: mes con turnos, festivos, eventos y vacaciones del usuario. */
 export default function Calendario() {
   const { profile } = useAuthStore();
+  const { locale, direction, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
   const location = useLocation();
   const target = getNotificationTargetFromState(location.state);
   const calendarTarget =
@@ -200,17 +204,19 @@ export default function Calendario() {
       put(iso(new Date(t))).events.push({ title: e.title, all_day: e.all_day, starts_at: e.starts_at });
   }
 
-  const monthLabel = new Date(Date.UTC(cursor.year, cursor.month, 1)).toLocaleDateString('es-ES', {
+  const monthLabel = new Date(Date.UTC(cursor.year, cursor.month, 1)).toLocaleDateString(intlLocale, {
     month: 'long',
     year: 'numeric',
   });
+  const PreviousMonthIcon = direction === 'rtl' ? ChevronRightIcon : ChevronLeftIcon;
+  const NextMonthIcon = direction === 'rtl' ? ChevronLeftIcon : ChevronRightIcon;
   const shiftMonth = (delta: number) => {
     const d = new Date(Date.UTC(cursor.year, cursor.month + delta, 1));
     setCursor({ year: d.getUTCFullYear(), month: d.getUTCMonth() });
   };
 
   const sel = byDate.get(selected);
-  const selLabel = new Date(`${selected}T12:00:00`).toLocaleDateString('es-ES', {
+  const selLabel = new Date(`${selected}T12:00:00`).toLocaleDateString(intlLocale, {
     weekday: 'long', day: 'numeric', month: 'long',
   });
 
@@ -218,17 +224,17 @@ export default function Calendario() {
     <PageLayout title="Calendario">
       {calendarTarget && notificationTargetQuery.isLoading && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          Buscando el elemento relacionado con la notificación…
+          {t('Buscando el elemento relacionado con la notificación…')}
         </Alert>
       )}
       {calendarTarget && notificationTargetQuery.data && (
         <Alert severity="info" icon={<EventIcon />} sx={{ mb: 2 }}>
-          Elemento de la notificación: {notificationTargetQuery.data.summary}
+          {t('Elemento de la notificación:')} {notificationTargetQuery.data.summary}
         </Alert>
       )}
       {calendarTarget && notificationTargetQuery.isError && (
         <Alert severity="error" sx={{ mb: 2 }}>
-          No se pudo cargar el elemento relacionado con la notificación.
+          {t('No se pudo cargar el elemento relacionado con la notificación.')}
         </Alert>
       )}
       {calendarTarget &&
@@ -236,28 +242,30 @@ export default function Calendario() {
         !notificationTargetQuery.isError &&
         !notificationTargetQuery.data && (
           <Alert severity="warning" sx={{ mb: 2 }}>
-            El elemento relacionado ya no está disponible.
+            {t('El elemento relacionado ya no está disponible.')}
           </Alert>
         )}
       <Paper variant="outlined" sx={{ borderRadius: 3, p: 1.5, mb: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
         {/* Navegación de mes */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
-          <IconButton size="small" aria-label="Mes anterior" onClick={() => shiftMonth(-1)}>
-            <ChevronLeftIcon />
+          <IconButton size="small" aria-label={t('Mes anterior')} onClick={() => shiftMonth(-1)}>
+            <PreviousMonthIcon />
           </IconButton>
           <Typography variant="subtitle1" component="h2" sx={{ fontWeight: 700, textTransform: 'capitalize' }} aria-live="polite">
             {monthLabel}
           </Typography>
-          <IconButton size="small" aria-label="Mes siguiente" onClick={() => shiftMonth(1)}>
-            <ChevronRightIcon />
+          <IconButton size="small" aria-label={t('Mes siguiente')} onClick={() => shiftMonth(1)}>
+            <NextMonthIcon />
           </IconButton>
         </Box>
 
         {/* Cabecera de días */}
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', mb: 0.5 }}>
-          {['L', 'M', 'X', 'J', 'V', 'S', 'D'].map((d, i) => (
+          {Array.from({ length: 7 }, (_, index) =>
+            new Date(Date.UTC(2024, 0, 1 + index)).toLocaleDateString(intlLocale, { weekday: 'short' }),
+          ).map((d, i) => (
             <Typography
-              key={d}
+              key={`${d}-${i}`}
               variant="caption"
               align="center"
               sx={{ fontWeight: 700, color: i > 4 ? 'text.secondary' : 'primary', opacity: 0.8 }}
@@ -268,7 +276,7 @@ export default function Calendario() {
         </Box>
 
         {isLoading && (
-          <Skeleton variant="rectangular" height={260} aria-label="Cargando calendario" sx={{ borderRadius: 2 }} />
+          <Skeleton variant="rectangular" height={260} aria-label={t('Cargando calendario')} sx={{ borderRadius: 2 }} />
         )}
 
         {isError && (
@@ -277,17 +285,17 @@ export default function Calendario() {
             role="alert"
             action={
               <Button color="inherit" size="small" onClick={() => { shiftsQuery.refetch(); holidaysQuery.refetch(); eventsQuery.refetch(); vacationsQuery.refetch(); }}>
-                Reintentar
+                {t('Reintentar')}
               </Button>
             }
           >
-            No se pudo cargar el calendario.
+            {t('No se pudo cargar el calendario.')}
           </Alert>
         )}
 
         {/* Rejilla del mes */}
         {!isLoading && !isError && (
-          <Box role="grid" aria-label={`Turnos de ${monthLabel}`}>
+          <Box role="grid" aria-label={`${t('Turnos de')} ${monthLabel}`}>
             {monthWeeks(cursor.year, cursor.month).map((week, wi) => (
               <Box key={wi} sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0.5 }}>
                 {week.map((date) => {
@@ -301,7 +309,7 @@ export default function Calendario() {
                       role="gridcell"
                       component="button"
                       type="button"
-                      aria-label={`${date}${day?.shift ? `, turno ${SHIFT_LABEL[day.shift.code] ?? day.shift.code}` : ''}`}
+                      aria-label={`${new Date(`${date}T12:00:00`).toLocaleDateString(intlLocale)}${day?.shift ? `, ${t('Turno')} ${t(SHIFT_LABEL[day.shift.code] ?? day.shift.code)}` : ''}`}
                       aria-selected={isSelected}
                       onClick={() => setSelected(date)}
                       sx={{
@@ -365,16 +373,16 @@ export default function Calendario() {
               key={code}
               size="small"
               variant="outlined"
-              label={SHIFT_LABEL[code]}
+              label={t(SHIFT_LABEL[code])}
               sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }}
               icon={
                 <Box component="span" aria-hidden sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: SHIFT_COLORS[code], ml: '6px !important' }} />
               }
             />
           ))}
-          <Chip size="small" variant="outlined" label="Festivo" sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<HolidayVillageIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
-          <Chip size="small" variant="outlined" label="Vacaciones" sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<BeachAccessIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
-          <Chip size="small" variant="outlined" label="Evento" sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<EventIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
+          <Chip size="small" variant="outlined" label={t('Festivo')} sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<HolidayVillageIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
+          <Chip size="small" variant="outlined" label={t('Vacaciones')} sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<BeachAccessIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
+          <Chip size="small" variant="outlined" label={t('Evento')} sx={{ height: 24, '& .MuiChip-label': { px: 0.75, fontSize: '0.7rem' } }} icon={<EventIcon sx={{ fontSize: 14, color: 'text.secondary !important' }} />} />
         </Box>
       </Paper>
 
@@ -386,7 +394,7 @@ export default function Calendario() {
 
         {!sel && (
           <Typography variant="body2" color="text.secondary">
-            Sin datos para este día: no tienes turno asignado ni eventos.
+            {t('Sin datos para este día: no tienes turno asignado ni eventos.')}
           </Typography>
         )}
 
@@ -395,7 +403,7 @@ export default function Calendario() {
             <Box aria-hidden sx={{ width: 10, height: 36, borderRadius: 5, bgcolor: SHIFT_COLORS[sel.shift.code] }} />
             <Box>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.3 }}>
-                {SHIFT_LABEL[sel.shift.code] ?? sel.shift.code}
+                {t(SHIFT_LABEL[sel.shift.code] ?? sel.shift.code)}
               </Typography>
               {sel.shift.code !== 'L' && sel.shift.start_time && (
                 <Typography variant="body2" color="text.secondary">
@@ -404,7 +412,7 @@ export default function Calendario() {
               )}
               {sel.shift.overnight && (
                 <Typography variant="caption" color="text.secondary">
-                  Turno de noche (termina al día siguiente)
+                  {t('Turno de noche (termina al día siguiente)')}
                 </Typography>
               )}
             </Box>
@@ -413,14 +421,14 @@ export default function Calendario() {
 
         {sel?.holidays.map((name) => (
           <Typography key={name} variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <HolidayVillageIcon sx={{ fontSize: 16 }} /> Festivo: {name}
+            <HolidayVillageIcon sx={{ fontSize: 16 }} /> {t('Festivo:')} {name}
           </Typography>
         ))}
 
         {sel?.vacations.map((v, i) => (
           <Typography key={i} variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
             <BeachAccessIcon sx={{ fontSize: 16 }} />
-            {v.type === 'vacacion' ? 'Vacaciones' : 'Permiso'} ({v.status})
+            {t(v.type === 'vacacion' ? 'Vacaciones' : 'Permiso')} ({t(v.status)})
           </Typography>
         ))}
 
@@ -430,7 +438,7 @@ export default function Calendario() {
             {e.title}
             {!e.all_day && (
               <Typography component="span" variant="caption" color="text.secondary">
-                {new Date(e.starts_at).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                {new Date(e.starts_at).toLocaleTimeString(intlLocale, { hour: '2-digit', minute: '2-digit' })}
               </Typography>
             )}
           </Typography>

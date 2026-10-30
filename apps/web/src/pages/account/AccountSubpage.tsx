@@ -5,6 +5,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
 import PageLayout from '../../components/ui/PageLayout';
+import { useI18n } from '../../i18n/I18nProvider';
 
 export default function AccountSubpage({
   title,
@@ -15,6 +16,8 @@ export default function AccountSubpage({
   description: string;
   children: React.ReactNode;
 }) {
+  const { t, direction } = useI18n();
+
   return (
     <PageLayout title={title}>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pb: 1 }}>
@@ -25,13 +28,13 @@ export default function AccountSubpage({
           <IconButton
             component={RouterLink}
             to="/cuenta"
-            aria-label="Volver a Cuenta"
+            aria-label={t('Volver a Cuenta')}
             sx={{ minWidth: 48, minHeight: 48, color: 'primary.main' }}
           >
-            <ArrowBackIcon />
+            <ArrowBackIcon sx={{ transform: direction === 'rtl' ? 'scaleX(-1)' : undefined }} />
           </IconButton>
           <Typography variant="body2" color="text.secondary">
-            {description}
+            {t(description)}
           </Typography>
         </Paper>
         {children}

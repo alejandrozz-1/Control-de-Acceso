@@ -13,6 +13,7 @@ import { useColorScheme } from '@mui/material/styles';
 import { useState } from 'react';
 import RepsolFlame from './RepsolFlame';
 import { useAuthStore } from '../../services/auth';
+import { useI18n } from '../../i18n/I18nProvider';
 
 const STORAGE_KEY = 'rps-onboarding-done';
 
@@ -53,6 +54,7 @@ const STEPS = [
 
 /** Onboarding first-login: 2 pasos cortos + preferencia de tema, una sola vez por dispositivo. */
 export default function Onboarding() {
+  const { t } = useI18n();
   const [step, setStep] = useState(0);
   const [open, setOpen] = useState(isOnboardingPending);
   const { mode, setMode } = useColorScheme();
@@ -67,7 +69,7 @@ export default function Onboarding() {
   const isThemeStep = step >= STEPS.length;
 
   return (
-    <Dialog open onClose={close} fullWidth maxWidth="xs" aria-label="Bienvenida">
+    <Dialog open onClose={close} fullWidth maxWidth="xs" aria-label={t('Bienvenida')}>
       <DialogContent sx={{ textAlign: 'center', pt: 4, pb: 2 }}>
         {isThemeStep ? (
           <>
@@ -75,17 +77,17 @@ export default function Onboarding() {
               {mode === 'dark' ? <DarkModeIcon fontSize="large" /> : <LightModeIcon fontSize="large" />}
             </Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 800, mb: 1 }}>
-              ¿Prefieres el modo oscuro?
+              {t('¿Prefieres el modo oscuro?')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Usa fondos azul marino y acentos naranjas de Repsol. Puedes cambiarlo después en tu cuenta.
+              {t('Usa fondos azul marino y acentos naranjas de Repsol. Puedes cambiarlo después en tu cuenta.')}
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
               <Button variant={mode === 'light' ? 'contained' : 'outlined'} startIcon={<LightModeIcon />} onClick={() => setMode('light')}>
-                Claro
+                {t('Claro')}
               </Button>
               <Button variant={mode === 'dark' ? 'contained' : 'outlined'} startIcon={<DarkModeIcon />} onClick={() => setMode('dark')}>
-                Oscuro
+                {t('Oscuro')}
               </Button>
             </Box>
           </>
@@ -93,24 +95,24 @@ export default function Onboarding() {
           <>
             <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>{STEPS[step].icon}</Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 800, mb: 1 }}>
-              {STEPS[step].title}
+              {t(STEPS[step].title)}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {fullName ? `${fullName.split(' ')[0]}, ` : ''}{STEPS[step].body}
+              {fullName ? `${fullName.split(' ')[0]}, ` : ''}{t(STEPS[step].body)}
             </Typography>
           </>
         )}
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', pb: 3, px: 3 }}>
         <Button size="small" onClick={close}>
-          Saltar
+          {t('Saltar')}
         </Button>
         <Button
           variant="contained"
           onClick={() => (isThemeStep ? close() : setStep(step + 1))}
           sx={{ px: 3 }}
         >
-          {isThemeStep ? 'Empezar' : 'Siguiente'}
+          {isThemeStep ? t('Empezar') : t('Siguiente')}
         </Button>
       </DialogActions>
     </Dialog>

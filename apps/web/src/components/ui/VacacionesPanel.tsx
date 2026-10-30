@@ -20,6 +20,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { supabase } from '../../services/supabase';
 import { useAuthStore } from '../../services/auth';
+import { getIntlLocale } from '../../i18n/catalog';
+import { useI18n } from '../../i18n/I18nProvider';
 
 interface VacationRow {
   id: string;
@@ -51,6 +53,7 @@ export function inclusiveDays(start: string, end: string): number {
 }
 
 function RequestDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useI18n();
   const uid = useAuthStore((s) => s.session?.user.id);
   const qc = useQueryClient();
   const [type, setType] = useState('vacacion');
@@ -83,22 +86,22 @@ function RequestDialog({ open, onClose }: { open: boolean; onClose: () => void }
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle sx={{ fontWeight: 700 }}>Nueva solicitud</DialogTitle>
+      <DialogTitle sx={{ fontWeight: 700 }}>{t('Nueva solicitud')}</DialogTitle>
       <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: '12px !important' }}>
         <TextField
           select
-          label="Tipo"
+          label={t('Tipo')}
           value={type}
           onChange={(e) => setType(e.target.value)}
           size="small"
         >
-          <MenuItem value="vacacion">Vacaciones</MenuItem>
-          <MenuItem value="permiso">Permiso</MenuItem>
-          <MenuItem value="baja">Baja</MenuItem>
+          <MenuItem value="vacacion">{t('Vacaciones')}</MenuItem>
+          <MenuItem value="permiso">{t('Permiso')}</MenuItem>
+          <MenuItem value="baja">{t('Baja')}</MenuItem>
         </TextField>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
-            label="Desde"
+            label={t('Desde')}
             type="date"
             value={start}
             onChange={(e) => setStart(e.target.value)}
@@ -107,19 +110,19 @@ function RequestDialog({ open, onClose }: { open: boolean; onClose: () => void }
             slotProps={{ inputLabel: { shrink: true } }}
           />
           <TextField
-            label="Hasta"
+            label={t('Hasta')}
             type="date"
             value={end}
             onChange={(e) => setEnd(e.target.value)}
             size="small"
             fullWidth
             error={!!start && !!end && days < 1}
-            helperText={!!start && !!end && days < 1 ? 'Fecha inválida' : undefined}
+            helperText={!!start && !!end && days < 1 ? t('Fecha inválida') : undefined}
             slotProps={{ inputLabel: { shrink: true } }}
           />
         </Box>
         <TextField
-          label="Motivo (opcional)"
+          label={t('Motivo (opcional)')}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           size="small"
@@ -128,22 +131,21 @@ function RequestDialog({ open, onClose }: { open: boolean; onClose: () => void }
         />
         {days > 0 && (
           <Typography variant="body2" color="text.secondary" aria-live="polite">
-            {days} {days === 1 ? 'día natural' : 'días naturales'} — quedará <strong>pendiente</strong> de aprobación
-            de tu responsable.
+            {days} {t(days === 1 ? 'día natural' : 'días naturales')} — {t('quedará pendiente de aprobación de tu responsable.')}
           </Typography>
         )}
         {save.isError && (
-          <Alert severity="error" role="alert">No se pudo enviar la solicitud. Inténtalo de nuevo.</Alert>
+          <Alert severity="error" role="alert">{t('No se pudo enviar la solicitud. Inténtalo de nuevo.')}</Alert>
         )}
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2.5 }}>
-        <Button onClick={onClose}>Cancelar</Button>
+        <Button onClick={onClose}>{t('Cancelar')}</Button>
         <Button
           variant="contained"
           disabled={invalid || save.isPending}
           onClick={() => save.mutate()}
         >
-          Enviar
+          {t('Enviar')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -163,31 +165,35 @@ function RequestRow({
   onAnul?: (id: string) => void;
   pending: boolean;
 }) {
+  const { locale, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
+
   return (
     <Box sx={{ py: 1 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
         <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          {TYPE_LABEL[r.type]}
+          {t(TYPE_LABEL[r.type])}
           {!own && r.requester ? ` · ${r.requester.full_name.split(' ')[0]}` : ''}
         </Typography>
-        <Chip size="small" color={STATUS_COLOR[r.status]} label={r.status} sx={{ height: 20, fontSize: '0.7rem' }} />
+        <Chip size="small" color={STATUS_COLOR[r.status]} label={t(r.status)} sx={{ height: 20, fontSize: '0.7rem' }} />
         <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto', fontVariantNumeric: 'tabular-nums' }}>
-          {new Date(`${r.start_date}T12:00:00`).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} –{' '}
-          {new Date(`${r.end_date}T12:00:00`).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })} · {r.days} d
+          {new Date(`${r.start_date}T12:00:00`).toLocaleDateString(intlLocale, { day: 'numeric', month: 'short' })} –{' '}
+          {new Date(`${r.end_date}T12:00:00`).toLocaleDateString(intlLocale, { day: 'numeric', month: 'short' })} · {r.days}{' '}
+          {t(r.days === 1 ? 'día' : 'días')}
         </Typography>
         {own && r.status === 'pendiente' && onAnul && (
-          <Tooltip title="Anular solicitud">
-            <IconButton size="small" aria-label="Anular solicitud" onClick={() => onAnul(r.id)} disabled={pending}>
+          <Tooltip title={t('Anular solicitud')}>
+            <IconButton size="small" aria-label={t('Anular solicitud')} onClick={() => onAnul(r.id)} disabled={pending}>
               <CloseIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         )}
         {!own && r.status === 'pendiente' && onDecide && (
           <>
-            <Tooltip title="Aprobar">
+            <Tooltip title={t('Aprobar')}>
               <IconButton
                 size="small"
-                aria-label={`Aprobar solicitud de ${r.requester?.full_name ?? ''}`}
+                aria-label={`${t('Aprobar')} ${t('solicitud de')} ${r.requester?.full_name ?? ''}`}
                 color="success"
                 onClick={() => onDecide(r.id, 'aprobada')}
                 disabled={pending}
@@ -195,10 +201,10 @@ function RequestRow({
                 <CheckIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-            <Tooltip title="Rechazar">
+            <Tooltip title={t('Rechazar')}>
               <IconButton
                 size="small"
-                aria-label={`Rechazar solicitud de ${r.requester?.full_name ?? ''}`}
+                aria-label={`${t('Rechazar')} ${t('solicitud de')} ${r.requester?.full_name ?? ''}`}
                 color="error"
                 onClick={() => onDecide(r.id, 'rechazada')}
                 disabled={pending}
@@ -223,6 +229,7 @@ function RequestRow({
  * el trigger `fn_vacation_review` lo valida en servidor y notifica al empleado).
  */
 export default function VacacionesPanel() {
+  const { t } = useI18n();
   const uid = useAuthStore((s) => s.session?.user.id);
   const qc = useQueryClient();
   const [dialog, setDialog] = useState(false);
@@ -265,34 +272,34 @@ export default function VacacionesPanel() {
     <>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
         <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>
-          Tus solicitudes
+          {t('Tus solicitudes')}
         </Typography>
         <Button size="small" startIcon={<AddIcon />} onClick={() => setDialog(true)} sx={{ px: 1 }}>
-          Solicitar
+          {t('Solicitar')}
         </Button>
       </Box>
 
-      {list.isLoading && <Skeleton variant="rounded" height={72} aria-label="Cargando solicitudes" />}
+      {list.isLoading && <Skeleton variant="rounded" height={72} aria-label={t('Cargando solicitudes')} />}
 
       {list.isError && (
         <Alert
           severity="error"
           role="alert"
-          action={<Button color="inherit" size="small" onClick={() => list.refetch()}>Reintentar</Button>}
+          action={<Button color="inherit" size="small" onClick={() => list.refetch()}>{t('Reintentar')}</Button>}
         >
-          No se pudieron cargar las solicitudes.
+          {t('No se pudieron cargar las solicitudes.')}
         </Alert>
       )}
 
       {list.isSuccess && mine.length === 0 && !canDecide && (
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Aún no has solicitado vacaciones ni permisos.
+          {t('Aún no has solicitado vacaciones ni permisos.')}
         </Typography>
       )}
 
       {(decide.isError || anul.isError) && (
         <Alert severity="error" role="alert" sx={{ mb: 1 }}>
-          No se pudo actualizar la solicitud. Solo el responsable del equipo puede decidir.
+          {t('No se pudo actualizar la solicitud. Solo el responsable del equipo puede decidir.')}
         </Alert>
       )}
 
@@ -311,10 +318,10 @@ export default function VacacionesPanel() {
       {teamPending.length > 0 && (
         <>
           <Typography variant="subtitle2" component="h3" sx={{ fontWeight: 700, mt: 1, mb: 0.5 }}>
-            Pendientes de tu equipo
+            {t('Pendientes de tu equipo')}
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Al aprobar, la persona recibe una notificación.
+            {t('Al aprobar, la persona recibe una notificación.')}
           </Typography>
           {teamPending.map((r) => (
             <RequestRow

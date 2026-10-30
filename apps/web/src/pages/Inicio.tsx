@@ -18,6 +18,8 @@ import { brand } from '../app/theme';
 import RepsolFlame from '../components/ui/RepsolFlame';
 import { useAuthStore } from '../services/auth';
 import { supabase } from '../services/supabase';
+import { getIntlLocale } from '../i18n/catalog';
+import { useI18n } from '../i18n/I18nProvider';
 
 interface TodayShift {
   code: string;
@@ -96,9 +98,9 @@ export function getCurrentShiftState(
   return { label: 'Turno finalizado', active: false, shift: todayShift };
 }
 
-function greeting(name: string): string {
+function greeting(name: string, t: (key: string) => string): string {
   const h = new Date().getHours();
-  const hello = h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches';
+  const hello = t(h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches');
   const firstName = name.split(' ')[0] ?? name;
   return `${hello}, ${firstName}`;
 }
@@ -125,6 +127,8 @@ export function shiftProgress(start: string, end: string, overnight: boolean, no
 /** Inicio: cabecera Waylet (saludo+reloj+estado) y turno de hoy con datos reales. */
 export default function Inicio() {
   const { profile } = useAuthStore();
+  const { locale, t } = useI18n();
+  const intlLocale = getIntlLocale(locale);
   const navigate = useNavigate();
   const [now, setNow] = useState(() => new Date());
 
@@ -201,14 +205,14 @@ export default function Inicio() {
           const date = new Date(log.scanned_at);
           setLastAccess({
             event: log.event === 'entrada' ? 'Entrada' : log.event === 'salida' ? 'Salida' : 'Acceso denegado',
-            date: date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }),
-            hour: date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-            method: ACCESS_METHOD_LABEL[String(log.method)] ?? 'Método desconocido',
-            source: ACCESS_SOURCE_LABEL[String(log.source)] ?? 'Punto de acceso desconocido',
+            date: date.toLocaleDateString(intlLocale, { day: 'numeric', month: 'short', year: 'numeric' }),
+            hour: date.toLocaleTimeString(intlLocale, { hour: '2-digit', minute: '2-digit' }),
+            method: t(ACCESS_METHOD_LABEL[String(log.method)] ?? 'Método desconocido'),
+            source: t(ACCESS_SOURCE_LABEL[String(log.source)] ?? 'Punto de acceso desconocido'),
           });
         }
       });
-  }, [profile]);
+  }, [intlLocale, profile, t]);
 
   const shift = shiftQuery.data;
   const shiftState = getCurrentShiftState(shift, previousShiftQuery.data, now);
@@ -245,7 +249,7 @@ export default function Inicio() {
               {centerQuery.data?.name ?? 'Control de Acceso'}
             </Typography>
             <Typography variant="h6" component="h1" sx={{ fontWeight: 800, lineHeight: 1.15, fontSize: '1.15rem' }}>
-              {profile ? greeting(profile.full_name) : 'Inicio'}
+              {profile ? greeting(profile.full_name, t) : t('Inicio')}
             </Typography>
           </Box>
         </Box>
@@ -269,20 +273,20 @@ export default function Inicio() {
           <Box sx={{ width: 7, height: 7, borderRadius: '50%' }}>
             {/* empty - just the circle color */}
           </Box>
-          {isShiftStateLoading ? 'Cargando turno…' : shiftState.label}
+          {isShiftStateLoading ? t('Cargando turno…') : t(shiftState.label)}
         </Box>
           <Box
             sx={{ ml: 'auto', display: 'flex', alignItems: 'baseline', gap: 1, bgcolor: 'rgba(0,0,0,0.15)', borderRadius: 2, px: 1.25, py: 0.5 }}
           >
             <Typography variant="caption" sx={{ opacity: 0.85 }}>
-              {now.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}
+              {now.toLocaleDateString(intlLocale, { weekday: 'short', day: 'numeric', month: 'short' })}
             </Typography>
             <Typography
               variant="body1"
               component="p"
               sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums', letterSpacing: 1 }}
             >
-              {now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              {now.toLocaleTimeString(intlLocale, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </Typography>
           </Box>
         </Box>
@@ -297,14 +301,14 @@ export default function Inicio() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <AccessTimeIcon fontSize="small" color="primary" />
             <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>
-              Tu turno de hoy
+              {t('Tu turno de hoy')}
             </Typography>
           </Box>
 
-          {!profile && <Skeleton variant="rounded" height={56} aria-label="Cargando perfil" />}
+          {!profile && <Skeleton variant="rounded" height={56} aria-label={t('Cargando perfil…')} />}
 
           {profile && shiftQuery.isLoading && (
-            <Skeleton variant="rounded" height={56} aria-label="Cargando turno de hoy" />
+            <Skeleton variant="rounded" height={56} aria-label={t('Cargando turno…')} />
           )}
 
           {profile && shiftQuery.isError && (
@@ -313,11 +317,11 @@ export default function Inicio() {
               role="alert"
               action={
                 <Button color="inherit" size="small" onClick={() => shiftQuery.refetch()}>
-                  Reintentar
+                  {t('Reintentar')}
                 </Button>
               }
             >
-              No se pudo cargar tu turno.
+              {t('No se pudo cargar tu turno.')}
             </Alert>
           )}
 
@@ -325,9 +329,9 @@ export default function Inicio() {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, color: 'text.secondary' }}>
               <EventBusyIcon />
               <Box>
-                <Typography variant="body2">Hoy no tienes turno asignado.</Typography>
+                <Typography variant="body2">{t('Hoy no tienes turno asignado.')}</Typography>
                 <Button size="small" onClick={() => navigate('/calendario')} sx={{ px: 0 }}>
-                  Ver calendario
+                  {t('Ver calendario')}
                 </Button>
               </Box>
             </Box>
@@ -338,7 +342,7 @@ export default function Inicio() {
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                 <Box>
                   <Typography variant="h6" component="p" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-                    {SHIFT_LABEL[shift.code] ?? shift.code}
+                    {t(SHIFT_LABEL[shift.code] ?? shift.code)}
                   </Typography>
                   {shift.start_time && (
                     <Typography variant="body2" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
@@ -350,7 +354,7 @@ export default function Inicio() {
                 <Chip
                   size="small"
                   color={todayShiftState.active ? 'secondary' : 'default'}
-                  label={shiftQuery.isLoading ? 'Cargando…' : todayShiftState.label}
+                  label={shiftQuery.isLoading ? t('Cargando…') : t(todayShiftState.label)}
                 />
               </Box>
 
@@ -358,7 +362,7 @@ export default function Inicio() {
                 <Box sx={{ mt: 1.5 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
                     <Typography variant="caption" color="text.secondary">
-                      Progreso de jornada
+                      {t('Progreso de jornada')}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ fontVariantNumeric: 'tabular-nums' }}>
                       {progress}%
@@ -390,7 +394,7 @@ export default function Inicio() {
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
             <AccessTimeIcon fontSize="small" color="primary" />
             <Typography variant="subtitle2" component="h2" sx={{ fontWeight: 700 }}>
-              Último acceso
+              {t('Último acceso')}
             </Typography>
           </Box>
 
@@ -414,20 +418,20 @@ export default function Inicio() {
               )}
               <Box sx={{ minWidth: 0, flex: 1 }}>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  {lastAccess.event} registrada
+                  {t(lastAccess.event)}{t(' registrada')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
                   {lastAccess.date} · {lastAccess.hour}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  Método: {lastAccess.method}
-                  {lastAccess.source !== lastAccess.method && ` · Punto de acceso: ${lastAccess.source}`}
+                  {t('Método:')} {lastAccess.method}
+                  {lastAccess.source !== lastAccess.method && ` · ${t('Punto de acceso:')} ${lastAccess.source}`}
                 </Typography>
               </Box>
             </Box>
           ) : (
             <Typography variant="body2" color="text.secondary">
-              No hay registros de acceso recientes.
+              {t('No hay registros de acceso recientes.')}
             </Typography>
           )}
 
@@ -438,7 +442,7 @@ export default function Inicio() {
             onClick={() => navigate('/historial-acceso')}
             sx={{ mt: 1.5, borderRadius: 2 }}
           >
-            Ver historial
+            {t('Ver historial')}
           </Button>
         </Paper>
 
@@ -455,7 +459,7 @@ export default function Inicio() {
             boxShadow: '0 8px 20px -4px rgba(255,90,0,0.4)',
           }}
         >
-          Mostrar mi QR de acceso
+          {t('Mostrar mi QR de acceso')}
         </Button>
       </Box>
     </Box>

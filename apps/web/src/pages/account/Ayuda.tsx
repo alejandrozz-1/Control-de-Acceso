@@ -7,43 +7,49 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import { Link as RouterLink } from 'react-router-dom';
 import AccountSubpage from './AccountSubpage';
+import { useI18n } from '../../i18n/I18nProvider';
 
-const helpItems = [
+function getHelpItems(t: (key: string) => string) {
+  return [
   {
-    question: '¿Cómo muestro mi credencial de acceso?',
+    question: t('¿Cómo muestro mi credencial de acceso?'),
     answer: (
       <>
-        Abre la sección <Link component={RouterLink} to="/acceso">Acceso</Link> para generar tu QR. El código tiene una validez breve y necesita conexión para verificarse.
+        {t('Abre la sección')} <Link component={RouterLink} to="/acceso">{t('Acceso')}</Link> {t('para generar tu QR. El código tiene una validez breve y necesita conexión para verificarse.')}
       </>
     ),
   },
   {
-    question: '¿Dónde puedo consultar mis turnos?',
+    question: t('¿Dónde puedo consultar mis turnos?'),
     answer: (
       <>
-        Consulta el <Link component={RouterLink} to="/calendario">Calendario</Link> para ver los turnos, festivos, eventos y solicitudes asociados a tu cuenta.
+        {t('Consulta el')} <Link component={RouterLink} to="/calendario">{t('Calendario')}</Link> {t('para ver los turnos, festivos, eventos y solicitudes asociados a tu cuenta.')}
       </>
     ),
   },
   {
-    question: '¿Cómo reviso mis avisos?',
+    question: t('¿Cómo reviso mis avisos?'),
     answer: (
       <>
-        En <Link component={RouterLink} to="/notificaciones">Notificaciones</Link> puedes consultar los avisos y marcar los que ya has leído.
+        {t('En')} <Link component={RouterLink} to="/notificaciones">{t('Notificaciones')}</Link> {t('puedes consultar los avisos y marcar los que ya has leído.')}
       </>
     ),
   },
   {
-    question: '¿Cómo cambio mi contraseña?',
+    question: t('¿Cómo cambio mi contraseña?'),
     answer: (
       <>
-        Ve a <Link component={RouterLink} to="/cuenta/seguridad">Seguridad</Link>. Se te pedirá la contraseña actual antes de aplicar una nueva.
+        {t('Ve a')} <Link component={RouterLink} to="/cuenta/seguridad">{t('Seguridad')}</Link>. {t('Se te pedirá la contraseña actual antes de aplicar una nueva.')}
       </>
     ),
   },
-];
+  ];
+}
 
 export default function Ayuda() {
+  const { t } = useI18n();
+  const helpItems = getHelpItems(t);
+
   return (
     <AccountSubpage title="Ayuda" description="Guía rápida de la aplicación">
       <Paper variant="outlined" sx={{ p: 1, borderRadius: 4 }}>

@@ -2,8 +2,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, expect, test } from 'vitest';
 import Onboarding, { isOnboardingPending } from '../components/ui/Onboarding';
 import { useAuthStore, type Profile } from '../services/auth';
-import { theme } from '../app/theme';
-import { ThemeProvider } from '@mui/material/styles';
+import { AppProviders } from '../app/providers';
 
 const perfil: Profile = {
   id: 'u1',
@@ -23,9 +22,9 @@ const perfil: Profile = {
 
 function renderOnboarding() {
   return render(
-    <ThemeProvider theme={theme} defaultMode="light" modeStorageKey="rps-color-scheme">
+    <AppProviders>
       <Onboarding />
-    </ThemeProvider>,
+    </AppProviders>,
   );
 }
 

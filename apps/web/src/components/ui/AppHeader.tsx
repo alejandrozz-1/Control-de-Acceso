@@ -8,6 +8,7 @@ import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useUnreadCount } from '../../services/notifications';
 import { useAuthStore } from '../../services/auth';
 import { brand } from '../../app/theme';
+import { useI18n } from '../../i18n/I18nProvider';
 
 function initials(name: string | undefined): string {
   const [first, second] = (name ?? '').trim().split(/\s+/);
@@ -17,6 +18,7 @@ function initials(name: string | undefined): string {
 export default function AppHeader() {
   const { pathname } = useLocation();
   const profile = useAuthStore((state) => state.profile);
+  const { t } = useI18n();
   const unread = useUnreadCount();
   const isHome = pathname === '/';
 
@@ -45,11 +47,11 @@ export default function AppHeader() {
           gap: 1,
         }}
       >
-        <Tooltip title="Notificaciones">
+        <Tooltip title={t('Notificaciones')}>
           <IconButton
             component={RouterLink}
             to="/notificaciones"
-            aria-label="Abrir notificaciones"
+            aria-label={t('Abrir notificaciones')}
             aria-current={pathname === '/notificaciones' ? 'page' : undefined}
             sx={{
               width: 44,
@@ -65,11 +67,11 @@ export default function AppHeader() {
             </Badge>
           </IconButton>
         </Tooltip>
-        <Tooltip title="Cuenta">
+        <Tooltip title={t('Cuenta')}>
           <IconButton
             component={RouterLink}
             to="/cuenta"
-            aria-label="Abrir cuenta"
+            aria-label={t('Abrir cuenta')}
             aria-current={pathname.startsWith('/cuenta') ? 'page' : undefined}
             sx={{
               width: 44,
