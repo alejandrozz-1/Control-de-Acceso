@@ -9,6 +9,7 @@ import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 import SecurityIcon from '@mui/icons-material/Security';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Alert from '@mui/material/Alert';
 import Avatar from '@mui/material/Avatar';
@@ -22,10 +23,12 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper';
 import Skeleton from '@mui/material/Skeleton';
+import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { useColorScheme } from '@mui/material/styles';
 import appPackage from '../../../../package.json';
 import { brand } from '../app/theme';
 import PageLayout from '../components/ui/PageLayout';
@@ -64,6 +67,7 @@ function formatAccessDate(value: string | undefined): string {
 
 export default function Cuenta() {
   const { profile, signOut } = useAuthStore();
+  const { mode, setMode } = useColorScheme();
   const [error, setError] = useState<string | null>(null);
 
   const centerQuery = useQuery({
@@ -308,6 +312,26 @@ export default function Cuenta() {
                 </ListItemButton>
               </ListItem>
             ))}
+            <ListItem
+              disablePadding
+              sx={{ borderTop: '1px solid', borderColor: 'divider' }}
+            >
+              <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', minHeight: 56, px: 2.5 }}>
+                <ListItemIcon sx={{ minWidth: 42, color: 'primary.main' }}>
+                  <DarkModeIcon />
+                </ListItemIcon>
+                <ListItemText
+                  primary="Modo oscuro"
+                  secondary="Azul marino y acentos Repsol"
+                  slotProps={{ primary: { sx: { fontWeight: 600 } }, secondary: { variant: 'caption' } }}
+                />
+                <Switch
+                  checked={mode === 'dark'}
+                  onChange={(_, checked) => setMode(checked ? 'dark' : 'light')}
+                  slotProps={{ input: { 'aria-label': 'Modo oscuro' } }}
+                />
+              </Box>
+            </ListItem>
           </List>
         </Paper>
 

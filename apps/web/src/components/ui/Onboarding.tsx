@@ -75,10 +75,10 @@ export default function Onboarding() {
               {mode === 'dark' ? <DarkModeIcon fontSize="large" /> : <LightModeIcon fontSize="large" />}
             </Box>
             <Typography variant="h6" component="h2" sx={{ fontWeight: 800, mb: 1 }}>
-              Elige tu tema
+              ¿Prefieres el modo oscuro?
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Puedes cambiarlo después en tu cuenta.
+              Usa fondos azul marino y acentos naranjas de Repsol. Puedes cambiarlo después en tu cuenta.
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
               <Button variant={mode === 'light' ? 'contained' : 'outlined'} startIcon={<LightModeIcon />} onClick={() => setMode('light')}>

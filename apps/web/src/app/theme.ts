@@ -12,7 +12,7 @@ export const brand = {
 } as const;
 
 export const theme = createTheme({
-  cssVariables: true,
+  cssVariables: { colorSchemeSelector: 'data-mui-color-scheme' },
   colorSchemes: {
     light: {
       palette: {
@@ -25,11 +25,12 @@ export const theme = createTheme({
     },
     dark: {
       palette: {
-        primary: { main: '#5B8DEF', contrastText: brand.blue },
-        secondary: { main: brand.orange, contrastText: brand.blue },
+        primary: { main: brand.orange, contrastText: brand.blue },
+        secondary: { main: '#FF5A00', contrastText: brand.white },
         error: { main: '#FF4D6A' },
-        background: { default: '#0B1220', paper: '#111A2C' },
-        text: { primary: '#F2F4F8' },
+        background: { default: '#07182B', paper: '#10243A' },
+        text: { primary: '#F2F4F8', secondary: '#B6C5D8' },
+        divider: '#263B53',
       },
     },
   },

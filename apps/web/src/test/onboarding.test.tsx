@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, expect, test } from 'vitest';
 import Onboarding, { isOnboardingPending } from '../components/ui/Onboarding';
 import { useAuthStore, type Profile } from '../services/auth';
@@ -43,7 +43,7 @@ test('el onboarding se muestra en el primer login y desaparece al terminar', asy
   expect(screen.getByRole('heading', { name: 'Cómo funciona' })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
-  expect(screen.getByRole('heading', { name: 'Elige tu tema' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: '¿Prefieres el modo oscuro?' })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: 'Empezar' }));
   expect(isOnboardingPending()).toBe(false);
@@ -55,6 +55,18 @@ test('«Saltar» cierra el onboarding y no vuelve a aparecer', async () => {
   renderOnboarding();
   fireEvent.click(screen.getByRole('button', { name: 'Saltar' }));
   expect(isOnboardingPending()).toBe(false);
+});
+
+test('elegir modo oscuro lo aplica y guarda la preferencia', async () => {
+  renderOnboarding();
+  fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Siguiente' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Oscuro' }));
+
+  await waitFor(() => {
+    expect(localStorage.getItem('rps-color-scheme')).toBe('dark');
+    expect(document.documentElement).toHaveAttribute('data-mui-color-scheme', 'dark');
+  });
 });
 
 test('no se muestra si ya se completó', () => {
