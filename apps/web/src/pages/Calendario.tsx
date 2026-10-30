@@ -12,12 +12,14 @@ import EventIcon from '@mui/icons-material/Event';
 import BeachAccessIcon from '@mui/icons-material/BeachAccess';
 import HolidayVillageIcon from '@mui/icons-material/HolidayVillage';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { brand } from '../app/theme';
 import PageLayout from '../components/ui/PageLayout';
 import VacacionesPanel from '../components/ui/VacacionesPanel';
 import { useAuthStore } from '../services/auth';
 import { supabase } from '../services/supabase';
+import { getNotificationTargetFromState } from './notificationPresentation';
 
 /** Colores por código de turno (M mañana, T tarde, N noche, L libre). */
 export const SHIFT_COLORS: Record<string, string> = {
@@ -65,12 +67,55 @@ function iso(d: Date): ISODate {
 /** Calendario mobile-first: mes con turnos, festivos, eventos y vacaciones del usuario. */
 export default function Calendario() {
   const { profile } = useAuthStore();
+  const location = useLocation();
+  const target = getNotificationTargetFromState(location.state);
+  const calendarTarget =
+    target?.kind === 'vacation' || target?.kind === 'event' ? target : null;
   const today = iso(new Date());
   const [cursor, setCursor] = useState(() => {
     const n = new Date();
     return { year: n.getFullYear(), month: n.getMonth() };
   });
   const [selected, setSelected] = useState<ISODate>(today);
+
+  const notificationTargetQuery = useQuery({
+    queryKey: ['calendar-notification-target', calendarTarget?.kind, calendarTarget?.id],
+    enabled: !!calendarTarget,
+    queryFn: async () => {
+      if (!calendarTarget) return null;
+      if (calendarTarget.kind === 'vacation') {
+        const { data, error } = await supabase
+          .from('vacation_requests')
+          .select('start_date, type, status')
+          .eq('id', calendarTarget.id)
+          .maybeSingle();
+        if (error) throw error;
+        if (!data) return null;
+        return {
+          date: data.start_date,
+          summary: `${data.type === 'vacacion' ? 'Vacaciones' : 'Permiso'} · ${data.status}`,
+        };
+      }
+
+      const { data, error } = await supabase
+        .from('corporate_events')
+        .select('title, starts_at')
+        .eq('id', calendarTarget.id)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      return { date: data.starts_at.slice(0, 10), summary: data.title };
+    },
+  });
+
+  useEffect(() => {
+    const targetDate = notificationTargetQuery.data?.date;
+    if (!targetDate) return;
+    const [year, month, day] = targetDate.split('-').map(Number);
+    if (!year || !month || !day) return;
+    setCursor({ year, month: month - 1 });
+    setSelected(targetDate);
+  }, [notificationTargetQuery.data]);
 
   const monthStart = iso(new Date(Date.UTC(cursor.year, cursor.month, 1)));
   const monthEnd = iso(new Date(Date.UTC(cursor.year, cursor.month + 1, 1) - DAY_MS));
@@ -171,6 +216,29 @@ export default function Calendario() {
 
   return (
     <PageLayout title="Calendario">
+      {calendarTarget && notificationTargetQuery.isLoading && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Buscando el elemento relacionado con la notificación…
+        </Alert>
+      )}
+      {calendarTarget && notificationTargetQuery.data && (
+        <Alert severity="info" icon={<EventIcon />} sx={{ mb: 2 }}>
+          Elemento de la notificación: {notificationTargetQuery.data.summary}
+        </Alert>
+      )}
+      {calendarTarget && notificationTargetQuery.isError && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          No se pudo cargar el elemento relacionado con la notificación.
+        </Alert>
+      )}
+      {calendarTarget &&
+        !notificationTargetQuery.isLoading &&
+        !notificationTargetQuery.isError &&
+        !notificationTargetQuery.data && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            El elemento relacionado ya no está disponible.
+          </Alert>
+        )}
       <Paper variant="outlined" sx={{ borderRadius: 3, p: 1.5, mb: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
         {/* Navegación de mes */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>

@@ -9,7 +9,10 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import { useQuery } from '@tanstack/react-query';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { brand } from '../app/theme';
+import { supabase } from '../services/supabase';
+import { getNotificationTargetFromState } from './notificationPresentation';
 import {
   formatCountdown,
   issueQr,
@@ -33,10 +36,27 @@ function useNow(active: boolean): number {
 
 /** Pantalla Acceso: fondo azul Repsol, QR a pantalla completa + código temporal (US-02). */
 export default function Acceso() {
+  const location = useLocation();
+  const target = getNotificationTargetFromState(location.state);
+  const credentialTarget = target?.kind === 'credential' ? target : null;
   const qrQuery = useQuery<QrCredential>({
     queryKey: ['access-qr'],
     queryFn: issueQr,
     retry: 1,
+  });
+  const credentialQuery = useQuery({
+    queryKey: ['notification-credential', credentialTarget?.id],
+    enabled: !!credentialTarget,
+    queryFn: async () => {
+      if (!credentialTarget) return null;
+      const { data, error } = await supabase
+        .from('access_credentials')
+        .select('status')
+        .eq('id', credentialTarget.id)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
   });
   const { refetch: refetchQr, isFetching: qrFetching } = qrQuery;
   const [temporal, setTemporal] = useState<{ code: string; expires_at: string } | null>(null);
@@ -111,6 +131,27 @@ export default function Acceso() {
       <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
         Tu credencial de acceso
       </Typography>
+
+      {credentialTarget && credentialQuery.isLoading && (
+        <Alert severity="info" sx={{ width: '100%', maxWidth: 360 }}>
+          Consultando la credencial relacionada…
+        </Alert>
+      )}
+      {credentialTarget && credentialQuery.data && (
+        <Alert severity={credentialQuery.data.status === 'revocada' ? 'warning' : 'info'} sx={{ width: '100%', maxWidth: 360 }}>
+          Credencial relacionada: {credentialQuery.data.status}
+        </Alert>
+      )}
+      {credentialTarget && credentialQuery.isError && (
+        <Alert severity="error" sx={{ width: '100%', maxWidth: 360 }}>
+          No se pudo consultar la credencial relacionada.
+        </Alert>
+      )}
+      {credentialTarget && !credentialQuery.isLoading && !credentialQuery.isError && !credentialQuery.data && (
+        <Alert severity="warning" sx={{ width: '100%', maxWidth: 360 }}>
+          La credencial relacionada ya no está disponible.
+        </Alert>
+      )}
 
       {qrQuery.isError && (
         <Alert
