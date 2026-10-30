@@ -1,6 +1,14 @@
 # Estrategia de despliegue web
 
-## Plataforma: Vercel (decidida con el PO)
+## Opción A: Docker (imagen propia)
+
+- `apps/web/Dockerfile` (build multi-etapa: Node compila → nginx sirve) + `apps/web/nginx.conf`
+  (fallback `try_files` para `BrowserRouter`) + `docker-compose.yml` en la raíz.
+- Build: `docker compose up --build` → `http://localhost:8080`. Las `VITE_*` se inyectan **en build**
+  (`.env` del repo o entorno); contra Supabase local usar `npx supabase start` y sobrescribirlas.
+- El build se ejecuta en la VM de Azure (la máquina de desarrollo no tiene Docker Engine).
+
+## Opción B: Vercel (decidida con el PO)
 
 | Entorno | Rama | URL | Contenido |
 |---|---|---|---|
