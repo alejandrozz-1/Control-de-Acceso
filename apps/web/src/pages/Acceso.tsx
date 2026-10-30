@@ -35,7 +35,7 @@ function useNow(active: boolean): number {
   return Date.now();
 }
 
-/** Pantalla Acceso: fondo azul Repsol, QR a pantalla completa + código temporal (US-02). */
+/** Pantalla Acceso: credencial QR y código temporal (US-02). */
 export default function Acceso() {
   const { t } = useI18n();
   const location = useLocation();
@@ -118,8 +118,8 @@ export default function Acceso() {
     <Box
       sx={{
         minHeight: 'calc(100dvh - 136px)',
-        bgcolor: brand.blue,
-        color: brand.white,
+        bgcolor: 'background.default',
+        color: 'text.primary',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -183,7 +183,7 @@ export default function Acceso() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          boxShadow: '0 12px 36px rgba(0,0,0,0.32), 0 0 0 4px rgba(255,130,0,0.14)',
+          boxShadow: '0 8px 28px rgba(4,30,66,0.12), 0 0 0 4px rgba(255,130,0,0.12)',
           position: 'relative',
         }}
         aria-label={
@@ -224,10 +224,10 @@ export default function Acceso() {
         onClick={() => void refetchQr()}
         disabled={qrQuery.isFetching}
         sx={{
-          color: brand.white,
-          borderColor: 'rgba(255,255,255,0.65)',
+          color: 'primary',
+          borderColor: 'currentColor',
           minWidth: 240,
-          '&:hover': { borderColor: brand.white, bgcolor: 'rgba(255,255,255,0.08)' },
+          '&:hover': { borderColor: 'currentColor', bgcolor: 'action.hover' },
         }}
       >
         {qrQuery.isLoading
@@ -258,10 +258,10 @@ export default function Acceso() {
           onClick={onTemporal}
           disabled={temporalBusy}
           sx={{
-            color: brand.white,
-            borderColor: 'rgba(255,255,255,0.5)',
+            color: 'primary',
+            borderColor: 'currentColor',
             minWidth: 240,
-            '&:hover': { borderColor: brand.white, bgcolor: 'rgba(255,255,255,0.08)' },
+            '&:hover': { borderColor: 'currentColor', bgcolor: 'action.hover' },
           }}
         >
           {temporalBusy ? t('Generando…') : t('Usar código temporal')}

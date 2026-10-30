@@ -9,6 +9,7 @@ import { useUnreadCount } from '../../services/notifications';
 import { useAuthStore } from '../../services/auth';
 import { brand } from '../../app/theme';
 import { useI18n } from '../../i18n/I18nProvider';
+import RepsolFlame from './RepsolFlame';
 
 function initials(name: string | undefined): string {
   const [first, second] = (name ?? '').trim().split(/\s+/);
@@ -27,24 +28,45 @@ export default function AppHeader() {
       component="header"
       sx={{
         position: isHome ? 'absolute' : 'relative',
-        top: isHome ? 40 : 0,
+        top: isHome ? 20 : 0,
         zIndex: (theme) => theme.zIndex.appBar,
-        height: isHome ? 48 : 64,
+        height: isHome ? 48 : 88,
         width: '100%',
         color: brand.white,
         background: isHome ? 'transparent' : brand.gradient,
+        borderRadius: isHome ? 0 : '0 0 32px 32px',
+        boxShadow: isHome ? 'none' : '0 10px 25px -5px rgba(255,90,0,0.25)',
+        overflow: isHome ? 'visible' : 'hidden',
       }}
     >
+      {!isHome && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: -34,
+            left: 14,
+            opacity: 0.22,
+            pointerEvents: 'none',
+          }}
+        >
+          <RepsolFlame size={132} />
+        </Box>
+      )}
       <Box
         sx={{
           maxWidth: 600,
-          height: '100%',
+          height: 48,
+          position: isHome ? 'relative' : 'absolute',
+          top: isHome ? 0 : 20,
+          right: 0,
+          left: 0,
           mx: 'auto',
           px: 2,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',
           gap: 1,
+          zIndex: 1,
         }}
       >
         <Tooltip title={t('Notificaciones')}>
@@ -59,7 +81,9 @@ export default function AppHeader() {
               color: brand.white,
               bgcolor: pathname === '/notificaciones' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.16)',
               border: '1px solid rgba(255,255,255,0.3)',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+              '&:hover': {
+                bgcolor: 'rgba(255,255,255,0.28)',
+              },
             }}
           >
             <Badge badgeContent={unread.data ?? 0} color="error" max={9}>
@@ -78,7 +102,9 @@ export default function AppHeader() {
               height: 44,
               bgcolor: 'rgba(255,255,255,0.16)',
               border: '1px solid rgba(255,255,255,0.3)',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+              '&:hover': {
+                bgcolor: 'rgba(255,255,255,0.28)',
+              },
             }}
           >
             <Avatar

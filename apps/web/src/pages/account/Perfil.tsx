@@ -1,73 +1,37 @@
-import BadgeIcon from '@mui/icons-material/Badge';
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
-import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
-import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import Alert from '@mui/material/Alert';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import LanguageIcon from '@mui/icons-material/Language';
+import PhoneOutlinedIcon from '@mui/icons-material/PhoneOutlined';
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import { useQuery } from '@tanstack/react-query';
 import AccountSubpage from './AccountSubpage';
 import { useAuthStore } from '../../services/auth';
-import { supabase } from '../../services/supabase';
 import { useI18n } from '../../i18n/I18nProvider';
 
 export default function Perfil() {
   const { profile } = useAuthStore();
   const { t } = useI18n();
-  const centerQuery = useQuery({
-    queryKey: ['account-profile-center', profile?.center_id],
-    enabled: !!profile?.center_id,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('centers')
-        .select('name')
-        .eq('id', profile!.center_id!)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-  });
-
+  const preferredLanguage = profile?.locale === 'es'
+    ? t('Español')
+    : profile?.locale === 'en'
+      ? t('Inglés')
+      : profile?.locale === 'ar'
+        ? t('Árabe')
+        : t('No especificado');
   const details = [
-    { label: 'Nombre completo', value: profile?.full_name ?? 'No disponible', Icon: PersonOutlinedIcon },
-    { label: 'ID de empleado', value: profile?.employee_code ?? 'No asignado', Icon: BadgeIcon },
-    { label: 'Correo electrónico', value: profile?.email ?? 'No disponible', Icon: EmailOutlinedIcon },
-    { label: 'Teléfono', value: profile?.phone ?? 'No registrado', Icon: PhoneOutlinedIcon },
-    {
-      label: 'Centro asignado',
-      value: !profile
-        ? 'Cargando…'
-        : centerQuery.isLoading
-          ? 'Cargando…'
-          : centerQuery.data?.name ?? 'Sin centro asignado',
-      Icon: LocationOnOutlinedIcon,
-    },
+    { label: 'Correo electrónico', value: profile?.email ?? t('No disponible'), Icon: EmailOutlinedIcon },
+    { label: 'Teléfono', value: profile?.phone ?? t('No registrado'), Icon: PhoneOutlinedIcon },
+    { label: 'Idioma preferido', value: preferredLanguage, Icon: LanguageIcon },
   ];
 
   return (
-    <AccountSubpage title="Mi perfil" description="Datos de tu cuenta corporativa">
-      {centerQuery.isError && (
-        <Alert
-          severity="error"
-          role="alert"
-          action={
-            <Button color="inherit" size="small" onClick={() => void centerQuery.refetch()}>
-              {t('Reintentar')}
-            </Button>
-          }
-        >
-          {t('No se pudo cargar el centro asignado.')}
-        </Alert>
-      )}
+    <AccountSubpage title={t('Mi perfil')} description={t('Tus datos de contacto y preferencias')}>
       <Paper variant="outlined" sx={{ p: 2.5, borderRadius: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
           <Avatar sx={{ width: 56, height: 56, bgcolor: 'primary.main' }}>
@@ -78,7 +42,7 @@ export default function Perfil() {
               {t('Información personal')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              {t('Los datos los gestiona el administrador de tu organización.')}
+              {t('Contacto y preferencias de tu cuenta.')}
             </Typography>
           </Box>
         </Box>

@@ -94,7 +94,9 @@ test('la página Cuenta muestra el perfil y el botón de salir', () => {
   render(<App />);
   fireEvent.click(screen.getByRole('link', { name: 'Abrir cuenta' }));
   expect(screen.getByText('Eva Empleada')).toBeInTheDocument();
-  expect(screen.getByText('Credencial')).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Información' })).toBeInTheDocument();
+  expect(screen.queryByRole('heading', { name: 'Credencial' })).not.toBeInTheDocument();
+  expect(screen.getByText('E0021')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Mi perfil/ })).toHaveAttribute('href', '/cuenta/perfil');
   expect(screen.getByRole('link', { name: 'Abrir notificaciones' })).toHaveAttribute('href', '/notificaciones');
   expect(screen.getByRole('link', { name: /Seguridad/ })).toHaveAttribute('href', '/cuenta/seguridad');
