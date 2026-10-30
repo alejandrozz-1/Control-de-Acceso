@@ -38,3 +38,11 @@ npx cap sync android     # copia dist/ + plugins al proyecto Android
 ## NFC (futuro, no MVP)
 - Decisión de alcance: solo QR + código temporal (ver [[memoria/Preguntas-resueltas]]).
 - Cuando se active: `@capacitor/nfc` (lectura) y/o HCE, condicionado por los tornos de Repsol (R-02). El campo `nfc_uid` ya existe en el esquema.
+
+## Estado (2026-10-30)
+- ✅ Implementado: `capacitor.config.ts` en `apps/web` (appId `com.repsol.controlacceso`), plataformas
+  `apps/web/android/` e `apps/web/ios/` añadidas y commiteables, script `npm run cap:sync -w control-acceso-web`
+  (build + `cap sync` de ambas plataformas).
+- ⛔ Pendiente: compilar el APK (requiere JDK 17 + Android SDK en la máquina de build; iOS requiere macOS + Xcode),
+  plugin de push, back button y keystore de release.
+
