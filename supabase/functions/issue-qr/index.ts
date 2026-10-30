@@ -63,6 +63,10 @@ Deno.serve(async (req) => {
   const { kind = 'qr' } = await req.json().catch(() => ({ kind: 'qr' }));
   if (kind !== 'qr' && kind !== 'temporal') return json({ error: 'tipo_invalido' }, 400);
 
+  // Limpieza oportunista: caduca credenciales vencidas y borra QRs antiguos sin uso.
+  await admin.rpc('fn_expire_credentials', { p_user_id: userId });
+  await admin.rpc('fn_purge_credentials', { p_user_id: userId, p_keep_days: 1 });
+
   // Rate limit sencillo por usuario: 10 emisiones/minuto.
   const since = new Date(Date.now() - 60_000).toISOString();
   const { count } = await admin
