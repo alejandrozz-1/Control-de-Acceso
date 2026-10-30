@@ -67,11 +67,7 @@ export default function HistorialAcceso() {
     },
   });
 
-  const goBack = () => {
-    const index = window.history.state?.idx;
-    if (typeof index === 'number' && index > 0) navigate(-1);
-    else navigate('/');
-  };
+  const goBack = () => navigate('/');
 
   const logs = historyQuery.data ?? [];
 

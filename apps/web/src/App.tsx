@@ -1,13 +1,13 @@
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { AppProviders } from './app/providers';
 import AppRoutes from './app/router';
 
 export default function App() {
   return (
     <AppProviders>
-      <BrowserRouter>
+      <MemoryRouter initialEntries={['/']}>
         <AppRoutes />
-      </BrowserRouter>
+      </MemoryRouter>
     </AppProviders>
   );
 }

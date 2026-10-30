@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, vi } from 'vitest';
 import type { Session } from '@supabase/supabase-js';
 import App from '../App';
+import { normalizePublicUrl } from '../app/publicUrl';
 import { useAuthStore, type Profile } from '../services/auth';
 import { supabase } from '../services/supabase';
 
@@ -24,6 +25,7 @@ const empleado: Profile = {
 };
 
 beforeEach(() => {
+  window.history.replaceState(null, '', '/');
   localStorage.setItem('rps-onboarding-done', '1');
   useAuthStore.setState({ session: null, profile: null, initializing: false, profileLoaded: false });
 });
@@ -46,18 +48,21 @@ test('con sesión el shell muestra los 5 destinos de la navegación inferior', (
   }
 });
 
-test('la ruta desconocida redirige a Inicio', () => {
+test('la navegación interna mantiene la URL pública en la página inicial', () => {
   useAuthStore.setState({ session: fakeSession, profile: empleado, profileLoaded: true });
-  window.history.pushState({}, '', '/no-existe');
   render(<App />);
-  expect(screen.getByRole('heading', { name: /Buenos días|Buenas tardes|Buenas noches/ })).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Calendario' }));
+  expect(screen.getByRole('heading', { name: 'Calendario' })).toBeInTheDocument();
+  expect(window.location.pathname).toBe('/');
 });
 
-test('un empleado no puede entrar a /admin/usuarios (redirige a Inicio)', () => {
+test('una URL interna al abrir la app se normaliza a la inicial', () => {
   useAuthStore.setState({ session: fakeSession, profile: empleado, profileLoaded: true });
   window.history.pushState({}, '', '/admin/usuarios');
+  normalizePublicUrl();
   render(<App />);
   expect(screen.getByRole('heading', { name: /Buenos días|Buenas tardes|Buenas noches/ })).toBeInTheDocument();
+  expect(window.location.pathname).toBe('/');
 });
 
 test('la página Cuenta muestra el perfil y el botón de salir', () => {
@@ -68,12 +73,14 @@ test('la página Cuenta muestra el perfil y el botón de salir', () => {
       order: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+      then: (callback: (result: { data: null; error: null }) => unknown) =>
+        Promise.resolve(callback({ data: null, error: null })),
     };
     return query as never;
   });
   useAuthStore.setState({ session: fakeSession, profile: empleado, profileLoaded: true });
-  window.history.pushState({}, '', '/cuenta');
   render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'Cuenta' }));
   expect(screen.getByText('Eva Empleada')).toBeInTheDocument();
   expect(screen.getByText('Credencial')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Mi perfil/ })).toHaveAttribute('href', '/cuenta/perfil');
