@@ -40,12 +40,14 @@ test('sin sesión muestra la pantalla de login', () => {
   expect(screen.getByLabelText(/^Email/)).toBeInTheDocument();
 });
 
-test('con sesión el shell muestra los 5 destinos de la navegación inferior', () => {
+test('con sesión el shell separa la navegación inferior de las acciones superiores', () => {
   useAuthStore.setState({ session: fakeSession, profile: empleado, profileLoaded: true });
   render(<App />);
-  for (const label of ['Inicio', 'Calendario', 'Acceso', 'Notificaciones', 'Cuenta']) {
+  for (const label of ['Inicio', 'Calendario', 'Acceso']) {
     expect(screen.getAllByText(label).length).toBeGreaterThan(0);
   }
+  expect(screen.getByRole('link', { name: 'Abrir notificaciones' })).toHaveAttribute('href', '/notificaciones');
+  expect(screen.getByRole('link', { name: 'Abrir cuenta' })).toHaveAttribute('href', '/cuenta');
 });
 
 test('la navegación interna mantiene la URL pública en la página inicial', () => {
@@ -84,7 +86,7 @@ test('la página Cuenta muestra el perfil y el botón de salir', () => {
   expect(screen.getByText('Eva Empleada')).toBeInTheDocument();
   expect(screen.getByText('Credencial')).toBeInTheDocument();
   expect(screen.getByRole('link', { name: /Mi perfil/ })).toHaveAttribute('href', '/cuenta/perfil');
-  expect(screen.getByRole('link', { name: /Notificaciones/ })).toHaveAttribute('href', '/notificaciones');
+  expect(screen.getByRole('link', { name: 'Abrir notificaciones' })).toHaveAttribute('href', '/notificaciones');
   expect(screen.getByRole('link', { name: /Seguridad/ })).toHaveAttribute('href', '/cuenta/seguridad');
   expect(screen.getByRole('button', { name: 'Cerrar sesión' })).toBeInTheDocument();
 });

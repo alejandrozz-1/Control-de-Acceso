@@ -1,0 +1,99 @@
+import Badge from '@mui/material/Badge';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import Avatar from '@mui/material/Avatar';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useUnreadCount } from '../../services/notifications';
+import { useAuthStore } from '../../services/auth';
+import { brand } from '../../app/theme';
+
+function initials(name: string | undefined): string {
+  const [first, second] = (name ?? '').trim().split(/\s+/);
+  return `${first?.[0] ?? ''}${second?.[0] ?? ''}`.toUpperCase() || 'U';
+}
+
+export default function AppHeader() {
+  const { pathname } = useLocation();
+  const profile = useAuthStore((state) => state.profile);
+  const unread = useUnreadCount();
+  const isHome = pathname === '/';
+
+  return (
+    <Box
+      component="header"
+      sx={{
+        position: isHome ? 'absolute' : 'relative',
+        top: isHome ? 40 : 0,
+        zIndex: (theme) => theme.zIndex.appBar,
+        height: isHome ? 48 : 64,
+        width: '100%',
+        color: brand.white,
+        background: isHome ? 'transparent' : brand.gradient,
+      }}
+    >
+      <Box
+        sx={{
+          maxWidth: 600,
+          height: '100%',
+          mx: 'auto',
+          px: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-end',
+          gap: 1,
+        }}
+      >
+        <Tooltip title="Notificaciones">
+          <IconButton
+            component={RouterLink}
+            to="/notificaciones"
+            aria-label="Abrir notificaciones"
+            aria-current={pathname === '/notificaciones' ? 'page' : undefined}
+            sx={{
+              width: 44,
+              height: 44,
+              color: brand.white,
+              bgcolor: pathname === '/notificaciones' ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.16)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+            }}
+          >
+            <Badge badgeContent={unread.data ?? 0} color="error" max={9}>
+              <NotificationsOutlinedIcon />
+            </Badge>
+          </IconButton>
+        </Tooltip>
+        <Tooltip title="Cuenta">
+          <IconButton
+            component={RouterLink}
+            to="/cuenta"
+            aria-label="Abrir cuenta"
+            aria-current={pathname.startsWith('/cuenta') ? 'page' : undefined}
+            sx={{
+              width: 44,
+              height: 44,
+              bgcolor: 'rgba(255,255,255,0.16)',
+              border: '1px solid rgba(255,255,255,0.3)',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.28)' },
+            }}
+          >
+            <Avatar
+              sx={{
+                width: 32,
+                height: 32,
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                bgcolor: pathname.startsWith('/cuenta') ? brand.white : 'rgba(255,255,255,0.24)',
+                color: pathname.startsWith('/cuenta') ? brand.blue : brand.white,
+              }}
+            >
+              {initials(profile?.full_name)}
+            </Avatar>
+          </IconButton>
+        </Tooltip>
+      </Box>
+    </Box>
+  );
+}

@@ -1,6 +1,7 @@
 import Box from '@mui/material/Box';
 import { Outlet } from 'react-router-dom';
 import BottomNav from '../components/ui/BottomNav';
+import AppHeader from '../components/ui/AppHeader';
 import Onboarding from '../components/ui/Onboarding';
 import { useNotificationsRealtime } from '../services/notifications';
 
@@ -10,7 +11,15 @@ export default function Shell() {
   return (
     <>
       <Onboarding />
-      <Box component="main" sx={{ pb: 'calc(72px + env(safe-area-inset-bottom))', minHeight: '100dvh' }}>
+      <Box
+        component="main"
+        sx={{
+          pb: 'calc(72px + env(safe-area-inset-bottom))',
+          minHeight: '100dvh',
+          position: 'relative',
+        }}
+      >
+        <AppHeader />
         <Outlet />
       </Box>
       <BottomNav />

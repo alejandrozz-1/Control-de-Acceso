@@ -5,7 +5,6 @@ import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
 import QrCodeScannerIcon from '@mui/icons-material/QrCodeScanner';
@@ -102,11 +101,6 @@ function greeting(name: string): string {
   const hello = h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches';
   const firstName = name.split(' ')[0] ?? name;
   return `${hello}, ${firstName}`;
-}
-
-function initials(name: string): string {
-  const parts = name.trim().split(/\s+/);
-  return ((parts[0]?.[0] ?? '') + (parts[1]?.[0] ?? '')).toUpperCase() || '??';
 }
 
 /** % de jornada transcurrido (0-100); soporta turno de noche cruzando medianoche. */
@@ -234,7 +228,7 @@ export default function Inicio() {
           color: brand.white,
           borderRadius: '0 0 36px 36px',
           px: 2.5,
-          pt: 2.5,
+          pt: 5,
           pb: 8,
           position: 'relative',
           overflow: 'hidden',
@@ -245,10 +239,7 @@ export default function Inicio() {
           <RepsolFlame size={200} />
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, position: 'relative' }}>
-          <Avatar sx={{ bgcolor: 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.35)', fontWeight: 700 }}>
-            {initials(profile?.full_name ?? '')}
-          </Avatar>
+        <Box sx={{ display: 'flex', alignItems: 'center', position: 'relative' }}>
           <Box sx={{ minWidth: 0 }}>
             <Typography variant="caption" sx={{ opacity: 0.9 }}>
               {centerQuery.data?.name ?? 'Control de Acceso'}

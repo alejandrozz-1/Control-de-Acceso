@@ -95,7 +95,7 @@ export default function Acceso() {
   return (
     <Box
       sx={{
-        minHeight: 'calc(100dvh - 72px)',
+        minHeight: 'calc(100dvh - 136px)',
         bgcolor: brand.blue,
         color: brand.white,
         display: 'flex',
