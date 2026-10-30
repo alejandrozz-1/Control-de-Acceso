@@ -91,13 +91,30 @@ beforeEach(() => {
   mocks.deleteNotification.mockReset();
 });
 
-test('muestra la tarjeta con su estado y categoría', () => {
+test('destaca las no leídas y no muestra insignias de lectura', () => {
   renderNotifications();
 
-  expect(screen.getByRole('article')).toHaveTextContent('Aprobación');
-  expect(screen.getByRole('article')).toHaveTextContent('Sin leer');
+  const card = screen.getByRole('article');
+  expect(card).toHaveTextContent('Aprobación');
+  expect(card).toHaveAttribute('data-read-state', 'unread');
+  expect(card).not.toHaveTextContent('Leída');
+  expect(card).not.toHaveTextContent('Sin leer');
+  expect(screen.getByRole('heading', { name: 'Vacaciones aprobadas' })).toHaveStyle({ fontWeight: '750' });
   expect(screen.getByLabelText('No leída')).toBeInTheDocument();
   expect(screen.getByRole('heading', { name: 'Hoy' })).toBeInTheDocument();
+});
+
+test('las leídas se muestran discretamente y sin el indicador azul', () => {
+  mocks.notifications.data = {
+    pages: [{ items: [{ ...item, read_at: '2026-10-30T09:00:00.000Z' }], nextCursor: null }],
+  };
+  renderNotifications();
+
+  const card = screen.getByRole('article');
+  expect(card).toHaveAttribute('data-read-state', 'read');
+  expect(card).not.toHaveTextContent('Leída');
+  expect(screen.queryByLabelText('No leída')).not.toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Vacaciones aprobadas' })).toHaveStyle({ fontWeight: '400' });
 });
 
 test('permite marcar una notificación como leída', () => {
@@ -111,7 +128,7 @@ test('permite marcar una notificación como leída', () => {
 test('abre el detalle y marca la notificación como leída', () => {
   renderNotifications();
 
-  fireEvent.click(screen.getByRole('button', { name: 'Ver detalle' }));
+  fireEvent.click(screen.getByRole('article'));
 
   expect(screen.getByRole('dialog')).toHaveTextContent(item.body);
   expect(mocks.markRead).toHaveBeenCalledWith(item.id);

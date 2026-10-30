@@ -98,10 +98,22 @@ function NotificationCard({
     <Card
       component="article"
       variant="outlined"
+      tabIndex={0}
+      data-read-state={isUnread ? 'unread' : 'read'}
+      onClick={(event) => {
+        if (event.target instanceof Element && event.target.closest('button, a')) return;
+        onOpen(notification);
+      }}
+      onKeyDown={(event) => {
+        if (event.target !== event.currentTarget || (event.key !== 'Enter' && event.key !== ' ')) return;
+        event.preventDefault();
+        onOpen(notification);
+      }}
       sx={{
         overflow: 'visible',
-        borderColor: isUnread ? 'rgba(76, 141, 255, 0.36)' : 'divider',
-        bgcolor: isUnread ? 'rgba(76, 141, 255, 0.055)' : 'background.paper',
+        borderColor: 'divider',
+        borderInlineStart: isUnread ? `4px solid ${brand.orange}` : '4px solid transparent',
+        bgcolor: isUnread ? 'rgba(255, 130, 0, 0.055)' : 'background.paper',
         borderRadius: 3,
         boxShadow: isUnread ? '0 8px 24px rgba(0,0,0,0.12)' : '0 4px 16px rgba(0,0,0,0.07)',
         animation: 'notificationEnter 360ms ease both',
@@ -112,6 +124,8 @@ function NotificationCard({
         },
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
         transition: 'transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease',
+        cursor: 'pointer',
+        '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main', outlineOffset: 2 },
         '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 10px 28px rgba(0,0,0,0.14)' },
         '&:active': { transform: 'scale(0.99)' },
       }}
@@ -167,23 +181,13 @@ function NotificationCard({
                 bgcolor: CATEGORY_COLOR[category].background,
               }}
             />
-            <Chip
-              size="small"
-              variant="outlined"
-              label={t(isUnread ? 'Sin leer' : 'Leída')}
-              sx={{
-                height: 23,
-                borderColor: isUnread ? 'rgba(76, 141, 255, 0.5)' : 'divider',
-                color: isUnread ? '#7FAEFF' : 'text.secondary',
-              }}
-            />
           </Stack>
 
           <Typography
             variant="subtitle1"
             component="h3"
             sx={{
-              fontWeight: isUnread ? 750 : 600,
+              fontWeight: isUnread ? 750 : 400,
               lineHeight: 1.35,
               overflowWrap: 'anywhere',
             }}
@@ -231,7 +235,10 @@ function NotificationCard({
           >
             <Button
               size="small"
-              onClick={() => onOpen(notification)}
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpen(notification);
+              }}
               sx={{ minHeight: 40, px: 1, textTransform: 'none', fontWeight: 700 }}
             >
               {t('Ver detalle')}
@@ -239,7 +246,10 @@ function NotificationCard({
             {getNotificationNavigation(notification) && (
               <Button
                 size="small"
-                onClick={() => onNavigate(notification)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onNavigate(notification);
+                }}
                 sx={{ minHeight: 40, px: 1, textTransform: 'none' }}
               >
                 {t(getNotificationNavigation(notification)?.label ?? '')}
@@ -249,7 +259,10 @@ function NotificationCard({
               <Button
                 size="small"
                 startIcon={<CheckCircleIcon />}
-                onClick={() => onMarkRead(notification)}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onMarkRead(notification);
+                }}
                 disabled={markingRead}
                 sx={{ minHeight: 40, px: 1, textTransform: 'none' }}
               >
@@ -260,7 +273,10 @@ function NotificationCard({
               <span>
                 <IconButton
                   aria-label={`${t('Eliminar')} «${translateNotificationText(notification.title, intlLocale, t)}»`}
-                  onClick={() => onDelete(notification)}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onDelete(notification);
+                  }}
                   disabled={deleting}
                   sx={{ minWidth: 40, minHeight: 40, color: 'text.secondary' }}
                 >
