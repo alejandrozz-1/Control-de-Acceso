@@ -101,7 +101,7 @@ test('destaca las no leídas y no muestra insignias de lectura', () => {
   expect(card).not.toHaveTextContent('Sin leer');
   expect(screen.getByRole('heading', { name: 'Vacaciones aprobadas' })).toHaveStyle({ fontWeight: '750' });
   expect(screen.getByLabelText('No leída')).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Hoy' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Notificaciones' })).toBeInTheDocument();
 });
 
 test('las leídas se muestran discretamente y sin el indicador azul', () => {

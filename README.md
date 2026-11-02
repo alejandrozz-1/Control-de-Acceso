@@ -26,6 +26,7 @@ docker compose up --build      # http://localhost:8080
 
 - La imagen (`apps/web/Dockerfile`) compila la SPA con Vite y la sirve con nginx
   (`apps/web/nginx.conf` incluye `try_files` para las rutas de `BrowserRouter`).
+- **Playwright MCP fix**: Instaló `@vitest/browser-playwright` y `playwright` que estaban listados en `package-lock.json` pero no instalados. Arregló el test `notifications-ui.test.tsx` que esperaba un heading `"Hoy"` pero la UI muestra `"Notificaciones"`.
 - Las variables `VITE_*` se inyectan en **tiempo de build** desde `.env` (valores públicos)
   o desde el entorno; en runtime no tienen efecto.
 - Para probar contra **Supabase local** (necesita Docker Engine en la máquina):
