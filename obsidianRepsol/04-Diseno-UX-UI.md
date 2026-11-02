@@ -40,7 +40,7 @@
 - Screens clave:
   - **Acceso**: QR a pantalla completa con fondo azul `#041E42`, botón "código temporal", estado (activa/revocada), temporizador de caducidad.
   - **Inicio**: saludo + turno de hoy con estado calculado a partir del horario real + tarjeta independiente de último acceso y acceso rápido al QR.
-  - **Calendario**: vista mes con leyenda de color por tipo de día.
+  - **Calendario**: vista mes con leyenda de color por tipo de día. «Tus solicitudes» usa tarjetas responsive con tipo, estado destacado, fechas, duración y motivo; incluye resumen anual compacto en una fila, búsqueda por tipo/motivo/estado y filtros frecuentes por estado. Año, mes, rango de fechas, ordenación, estado/tipo avanzado y selector Activas/Archivadas quedan dentro del botón Filtros para priorizar espacio en móvil. El histórico se consulta por páginas para que el listado siga siendo usable con cientos de registros. Las solicitudes archivadas no se muestran en el calendario. Las aprobaciones del equipo conservan sus acciones de aprobar/rechazar.
   - **Historial de accesos**: cabecera con volver, tarjetas de entrada/salida en línea temporal y método/punto de acceso.
   - **Notificaciones**: lista con swipe marcar leída, badge en la bottom bar.
   - **Responsable**: secciones extra (métricas, registros, aprobaciones) — misma bottom bar, contenido con tabs superiores.

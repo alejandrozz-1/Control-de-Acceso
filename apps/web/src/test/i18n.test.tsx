@@ -40,6 +40,16 @@ test('translates the requests section at the bottom of the calendar in every loc
     expect(translate(locale, 'Pendientes de tu equipo')).not.toBe('Pendientes de tu equipo');
     expect(translate(locale, 'Aún no has solicitado vacaciones ni permisos.'))
       .not.toBe('Aún no has solicitado vacaciones ni permisos.');
+    expect(translate(locale, 'Filtrar solicitudes')).not.toBe('Filtrar solicitudes');
+    expect(translate(locale, 'Baja médica')).not.toBe('Baja médica');
+    expect(translate(locale, 'No se pudo cancelar la solicitud. Inténtalo de nuevo.'))
+      .not.toBe('No se pudo cancelar la solicitud. Inténtalo de nuevo.');
+    expect(translate(locale, 'Anuladas')).not.toBe('Anuladas');
+    expect(translate(locale, 'Buscar solicitudes...')).not.toBe('Buscar solicitudes...');
+    expect(translate(locale, 'Filtros avanzados')).not.toBe('Filtros avanzados');
+    expect(translate(locale, 'Archivar')).not.toBe('Archivar');
+    expect(translate(locale, 'Activas')).not.toBe('Activas');
+    expect(translate(locale, 'Archivadas')).not.toBe('Archivadas');
   }
   expect(translate('ar', 'día')).toBe('يوم');
   expect(translate('ar', 'días')).toBe('أيام');

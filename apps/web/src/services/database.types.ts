@@ -694,6 +694,7 @@ export type Database = {
       }
       vacation_requests: {
         Row: {
+          archived_at: string | null
           created_at: string
           days: number
           decided_at: string | null
@@ -708,6 +709,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          archived_at?: string | null
           created_at?: string
           days: number
           decided_at?: string | null
@@ -722,6 +724,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          archived_at?: string | null
           created_at?: string
           days?: number
           decided_at?: string | null

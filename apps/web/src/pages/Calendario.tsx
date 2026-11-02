@@ -203,6 +203,7 @@ export default function Calendario() {
         .from('vacation_requests')
         .select('type, status, start_date, end_date')
         .eq('user_id', profile!.id)
+        .is('archived_at', null)
         .lte('start_date', monthEnd)
         .gte('end_date', monthStart);
       if (error) throw error;

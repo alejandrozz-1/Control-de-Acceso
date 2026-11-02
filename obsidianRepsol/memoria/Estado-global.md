@@ -1,6 +1,6 @@
 # Estado global del proyecto
 
-> Última actualización: 2026-10-30 — por: agente de sesión (antes: 2026-10-29 frontend-ux, 2026-10-28 sesión 2, coordinador)
+> Última actualización: 2026-11-02 — por: agente de sesión
 
 ## Salud general
 🟡 Fases 0-4 en marcha: auth, Acceso (QR validado end-to-end contra la Edge Function `validate-access`), Calendario con festivos por comunidad, Vacaciones y Notificaciones. 2026-10-30: revisión completa con Playwright + fixes de bugs reales (BrowserRouter, permisos admin, festivos, fechas, layout). Pendiente: alta CSV, CRUD centros/equipos, push, PWA, APK compilado.
@@ -39,11 +39,11 @@ Definición completa en [[10-Riesgos]].
 | Componente | Estado |
 |---|---|
 | Supabase `bipcvxetgypugwnbhmwm` (eu-central-1) | ✅ 16 tablas, RLS 16/16, advisors **0 ERROR** / 6 WARN aceptados + 1 WARN plan free (R-12), seed aplicado |
-| Migraciones | ✅ 11 versiones registradas. `20261030000001` (fix RLS: recursión `team_members`, INSERT de credenciales revokeado, `fn_expire/purge_credentials`) aplicada 2026-10-30. El seed de calendario se renombró `20261028000007`→`20261030000002` (colisión de timestamp con `audit_rls`) y queda registrado como aplicado (dato ya verificado: 14 festivos, 9 vacaciones, 5 eventos) |
+| Migraciones | ✅ 11 versiones registradas. `20261030000001` (fix RLS: recursión `team_members`, INSERT de credenciales revokeado, `fn_expire/purge_credentials`) aplicada 2026-10-30. El seed de calendario se renombró `20261028000007`→`20261030000002` (colisión de timestamp con `audit_rls`) y queda registrado como aplicado (dato ya verificado: 14 festivos, 9 vacaciones, 5 eventos). `20261102000001_vacation_request_archiving.sql`: columna `archived_at` disponible y lectura de solicitudes verificada; su alta en `schema_migrations` no está comprobada. |
 | Edge Functions | ✅ `invite-user`, `issue-qr` (limpia credenciales caducadas en cada emisión) y `validate-access` (torno: HMAC QR → entrada/salida + código temporal de un solo uso, protegida por `x-device-key`) desplegadas y probadas end-to-end (incl. rechazos: firma inválida, caducada, clave errónea) |
 | Credenciales | ✅ Limpieza 2026-10-30: 115 vencidas marcadas `caducada` (antes estaban `activa`); purga automática vía `fn_purge_credentials` |
 | Auth (GoTrue) | ✅ Login verificado con usuarios seed. **Lección**: insertar usuarios directamente en `auth.users` exige normalizar columnas token a `''` (NULL → `Scan error` en GoTrue) — ya en el seed |
-| App web (apps/web) | ✅ `lint+typecheck+test+build` en verde (40 tests); build ~227 kB gzip (R-14). 2026-10-30: `BrowserRouter` (URLs reales + botón atrás), `/admin/*` solo admin, festivos filtrados por comunidad del centro, fixes de fechas/layout/copy |
+| App web (apps/web) | ✅ `lint+typecheck+test+build` en verde (62 tests); 2026-11-02 se amplió «Tus solicitudes» con búsqueda, filtros, ordenación, resumen anual, archivo/restauración e histórico paginado. La consulta del campo `archived_at` funciona en Supabase. |
 | CI | ✅ `ci.yml` en develop/main (advisors con secret, si no → skip) |
 | Docker | 🟡 `apps/web/Dockerfile` (Node build → nginx con fallback SPA) + `docker-compose.yml` listos y validados; **build pendiente en la VM de Azure** (la máquina dev no tiene Docker Engine; ver [[13-Estrategia-despliegue]]) |
 | PWA / Capacitor | 🟡 Capacitor 8: `capacitor.config.ts` + plataformas `android/` e `ios/` generadas y con `npm run cap:sync -w control-acceso-web` verde. Pendiente: compilar APK (JDK 17 + Android SDK) e iOS (macOS + Xcode); push/back button/PWA en Fase 6 |
