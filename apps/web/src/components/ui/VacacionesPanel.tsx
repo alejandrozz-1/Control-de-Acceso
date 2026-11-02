@@ -845,10 +845,9 @@ export default function VacacionesPanel() {
             sx={{ mb: 1 }}
           />
 
-          <Stack direction="row" spacing={0.75} sx={{ alignItems: 'stretch', mb: 1.25 }}>
+          <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 1.25 }}>
             <ToggleButtonGroup
               exclusive
-              size="small"
               value={filter}
               aria-label={t('Filtrar solicitudes')}
               onChange={(_, value: RequestFilter | null) => updateQuickFilter(value)}
@@ -859,7 +858,8 @@ export default function VacacionesPanel() {
                 '& .MuiToggleButton-root': {
                   flex: '1 1 0',
                   minWidth: 0,
-                  px: { xs: 0.5, sm: 1 },
+                  minHeight: 38,
+                  px: { xs: 0.25, sm: 1 },
                   fontSize: { xs: '0.68rem', sm: '0.8rem' },
                   textTransform: 'none',
                   whiteSpace: 'nowrap',
@@ -876,10 +876,21 @@ export default function VacacionesPanel() {
               variant="outlined"
               size="small"
               startIcon={<FilterListIcon />}
+              aria-label={t('Filtros')}
               onClick={() => setFilterDialog(true)}
-              sx={{ flexShrink: 0, minWidth: 0, px: { xs: 1, sm: 1.5 }, textTransform: 'none' }}
+              sx={{
+                flexShrink: 0,
+                minWidth: { xs: 38, sm: 0 },
+                width: { xs: 38, sm: 'auto' },
+                px: { xs: 0, sm: 1.25 },
+                fontSize: '0.8rem',
+                textTransform: 'none',
+                '& .MuiButton-startIcon': { mx: { xs: 0, sm: -0.5 } },
+              }}
             >
-              {t('Filtros')}
+              <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                {t('Filtros')}
+              </Box>
             </Button>
           </Stack>
 
