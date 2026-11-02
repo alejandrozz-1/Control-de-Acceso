@@ -333,9 +333,9 @@ export default function Notificaciones() {
           sx={{
             p: { xs: 2, sm: 2.5 },
             borderRadius: 3.5,
-            background: 'linear-gradient(135deg, rgba(4,30,66,0.96), rgba(16,36,58,0.98))',
-            borderColor: 'rgba(255,130,0,0.28)',
-            boxShadow: '0 12px 30px rgba(4,30,66,0.18)',
+            bgcolor: 'background.paper',
+            borderColor: 'divider',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.07)',
           }}
         >
           <Stack
@@ -344,10 +344,10 @@ export default function Notificaciones() {
             sx={{ alignItems: 'center', justifyContent: 'space-between' }}
           >
             <Box>
-              <Typography variant="body2" color="rgba(255,255,255,0.72)">
+              <Typography variant="body2" color="text.secondary">
                 {t('Tu actividad, siempre al día')}
               </Typography>
-              <Typography variant="h6" sx={{ mt: 0.25, color: brand.white, fontWeight: 800 }}>
+              <Typography variant="h6" sx={{ mt: 0.25, color: 'text.primary', fontWeight: 800 }}>
                 {list.isSuccess
                   ? unread > 0
                     ? `${unread} ${t(unread === 1 ? 'aviso pendiente' : 'avisos pendientes')}`
@@ -361,7 +361,7 @@ export default function Notificaciones() {
                 width: 48,
                 height: 48,
                 bgcolor: 'rgba(255,130,0,0.18)',
-                color: brand.orange,
+                color: 'primary.main',
                 borderRadius: 3,
               }}
             >
@@ -377,11 +377,11 @@ export default function Notificaciones() {
               sx={{
                 mt: 1.5,
                 minHeight: 44,
-                color: brand.white,
+                color: 'primary.main',
                 textTransform: 'none',
                 fontWeight: 700,
-                bgcolor: 'rgba(255,255,255,0.12)',
-                '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                bgcolor: 'action.selected',
+                '&:hover': { bgcolor: 'action.hover' },
               }}
             >
               {markAll.isPending ? t('Actualizando…') : t('Marcar todas como leídas')}

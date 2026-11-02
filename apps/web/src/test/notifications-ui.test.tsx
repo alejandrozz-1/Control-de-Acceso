@@ -42,6 +42,10 @@ vi.mock('../services/notifications', () => ({
   useDeleteNotification: () => ({ mutate: mocks.deleteNotification, isPending: false, error: null }),
 }));
 
+// Hoy a mediodá local: el agrupado "Hoy" del test no debe depender de la fecha de ejecución.
+const todayNoon = new Date();
+todayNoon.setHours(12, 0, 0, 0);
+
 const item = {
   id: 'notice-1',
   type: 'vacacion' as const,
@@ -49,7 +53,7 @@ const item = {
   body: 'Tu solicitud ha sido aprobada.',
   data: { status: 'aprobada' },
   read_at: null,
-  created_at: '2026-10-30T08:00:00.000Z',
+  created_at: todayNoon.toISOString(),
 };
 
 function renderNotifications() {
