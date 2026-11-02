@@ -364,7 +364,7 @@ function RequestRow({
             icon={statusMeta.icon}
             label={t(statusMeta.label)}
             color={statusMeta.color}
-            sx={{ fontWeight: 700, borderRadius: 2, textTransform: 'capitalize' }}
+            sx={{ fontWeight: 700, textTransform: 'capitalize' }}
           />
           <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', color: 'text.secondary' }}>
             <CalendarMonthIcon fontSize="small" />
@@ -381,7 +381,7 @@ function RequestRow({
           </Typography>
         </Stack>
 
-        <Box sx={{ mt: 1.5, p: 1.25, borderRadius: 2, bgcolor: 'action.hover' }}>
+        <Box sx={{ mt: 1.5, p: 1.5, borderRadius: 2, bgcolor: 'action.hover' }}>
           <Typography variant="body2" sx={{ overflowWrap: 'anywhere' }}>
             {r.reason || t('Sin motivo indicado')}
           </Typography>

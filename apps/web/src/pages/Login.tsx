@@ -48,7 +48,7 @@ export default function Login() {
             px: 4,
             pt: 3,
             pb: 5,
-            borderRadius: '0 0 28px 28px',
+            borderRadius: '0 0 16px 16px',
             position: 'relative',
             overflow: 'hidden',
           }}

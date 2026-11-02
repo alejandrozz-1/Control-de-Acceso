@@ -276,7 +276,7 @@ export default function Calendario() {
             {t('El elemento relacionado ya no está disponible.')}
           </Alert>
         )}
-      <Paper variant="outlined" sx={{ borderRadius: 3, p: 1.5, mb: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+      <Paper variant="outlined" sx={{ borderRadius: 3, p: 2, mb: 2, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
         {/* Navegación de mes */}
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
           <IconButton size="small" aria-label={t('Mes anterior')} onClick={() => shiftMonth(-1)}>

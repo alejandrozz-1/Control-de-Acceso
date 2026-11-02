@@ -38,7 +38,7 @@ const themeOptions: ThemeOptions = {
   typography: {
     fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
   },
-  shape: { borderRadius: 12 },
+  shape: { borderRadius: 4 },
   components: {
     MuiCssBaseline: {
       styleOverrides: (muiTheme) => ({
@@ -78,10 +78,36 @@ const themeOptions: ThemeOptions = {
       defaultProps: { disableElevation: true },
       styleOverrides: {
         root: {
+          borderRadius: 10,
           // Feedback táctil al pulsar (ref. "tactile-btn" del index del compañero)
           transition: 'transform 0.08s ease, background-color 0.2s ease, border-color 0.2s ease',
           '&:active:not(:disabled)': { transform: 'scale(0.96)' },
         },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: { borderRadius: 999 },
+      },
+    },
+    MuiDialog: {
+      styleOverrides: {
+        paper: { borderRadius: 12 },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: { borderRadius: 10 },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: { borderRadius: 12 },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: { borderRadius: 12 },
       },
     },
     MuiBottomNavigationAction: {

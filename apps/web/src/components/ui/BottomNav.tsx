@@ -34,7 +34,7 @@ export default function BottomNav() {
         left: 0,
         right: 0,
         zIndex: (t) => t.zIndex.appBar,
-        borderRadius: '20px 20px 0 0',
+        borderRadius: '16px 16px 0 0',
         paddingBottom: 'env(safe-area-inset-bottom)',
         overflow: 'visible',
       }}

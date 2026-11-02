@@ -34,7 +34,7 @@ export default function AppHeader() {
         width: '100%',
         color: brand.white,
         background: isHome ? 'transparent' : brand.gradient,
-        borderRadius: isHome ? 0 : '0 0 32px 32px',
+        borderRadius: isHome ? 0 : '0 0 16px 16px',
         boxShadow: isHome ? 'none' : '0 10px 25px -5px rgba(255,90,0,0.25)',
         overflow: isHome ? 'visible' : 'hidden',
       }}

@@ -230,7 +230,7 @@ export default function Inicio() {
         sx={{
           background: brand.gradient,
           color: brand.white,
-          borderRadius: '0 0 36px 36px',
+          borderRadius: '0 0 16px 16px',
           px: 2.5,
           pt: 'calc(28px + env(safe-area-inset-top, 0px))',
           pb: 8,

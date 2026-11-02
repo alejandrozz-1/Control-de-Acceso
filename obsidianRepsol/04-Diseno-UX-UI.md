@@ -33,6 +33,7 @@
 
 ## 3. Layout mobile-first
 
+- **Jerarquía de radios**: base del tema 4 px; tarjetas y contenedores 12–16 px; botones e inputs 10 px; chips y estados en formato pill. Mantener radios menores en elementos secundarios y evitar redondear en exceso las cabeceras.
 - **Bottom Navigation** fija (5 destinos, icono + etiqueta): Inicio · Calendario · Acceso · Notificaciones · Cuenta.
   - Acceso como destino central prominente (izquierdo de center: orden Inicio, Calendario, **Acceso**, Notificaciones, Cuenta).
 - Breakpoints: móvil (<600, base), tablet (600–900, dos columnas), escritorio (>900, **Drawer lateral izquierdo** sustituye la bottom bar y aparece el menú de responsable).
