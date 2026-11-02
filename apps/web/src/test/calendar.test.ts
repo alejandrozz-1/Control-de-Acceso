@@ -6,18 +6,18 @@ describe('SHIFT_COLORS', () => {
   it('uses a contrast-aware Repsol palette in light and dark modes', () => {
     expect(SHIFT_COLORS).toEqual({
       M: '#B85C00',
-      T: '#041E42',
+      T: '#0E7490',
       N: '#6D28D9',
       L: '#64748B',
     });
     expect(SHIFT_DARK_COLORS).toEqual({
       M: '#FF9D33',
-      T: '#60A5FA',
+      T: '#22D3EE',
       N: '#B794F4',
       L: '#94A3B8',
     });
-    expect(getShiftColor('T', 'light')).toBe('#041E42');
-    expect(getShiftColor('T', 'dark')).toBe('#60A5FA');
+    expect(getShiftColor('T', 'light')).toBe('#0E7490');
+    expect(getShiftColor('T', 'dark')).toBe('#22D3EE');
     expect(getShiftColor('unknown', 'dark')).toBe(SHIFT_COLORS.L);
   });
 });
