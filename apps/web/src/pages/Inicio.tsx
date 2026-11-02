@@ -232,7 +232,7 @@ export default function Inicio() {
           color: brand.white,
           borderRadius: '0 0 36px 36px',
           px: 2.5,
-          pt: 2.5,
+          pt: 'calc(28px + env(safe-area-inset-top, 0px))',
           pb: 8,
           position: 'relative',
           overflow: 'hidden',

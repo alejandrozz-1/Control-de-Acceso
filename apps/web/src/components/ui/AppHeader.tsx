@@ -28,9 +28,9 @@ export default function AppHeader() {
       component="header"
       sx={{
         position: isHome ? 'absolute' : 'relative',
-        top: isHome ? 20 : 0,
+        top: isHome ? 'calc(env(safe-area-inset-top, 0px) + 28px)' : 0,
         zIndex: (theme) => theme.zIndex.appBar,
-        height: isHome ? 48 : 88,
+        height: isHome ? 48 : 'calc(96px + env(safe-area-inset-top, 0px))',
         width: '100%',
         color: brand.white,
         background: isHome ? 'transparent' : brand.gradient,
@@ -57,7 +57,7 @@ export default function AppHeader() {
           maxWidth: 600,
           height: 48,
           position: isHome ? 'relative' : 'absolute',
-          top: isHome ? 0 : 20,
+          top: isHome ? 0 : 'calc(env(safe-area-inset-top, 0px) + 28px)',
           right: 0,
           left: 0,
           mx: 'auto',
