@@ -224,7 +224,7 @@ export default function Acceso() {
         onClick={() => void refetchQr()}
         disabled={qrQuery.isFetching}
         sx={{
-          color: 'primary',
+          color: 'primary.main',
           borderColor: 'currentColor',
           minWidth: 240,
           '&:hover': { borderColor: 'currentColor', bgcolor: 'action.hover' },
@@ -258,7 +258,7 @@ export default function Acceso() {
           onClick={onTemporal}
           disabled={temporalBusy}
           sx={{
-            color: 'primary',
+            color: 'primary.main',
             borderColor: 'currentColor',
             minWidth: 240,
             '&:hover': { borderColor: 'currentColor', bgcolor: 'action.hover' },

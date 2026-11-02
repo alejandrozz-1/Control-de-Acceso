@@ -26,16 +26,16 @@ import { useI18n } from '../i18n/I18nProvider';
 /** Colores por código de turno (M mañana, T tarde, N noche, L libre). */
 export const SHIFT_COLORS: Record<string, string> = {
   M: '#B85C00',
-  T: '#C00027',
+  T: '#041E42', // brand.blue: el azul corporativo; el rojo se lee como alerta
   N: '#6D28D9',
-  L: '#0077A8',
+  L: '#64748B',
 };
 
 export const SHIFT_DARK_COLORS: Record<string, string> = {
   M: '#FF9D33',
-  T: '#FF526B',
+  T: '#60A5FA',
   N: '#B794F4',
-  L: '#58C7F3',
+  L: '#94A3B8',
 };
 
 export function getShiftColor(code: string, mode: 'light' | 'dark'): string {

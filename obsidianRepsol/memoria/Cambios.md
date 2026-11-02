@@ -31,6 +31,7 @@
 | 2026-10-30 | agente de sesión | Migración `20261030000001` aplicada (RLS `team_members` sin recursión, INSERT en `access_credentials` revokeado, `fn_expire/purge_credentials`); 115 credenciales vencidas marcadas `caducada`; seed de calendario renombrado `20261028000007`→`20261030000002` (colisión de timestamp) y registrado | `supabase/migrations/` | — |
 | 2026-10-30 | agente de sesión | Edge Function `validate-access` desplegada (torno: HMAC QR → entrada/salida + código temporal de un solo uso, `x-device-key`) y probada end-to-end; `issue-qr` limpia caducadas; secret `TURNSTILE_API_KEY` configurado | `supabase/functions/`, `.env.local` (secreto) | R-02 |
 | 2026-10-30 | agente de sesión | Docker (`apps/web/Dockerfile` + `nginx.conf` + `docker-compose.yml`, build pendiente en VM Azure) y Capacitor 8 (`capacitor.config.ts`, plataformas `android/`+`ios/`, `npm run cap:sync`; APK pendiente de JDK+SDK) | `apps/web/Dockerfile`, `docker-compose.yml`, `apps/web/capacitor.config.ts`, `apps/web/{android,ios}/` | — |
+| 2026-11-02 | agente de sesión | Fix de revisión: paleta de turnos con semántica estable por tema (Tarde azul corporativo en vez de rojo, Libre gris neutro; oscuro con la misma semántica), botones de Acceso con `primary.main` (antes `color: 'primary'` inválido en sx) y test de notificaciones inmune a la fecha de ejecución (agrupado "Hoy" con fecha fija caducaba) | `apps/web/src/pages/{Calendario,Acceso}.tsx`, `src/test/{calendar,notifications-ui}.test.*` | — |
 
 ### Plantilla
 ```
