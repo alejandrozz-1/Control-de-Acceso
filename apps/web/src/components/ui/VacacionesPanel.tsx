@@ -1,6 +1,7 @@
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import ButtonBase from '@mui/material/ButtonBase';
 import Chip from '@mui/material/Chip';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -715,11 +716,10 @@ export default function VacacionesPanel() {
     });
   const displayedRequests = visibleMine.slice(0, visibleCount);
   const teamPending = (list.data ?? []).filter((r) => r.user_id !== uid && r.status === 'pendiente');
-  const updateQuickFilter = (next: RequestFilter | null) => {
-    if (next) {
-      setFilter(next);
-      setVisibleCount(20);
-    }
+  const updateQuickFilter = (next: Exclude<RequestFilter, 'todas'>) => {
+    setFilter((current) => current === next ? 'todas' : next);
+    setPeriod((current) => current.status === 'todas' ? current : { ...current, status: 'todas' });
+    setVisibleCount(20);
   };
   const updateSearch = (value: string) => {
     setSearch(value);
@@ -805,16 +805,29 @@ export default function VacacionesPanel() {
               {period.year === 'todas' ? t('Todos') : period.year}
             </Typography>
             {([
-              ['pendiente', 'Pend.', 'warning.main'],
-              ['aprobada', 'Apr.', 'success.main'],
-              ['rechazada', 'Rech.', 'error.main'],
-              ['anulada', 'Anul.', 'text.secondary'],
-            ] as const).map(([status, label, color]) => (
-              <Stack
+              ['pendiente', 'Pend.', 'Pendientes', 'warning.main'],
+              ['aprobada', 'Apr.', 'Aprobadas', 'success.main'],
+              ['rechazada', 'Rech.', 'Rechazadas', 'error.main'],
+              ['anulada', 'Anul.', 'Anuladas', 'text.secondary'],
+            ] as const).map(([status, label, fullLabel, color]) => (
+              <ButtonBase
                 key={status}
-                direction="row"
-                spacing={0.5}
-                sx={{ minWidth: 0, alignItems: 'center', justifyContent: 'center' }}
+                type="button"
+                aria-label={t(fullLabel)}
+                aria-pressed={filter === status}
+                onClick={() => updateQuickFilter(status)}
+                sx={{
+                  minWidth: 0,
+                  px: 0.5,
+                  py: 0.25,
+                  gap: 0.5,
+                  borderRadius: 1,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: filter === status ? 'action.selected' : 'transparent',
+                  '&:hover': { bgcolor: 'action.selected' },
+                  '&:focus-visible': { outline: '2px solid', outlineColor: 'primary.main' },
+                }}
               >
                 <Box component="span" sx={{ color, display: 'flex', fontSize: '0.95rem', fontWeight: 800 }}>
                   {counts[status]}
@@ -822,56 +835,35 @@ export default function VacacionesPanel() {
                 <Typography variant="caption" color="text.secondary" noWrap sx={{ fontWeight: 650 }}>
                   {t(label)}
                 </Typography>
-              </Stack>
+              </ButtonBase>
             ))}
           </Box>
 
-          <TextField
-            fullWidth
-            size="small"
-            value={search}
-            onChange={(event) => updateSearch(event.target.value)}
-            placeholder={t('Buscar solicitudes...')}
-            slotProps={{
-              htmlInput: { 'aria-label': t('Buscar solicitudes...') },
-              input: {
-                startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-                ),
-              },
-            }}
-            sx={{ mb: 1 }}
-          />
-
-          <Stack direction="row" spacing={0.75} sx={{ alignItems: 'center', mb: 1.25 }}>
-            <ToggleButtonGroup
-              exclusive
-              value={filter}
-              aria-label={t('Filtrar solicitudes')}
-              onChange={(_, value: RequestFilter | null) => updateQuickFilter(value)}
-              sx={{
-                display: 'flex',
-                flex: 1,
-                minWidth: 0,
-                '& .MuiToggleButton-root': {
-                  flex: '1 1 0',
-                  minWidth: 0,
-                  minHeight: 38,
-                  px: { xs: 0.25, sm: 1 },
-                  fontSize: { xs: '0.68rem', sm: '0.8rem' },
-                  textTransform: 'none',
-                  whiteSpace: 'nowrap',
+          <Stack
+            role="group"
+            aria-label={`${t('Buscar solicitudes...')} · ${t('Filtros')}`}
+            direction="row"
+            spacing={1}
+            sx={{ alignItems: 'center', mb: 1.25 }}
+          >
+            <TextField
+              fullWidth
+              size="small"
+              value={search}
+              onChange={(event) => updateSearch(event.target.value)}
+              placeholder={t('Buscar solicitudes...')}
+              slotProps={{
+                htmlInput: { 'aria-label': t('Buscar solicitudes...') },
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
                 },
               }}
-            >
-              {FILTERS.map((value) => (
-                <ToggleButton key={value} value={value}>
-                  {t(value === 'todas' ? 'Todas' : value === 'pendiente' ? 'Pendientes' : value === 'aprobada' ? 'Aprobadas' : value === 'rechazada' ? 'Rechazadas' : 'Anuladas')}
-                </ToggleButton>
-              ))}
-            </ToggleButtonGroup>
+              sx={{ flex: 1, minWidth: 0 }}
+            />
             <Button
               variant="outlined"
               size="small"
@@ -881,7 +873,8 @@ export default function VacacionesPanel() {
               sx={{
                 flexShrink: 0,
                 minWidth: { xs: 38, sm: 0 },
-                width: { xs: 38, sm: 'auto' },
+                width: { xs: 40, sm: 'auto' },
+                minHeight: 40,
                 px: { xs: 0, sm: 1.25 },
                 fontSize: '0.8rem',
                 textTransform: 'none',

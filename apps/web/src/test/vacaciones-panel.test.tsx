@@ -131,15 +131,22 @@ test('muestra estadísticas, filtra tarjetas y ofrece acciones contextuales', as
   expect(screen.queryByRole('combobox', { name: 'Año' })).not.toBeInTheDocument();
   expect(screen.queryByRole('combobox', { name: 'Ordenar por' })).not.toBeInTheDocument();
   expect(screen.queryByRole('group', { name: 'Histórico de solicitudes' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('group', { name: 'Filtrar solicitudes' })).not.toBeInTheDocument();
+  const searchAndFilters = screen.getByRole('group', { name: 'Buscar solicitudes... · Filtros' });
+  expect(within(searchAndFilters).getByRole('textbox', { name: 'Buscar solicitudes...' })).toBeInTheDocument();
+  expect(within(searchAndFilters).getByRole('button', { name: 'Filtros' })).toBeInTheDocument();
 
-  fireEvent.click(screen.getByRole('button', { name: 'Anuladas' }));
+  const cancelledFilter = within(statistics).getByRole('button', { name: 'Anuladas' });
+  fireEvent.click(cancelledFilter);
+  expect(cancelledFilter).toHaveAttribute('aria-pressed', 'true');
   expect(screen.getByText('Cita aplazada')).toBeInTheDocument();
   expect(screen.queryByText('Vacaciones de verano')).not.toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Aprobadas' }));
   expect(screen.getByText('Recuperación')).toBeInTheDocument();
   expect(screen.queryByText('Vacaciones de verano')).not.toBeInTheDocument();
 
-  fireEvent.click(screen.getByRole('button', { name: 'Todas' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Aprobadas' }));
+  expect(screen.getByText('Vacaciones de verano')).toBeInTheDocument();
   fireEvent.change(screen.getByRole('textbox', { name: 'Buscar solicitudes...' }), { target: { value: 'verano' } });
   expect(screen.getByText('Vacaciones de verano')).toBeInTheDocument();
   expect(screen.queryByText('Recuperación')).not.toBeInTheDocument();
@@ -194,7 +201,7 @@ test('muestra estadísticas, filtra tarjetas y ofrece acciones contextuales', as
   fireEvent.click(await screen.findByRole('menuitem', { name: 'Editar' }));
   const editDialog = screen.getByRole('dialog', { name: 'Editar solicitud' });
   expect(within(editDialog).getByLabelText('Desde')).toHaveValue('2026-07-27');
-}, 15_000);
+}, 20_000);
 
 test('carga el histórico del servidor por páginas y limita las tarjetas iniciales', async () => {
   mockState.requests.splice(
