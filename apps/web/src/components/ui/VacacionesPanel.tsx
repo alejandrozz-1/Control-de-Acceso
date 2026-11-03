@@ -727,6 +727,8 @@ export default function VacacionesPanel() {
   };
   const applyAdvancedFilters = (nextPeriod: RequestPeriod, nextSort: RequestSort, nextShowArchived: boolean) => {
     setPeriod(nextPeriod);
+    // El Estado del filtro avanzado sustituye al filtro rápido: aplicados a la vez dan intersección vacía
+    if (nextPeriod.status !== 'todas') setFilter('todas');
     setSort(nextSort);
     setShowArchived(nextShowArchived);
     setVisibleCount(20);
@@ -813,7 +815,7 @@ export default function VacacionesPanel() {
               <ButtonBase
                 key={status}
                 type="button"
-                aria-label={t(fullLabel)}
+                aria-label={`${counts[status]} ${t(fullLabel)}`}
                 aria-pressed={filter === status}
                 onClick={() => updateQuickFilter(status)}
                 sx={{
