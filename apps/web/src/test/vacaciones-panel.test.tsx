@@ -131,15 +131,22 @@ test('muestra estadísticas, filtra tarjetas y ofrece acciones contextuales', as
   expect(screen.queryByRole('combobox', { name: 'Año' })).not.toBeInTheDocument();
   expect(screen.queryByRole('combobox', { name: 'Ordenar por' })).not.toBeInTheDocument();
   expect(screen.queryByRole('group', { name: 'Histórico de solicitudes' })).not.toBeInTheDocument();
+  expect(screen.queryByRole('group', { name: 'Filtrar solicitudes' })).not.toBeInTheDocument();
+  const searchAndFilters = screen.getByRole('group', { name: 'Buscar solicitudes... · Filtros' });
+  expect(within(searchAndFilters).getByRole('textbox', { name: 'Buscar solicitudes...' })).toBeInTheDocument();
+  expect(within(searchAndFilters).getByRole('button', { name: 'Filtros' })).toBeInTheDocument();
 
-  fireEvent.click(screen.getByRole('button', { name: 'Anuladas' }));
+  const cancelledFilter = within(statistics).getByRole('button', { name: '1 Anuladas' });
+  fireEvent.click(cancelledFilter);
+  expect(cancelledFilter).toHaveAttribute('aria-pressed', 'true');
   expect(screen.getByText('Cita aplazada')).toBeInTheDocument();
   expect(screen.queryByText('Vacaciones de verano')).not.toBeInTheDocument();
-  fireEvent.click(screen.getByRole('button', { name: 'Aprobadas' }));
+  fireEvent.click(screen.getByRole('button', { name: '1 Aprobadas' }));
   expect(screen.getByText('Recuperación')).toBeInTheDocument();
   expect(screen.queryByText('Vacaciones de verano')).not.toBeInTheDocument();
 
-  fireEvent.click(screen.getByRole('button', { name: 'Todas' }));
+  fireEvent.click(screen.getByRole('button', { name: '1 Aprobadas' }));
+  expect(screen.getByText('Vacaciones de verano')).toBeInTheDocument();
   fireEvent.change(screen.getByRole('textbox', { name: 'Buscar solicitudes...' }), { target: { value: 'verano' } });
   expect(screen.getByText('Vacaciones de verano')).toBeInTheDocument();
   expect(screen.queryByText('Recuperación')).not.toBeInTheDocument();
@@ -165,6 +172,26 @@ test('muestra estadísticas, filtra tarjetas y ofrece acciones contextuales', as
   fireEvent.click(within(clearDialog).getByRole('button', { name: 'Aplicar' }));
   await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   expect(screen.getByText('Recuperación')).toBeInTheDocument();
+
+  // Estado del filtro avanzado sustituye al filtro rápido (sin intersección vacía)
+  fireEvent.click(screen.getByRole('button', { name: '1 Pendientes' }));
+  expect(screen.getByText('Vacaciones de verano')).toBeInTheDocument();
+  expect(screen.queryByText('Recuperación')).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Filtros' }));
+  const statusDialog = screen.getByRole('dialog', { name: 'Filtros avanzados' });
+  fireEvent.mouseDown(within(statusDialog).getByRole('combobox', { name: 'Estado' }));
+  fireEvent.click(await screen.findByRole('option', { name: 'Aprobadas' }));
+  fireEvent.click(within(statusDialog).getByRole('button', { name: 'Aplicar' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(screen.getByRole('button', { name: '1 Pendientes' })).toHaveAttribute('aria-pressed', 'false');
+  expect(screen.getByText('Recuperación')).toBeInTheDocument();
+  expect(screen.queryByText('Vacaciones de verano')).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Filtros' }));
+  const resetDialog = screen.getByRole('dialog', { name: 'Filtros avanzados' });
+  fireEvent.click(within(resetDialog).getByRole('button', { name: 'Limpiar filtros' }));
+  fireEvent.click(within(resetDialog).getByRole('button', { name: 'Aplicar' }));
+  await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  expect(screen.getByText('Vacaciones de verano')).toBeInTheDocument();
 
   const pendingCard = screen.getByText('Vacaciones de verano').closest<HTMLElement>('.MuiCard-root');
   if (!pendingCard) throw new Error('No se encontró la tarjeta pendiente');
@@ -194,7 +221,7 @@ test('muestra estadísticas, filtra tarjetas y ofrece acciones contextuales', as
   fireEvent.click(await screen.findByRole('menuitem', { name: 'Editar' }));
   const editDialog = screen.getByRole('dialog', { name: 'Editar solicitud' });
   expect(within(editDialog).getByLabelText('Desde')).toHaveValue('2026-07-27');
-}, 15_000);
+}, 20_000);
 
 test('carga el histórico del servidor por páginas y limita las tarjetas iniciales', async () => {
   mockState.requests.splice(
