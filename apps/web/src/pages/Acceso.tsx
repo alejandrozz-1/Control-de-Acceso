@@ -45,6 +45,9 @@ export default function Acceso() {
     queryKey: ['access-qr'],
     queryFn: issueQr,
     retry: 1,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
   });
   const credentialQuery = useQuery({
     queryKey: ['notification-credential', credentialTarget?.id],
@@ -71,17 +74,6 @@ export default function Acceso() {
   const qrSeconds = qr
     ? Math.min(QR_TTL_SECONDS, secondsUntil(qr.expires_at, now))
     : 0;
-
-  useEffect(() => {
-    if (!qr || qrFetching || secondsUntil(qr.expires_at) === 0) return;
-
-    const delay = Math.max(0, new Date(qr.expires_at).getTime() - Date.now());
-    const timeout = window.setTimeout(() => {
-      void refetchQr();
-    }, delay);
-
-    return () => window.clearTimeout(timeout);
-  }, [qr, qrFetching, refetchQr]);
 
   useEffect(() => {
     let cancelled = false;
@@ -194,8 +186,12 @@ export default function Acceso() {
       >
         {qrQuery.isLoading ? (
           <CircularProgress size={48} sx={{ color: brand.blue }} />
-        ) : qr && qrImage ? (
+        ) : qr && qrSeconds > 0 && qrImage ? (
           <Box component="img" src={qrImage} alt="" sx={{ width: 240, height: 240 }} />
+        ) : qr && qrSeconds === 0 ? (
+          <Typography variant="body1" sx={{ color: 'text.secondary', textAlign: 'center', px: 2 }}>
+            {t('Credencial caducada')}
+          </Typography>
         ) : (
           <QrCode2Icon sx={{ fontSize: 120, color: brand.blue }} />
         )}
@@ -264,7 +260,9 @@ export default function Acceso() {
             '&:hover': { borderColor: 'currentColor', bgcolor: 'action.hover' },
           }}
         >
-          {temporalBusy ? t('Generando…') : t('Usar código temporal')}
+          {temporalBusy
+            ? t('Generando…')
+            : t(temporal ? 'Regenerar código temporal' : 'Usar código temporal')}
         </Button>
       )}
 
