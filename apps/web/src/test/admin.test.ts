@@ -51,6 +51,6 @@ describe('revokeErrorText', () => {
   it('traduce errores de RLS a mensaje amable', () => {
     expect(revokeErrorText(new Error('new row violates row-level security policy'))).toContain('responsable del equipo');
     expect(revokeErrorText(null)).toBe('');
-    expect(revokeErrorText(new Error('otra cosa'))).toContain('No se pudo revocar');
+    expect(revokeErrorText(new Error('otra cosa'))).toContain('No se pudo eliminar');
   });
 });

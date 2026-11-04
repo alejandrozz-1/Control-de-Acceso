@@ -178,7 +178,7 @@ export default function AdminFestivos() {
   };
 
   return (
-    <PageLayout title="Festivos y eventos">
+    <PageLayout title="Festivos y eventos" backTo="/admin">
       {createHoliday.isError && <Alert severity="error" role="alert" sx={{ mb: 2 }}>{errText(createHoliday.error)}</Alert>}
       {createEvent.isError && <Alert severity="error" role="alert" sx={{ mb: 2 }}>{errText(createEvent.error)}</Alert>}
       {remove.isError && <Alert severity="error" role="alert" sx={{ mb: 2 }}>{errText(remove.error)}</Alert>}

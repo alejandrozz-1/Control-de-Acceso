@@ -13,15 +13,19 @@
 | full_name | text | |
 | employee_code | text UNIQUE | nº empleado corporativo |
 | phone | text NULL | |
-| role | user_role NOT NULL DEFAULT `'empleado'` | enum: `empleado`, `responsable`, `admin` |
+| role | user_role NOT NULL DEFAULT `'empleado'` | enum: `empleado`, `responsable`, `admin`, `seguridad`, `recursos_humanos` |
 | center_id | uuid FK → centers | centro base (define festivos) |
 | locale | text DEFAULT `'es'` | preparado i18n |
 | notification_prefs | jsonb | `{push:true, email:false, tipos:{turno:true,...}}` |
 | mfa_enabled | boolean DEFAULT false | preparado |
-| status | text DEFAULT `'activo'` | `activo`/`invitado`/`baja` |
+| status | text DEFAULT `'activo'` | `activo`/`inactivo`/`bloqueado`/`pendiente_activacion` |
+| must_change_password | boolean DEFAULT false | fuerza la activación y el cambio de contraseña en el primer acceso |
 | created_at / updated_at | timestamptz | |
 
 - Trigger: `on auth.users insert → crear profile` (RLS `SELECT` propio; `INSERT` solo admin).
+- `account_activations`: hash único del código, expiración a 24 h y límite de 5 intentos por 15 minutos. Solo service role; la activación consume el código y libera el perfil mediante RPC atómica.
+- Migración `20261104000001_admin_user_management.sql`: añade los roles y estados anteriores, centros de la lista corporativa y políticas restrictivas `fn_is_active_user()` para bloquear el acceso a datos de cuentas inactivas, bloqueadas o pendientes.
+- El trigger de alta ignora `role`/`center_id` enviados en `user_metadata` de registros públicos: los bloquea por defecto y solo acepta esos valores con marcador `app_metadata` escrito por service role. El entorno local deshabilita el auto-registro; mantenerlo deshabilitado también en Auth remoto.
 
 ### Tablas de identidad/estructura
 - **`centers`**: id, name, address, comunidad (c.Autónoma, p.ej. `madrid`), timezone, active.
@@ -93,6 +97,7 @@ create index on audit_logs (created_at desc), (actor_id, created_at desc);
 
 Funciones helper (`security definer`, `set search_path = public` para evitar recursión):
 - `fn_my_role() returns user_role` → `select role from profiles where id = auth.uid()`
+- `fn_is_active_user() returns boolean` → exige estado activo y cambio de contraseña completado para acceder a datos de la aplicación.
 - `fn_is_team_leader(p_team uuid) returns boolean`
 
 | Tabla | Lectura | Escritura |

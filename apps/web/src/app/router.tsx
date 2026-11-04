@@ -8,10 +8,7 @@ import Calendario from '../pages/Calendario';
 import Acceso from '../pages/Acceso';
 import Notificaciones from '../pages/Notificaciones';
 import Cuenta from '../pages/Cuenta';
-import AdminUsuarios from '../pages/admin/Usuarios';
 import HistorialAcceso from '../pages/HistorialAcceso';
-import AdminFestivos from '../pages/admin/Festivos';
-import AdminCredenciales from '../pages/admin/Credenciales';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useI18n } from '../i18n/I18nProvider';
@@ -20,6 +17,11 @@ const Perfil = lazy(() => import('../pages/account/Perfil'));
 const Idioma = lazy(() => import('../pages/account/Idioma'));
 const Seguridad = lazy(() => import('../pages/account/Seguridad'));
 const Ayuda = lazy(() => import('../pages/account/Ayuda'));
+const AdminUsuarios = lazy(() => import('../pages/admin/Usuarios'));
+const AdminFestivos = lazy(() => import('../pages/admin/Festivos'));
+const AdminCredenciales = lazy(() => import('../pages/admin/Credenciales'));
+const AdminHome = lazy(() => import('../pages/admin/AdminHome'));
+const AdminActivation = lazy(() => import('../pages/Activation'));
 
 function AccountPageFallback() {
   const { t } = useI18n();
@@ -34,6 +36,7 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/activar" element={<RequireAuth><Suspense fallback={<AccountPageFallback />}><AdminActivation /></Suspense></RequireAuth>} />
       <Route element={<RequireAuth><Shell /></RequireAuth>}>
         <Route path="/" element={<Inicio />} />
         <Route path="/calendario" element={<Calendario />} />
@@ -46,9 +49,10 @@ export default function AppRoutes() {
         <Route path="/cuenta/ayuda" element={<Suspense fallback={<AccountPageFallback />}><Ayuda /></Suspense>} />
         <Route path="/historial-acceso" element={<HistorialAcceso />} />
         <Route element={<RequireRole min="admin" />}>
-          <Route path="/admin/usuarios" element={<AdminUsuarios />} />
-          <Route path="/admin/festivos" element={<AdminFestivos />} />
-          <Route path="/admin/credenciales" element={<AdminCredenciales />} />
+          <Route path="/admin" element={<Suspense fallback={<AccountPageFallback />}><AdminHome /></Suspense>} />
+          <Route path="/admin/usuarios" element={<Suspense fallback={<AccountPageFallback />}><AdminUsuarios /></Suspense>} />
+          <Route path="/admin/festivos" element={<Suspense fallback={<AccountPageFallback />}><AdminFestivos /></Suspense>} />
+          <Route path="/admin/credenciales" element={<Suspense fallback={<AccountPageFallback />}><AdminCredenciales /></Suspense>} />
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

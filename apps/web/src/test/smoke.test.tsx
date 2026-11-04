@@ -18,6 +18,7 @@ const empleado: Profile = {
   locale: 'es',
   notification_prefs: {},
   mfa_enabled: false,
+  must_change_password: false,
   status: 'activo',
   created_at: '2026-10-28T00:00:00Z',
   updated_at: null,

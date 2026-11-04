@@ -27,6 +27,7 @@
 ## Variables y secretos
 - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` → vars de entorno Vercel (la anon key es pública por diseño; la protección real es RLS).
 - `SUPABASE_ACCESS_TOKEN`, `VAPID_PRIVATE_KEY`, `VAPID_PUBLIC_KEY` → GitHub Secrets (solo en Actions/Edge Functions, **nunca** en el bundle).
+- `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `APP_URL` → secrets de Supabase Edge Functions para `admin-users`; requiere remitente de dominio verificado en Resend y URL HTTPS pública de la app. Aplicar primero la migración `20261104000001_admin_user_management.sql` y desplegar `supabase/functions/admin-users/`.
 
 ## Headers de seguridad (Vercel `vercel.json`)
 ```json

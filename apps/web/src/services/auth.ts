@@ -5,6 +5,7 @@ import { supabase } from './supabase';
 
 export type Profile = Database['public']['Tables']['profiles']['Row'];
 export type Role = Profile['role'];
+export type AccountStatus = Profile['status'];
 
 interface AuthState {
   session: Session | null;
@@ -13,6 +14,7 @@ interface AuthState {
   initializing: boolean;
   /** true cuando el profile ya se resolvió (aunque sea null): distingue "cargando" de "sin perfil" */
   profileLoaded: boolean;
+  profileError: string | null;
   setSession: (s: Session | null) => void;
   setProfile: (p: Profile | null) => void;
   signIn: (email: string, password: string) => Promise<void>;
@@ -24,8 +26,9 @@ export const useAuthStore = create<AuthState>((set) => ({
   profile: null,
   initializing: true,
   profileLoaded: false,
+  profileError: null,
   setSession: (session) => set({ session }),
-  setProfile: (profile) => set({ profile }),
+  setProfile: (profile) => set({ profile, profileError: null }),
   signIn: async (email, password) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw new Error(
@@ -40,9 +43,13 @@ export const useAuthStore = create<AuthState>((set) => ({
 }));
 
 async function loadProfile(userId: string) {
-  const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
-  useAuthStore.getState().setProfile(data ?? null);
-  useAuthStore.setState({ profileLoaded: true });
+  const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+  if (error) {
+    console.error('Could not load the signed-in user profile', error.message);
+    useAuthStore.setState({ profile: null, profileLoaded: true, profileError: error.message });
+    return;
+  }
+  useAuthStore.setState({ profile: data, profileLoaded: true, profileError: null });
 }
 
 let started = false;
@@ -55,14 +62,24 @@ export function initAuth() {
     const prev = useAuthStore.getState().session;
     useAuthStore.setState({ session, initializing: false });
     if (session?.user.id !== prev?.user.id) {
-      if (session) void loadProfile(session.user.id);
-      else useAuthStore.getState().setProfile(null);
+      if (session) {
+        useAuthStore.setState({ profile: null, profileLoaded: false, profileError: null });
+        void loadProfile(session.user.id);
+      } else {
+        useAuthStore.setState({ profile: null, profileLoaded: false, profileError: null });
+      }
     }
   });
 }
 
-/** Jerarquía de roles: empleado < responsable < admin. */
-const RANK: Record<Role, number> = { empleado: 0, responsable: 1, admin: 2 };
+/** Solo administradores acceden al panel; los nuevos roles conservan permisos básicos. */
+const RANK: Record<Role, number> = {
+  empleado: 0,
+  seguridad: 0,
+  recursos_humanos: 0,
+  responsable: 1,
+  admin: 2,
+};
 
 export function hasRole(profile: Profile | null, min: Role): boolean {
   return !!profile && RANK[profile.role] >= RANK[min];

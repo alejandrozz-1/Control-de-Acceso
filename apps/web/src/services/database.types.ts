@@ -414,10 +414,11 @@ export type Database = {
           id: string
           locale: string
           mfa_enabled: boolean
+          must_change_password: boolean
           notification_prefs: Json
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
-          status: string
+          status: "activo" | "inactivo" | "bloqueado" | "pendiente_activacion"
           updated_at: string | null
         }
         Insert: {
@@ -429,6 +430,7 @@ export type Database = {
           id: string
           locale?: string
           mfa_enabled?: boolean
+          must_change_password?: boolean
           notification_prefs?: Json
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
@@ -444,10 +446,11 @@ export type Database = {
           id?: string
           locale?: string
           mfa_enabled?: boolean
+          must_change_password?: boolean
           notification_prefs?: Json
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
-          status?: string
+          status?: "activo" | "inactivo" | "bloqueado" | "pendiente_activacion"
           updated_at?: string | null
         }
         Relationships: [
@@ -821,7 +824,7 @@ export type Database = {
         | "corporativa"
         | "sistema"
       request_status: "pendiente" | "aprobada" | "rechazada" | "anulada"
-      user_role: "empleado" | "responsable" | "admin"
+      user_role: "empleado" | "responsable" | "admin" | "seguridad" | "recursos_humanos"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -965,7 +968,7 @@ export const Constants = {
         "sistema",
       ],
       request_status: ["pendiente", "aprobada", "rechazada", "anulada"],
-      user_role: ["empleado", "responsable", "admin"],
+      user_role: ["empleado", "responsable", "admin", "seguridad", "recursos_humanos"],
     },
   },
 } as const

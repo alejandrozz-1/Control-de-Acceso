@@ -38,7 +38,7 @@ begin
       u.value->>1,
       extensions.crypt('Password123!', extensions.gen_salt('bf')),
       now(),
-      '{"provider":"email","providers":["email"]}'::jsonb,
+      '{"provider":"email","providers":["email"],"user_creation":"seed"}'::jsonb,
       jsonb_build_object('full_name', u.value->>2, 'employee_code', u.value->>3, 'role', u.value->>4, 'center_id', u.value->>5),
       now(), now()
     )

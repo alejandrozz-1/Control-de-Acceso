@@ -37,6 +37,8 @@ const ROLE_LABEL: Record<string, string> = {
   empleado: 'Empleado',
   responsable: 'Responsable',
   admin: 'Administrador',
+  seguridad: 'Seguridad',
+  recursos_humanos: 'Recursos Humanos',
 };
 
 const settings = [
@@ -250,14 +252,8 @@ export default function Cuenta() {
             <Typography variant="subtitle1" component="h2" sx={{ mb: 1, fontWeight: 800 }}>
               {t('Administración')}
             </Typography>
-            <Button component={RouterLink} to="/admin/usuarios" variant="outlined" fullWidth>
-              {t('Gestionar usuarios')}
-            </Button>
-            <Button component={RouterLink} to="/admin/credenciales" variant="outlined" fullWidth sx={{ mt: 1 }}>
-              {t('Credenciales de acceso')}
-            </Button>
-            <Button component={RouterLink} to="/admin/festivos" variant="outlined" fullWidth sx={{ mt: 1 }}>
-              {t('Festivos y eventos')}
+            <Button component={RouterLink} to="/admin" variant="outlined" fullWidth>
+              {t('Abrir panel de administración')}
             </Button>
           </Paper>
         )}

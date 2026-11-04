@@ -45,8 +45,8 @@ const STATUS_COLOR: Record<string, 'success' | 'error' | 'default'> = {
 export function revokeErrorText(m: unknown): string {
   if (!m) return '';
   const s = String(m);
-  if (s.includes('row-level security') || s.includes('403')) return 'Solo un administrador o el responsable del equipo puede revocar';
-  return 'No se pudo revocar. Inténtalo de nuevo.';
+  if (s.includes('row-level security') || s.includes('403')) return 'Solo un administrador o el responsable del equipo puede eliminar credenciales';
+  return 'No se pudo eliminar. Inténtalo de nuevo.';
 }
 
 /** T-012: revocación individual/masiva de credenciales (auditoría y notificación las hace el trigger en servidor). */
@@ -87,7 +87,7 @@ export default function AdminCredenciales() {
     },
     onSuccess: (_d, ids) => {
       void qc.invalidateQueries({ queryKey: ['admin-credentials'] });
-      setOk(ids.length > 1 ? `${ids.length} ${t('credenciales revocadas')}` : t('Credencial revocada'));
+      setOk(ids.length > 1 ? `${ids.length} ${t('credenciales eliminadas')}` : t('Credencial eliminada'));
       setSelected(new Set());
       setConfirmBulk(false);
       setConfirmOne(null);
@@ -107,7 +107,7 @@ export default function AdminCredenciales() {
   const allSelected = selectableActive.length > 0 && selectableActive.every((r) => selected.has(r.id));
 
   return (
-    <PageLayout title="Credenciales">
+    <PageLayout title="Credenciales" backTo="/admin">
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 1.5, flexWrap: 'wrap' }}>
         <Typography variant="body2" color="text.secondary" aria-live="polite">
           {list.isLoading ? t('Cargando…') : `${rows.length} ${t('credenciales')} · ${selectableActive.length} ${t('activas')}`}
@@ -159,7 +159,7 @@ export default function AdminCredenciales() {
                     isActive ? (
                       <IconButton
                         size="small"
-                        aria-label={`${t('Revocar credencial de')} ${r.user?.full_name ?? ''}`}
+                        aria-label={`${t('Eliminar credencial de')} ${r.user?.full_name ?? ''}`}
                         color="error"
                         onClick={() => setConfirmOne(r)}
                       >
@@ -210,25 +210,25 @@ export default function AdminCredenciales() {
         </Paper>
       )}
 
-      {/* Revocación masiva */}
+      {/* Eliminación masiva */}
       <Dialog open={confirmBulk} onClose={() => setConfirmBulk(false)} maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700 }}>{t('Revocar')} {activeSelected.length} {t('credenciales')}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('Eliminar')} {activeSelected.length} {t('credenciales')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2">
-            {t('Dejarán de funcionar al instante (el QR caduca en cuanto se revoca). Las personas afectadas recibirán una notificación.')}
+            {t('Dejarán de funcionar al instante. Las personas afectadas recibirán una notificación. El registro se conservará para auditoría.')}
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setConfirmBulk(false)}>{t('Cancelar')}</Button>
           <Button color="error" variant="contained" disabled={revoke.isPending} onClick={() => revoke.mutate(activeSelected.map((r) => r.id))}>
-            {t('Revocar')}
+            {t('Eliminar')}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Revocación individual */}
+      {/* Eliminación individual */}
       <Dialog open={!!confirmOne} onClose={() => setConfirmOne(null)} maxWidth="xs">
-        <DialogTitle sx={{ fontWeight: 700 }}>{t('Revocar credencial')}</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 700 }}>{t('Eliminar credencial')}</DialogTitle>
         <DialogContent>
           <Typography variant="body2">
             {t('{name} dejará de poder usar su {kind} al instante y recibirá una notificación.')
@@ -244,7 +244,7 @@ export default function AdminCredenciales() {
             disabled={revoke.isPending}
             onClick={() => confirmOne && revoke.mutate([confirmOne.id])}
           >
-            {t('Revocar')}
+            {t('Eliminar')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -263,7 +263,7 @@ export default function AdminCredenciales() {
           <Typography variant="body2" sx={{ fontWeight: 600, flexGrow: 1 }}>{activeSelected.length} seleccionadas</Typography>
           <Button size="small" onClick={() => setSelected(new Set())}>{t('Limpiar')}</Button>
           <Button size="small" color="error" variant="contained" startIcon={<BlockIcon />} onClick={() => setConfirmBulk(true)}>
-            Revocar
+            {t('Eliminar')}
           </Button>
         </Box>
       )}
