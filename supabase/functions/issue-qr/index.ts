@@ -1,7 +1,7 @@
 // Edge Function: emisión de credenciales de acceso para el usuario autenticado (US-02, ADR-003).
 // - kind='qr': inserta una credencial de vida corta y devuelve el payload firmado con HMAC
 //   (credential_id.exp.firma — sin PII; cualquier lector futuro puede verificarlo).
-// - kind='temporal': genera un código de 8 dígitos con fn_issue_temporal (5 min).
+// - kind='temporal': genera un código de 8 dígitos con fn_issue_temporal (1 min).
 // La validación siempre es servidor-side: access_credentials.status revoca al instante.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -18,7 +18,7 @@ function json(body: unknown, status = 200): Response {
 }
 
 const QR_TTL_SECONDS = 60;
-const TEMPORAL_TTL_SECONDS = 300;
+const TEMPORAL_TTL_SECONDS = 60;
 const MAX_ISSUES_PER_MINUTE = 10;
 
 async function hmacSign(secret: string, message: string): Promise<string> {
