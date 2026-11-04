@@ -1,6 +1,31 @@
 import { describe, expect, it } from 'vitest';
 import { buildEvent, buildHoliday } from '../pages/admin/Festivos';
-import { revokeErrorText } from '../pages/admin/Credenciales';
+import { dateRange, getMatchingKinds, isRestorableCredential, revokeErrorText } from '../pages/admin/Credenciales';
+
+describe('credential management helpers', () => {
+  it('matches credential kinds case-insensitively for search', () => {
+    expect(getMatchingKinds('QR')).toEqual(['qr']);
+    expect(getMatchingKinds('Temporal')).toEqual(['temporal']);
+    expect(getMatchingKinds('persona')).toEqual([]);
+  });
+
+  it('only restores revoked credentials that are not expired', () => {
+    const now = new Date('2026-11-04T10:00:00.000Z');
+    expect(isRestorableCredential({ status: 'revocada', expires_at: null }, now)).toBe(true);
+    expect(isRestorableCredential({ status: 'revocada', expires_at: '2026-11-05T10:00:00.000Z' }, now)).toBe(true);
+    expect(isRestorableCredential({ status: 'revocada', expires_at: '2026-11-03T10:00:00.000Z' }, now)).toBe(false);
+    expect(isRestorableCredential({ status: 'caducada', expires_at: null }, now)).toBe(false);
+  });
+
+  it('builds date ranges for preset and custom creation dates', () => {
+    expect(dateRange({ status: '', kind: '', role: '', centerId: '', datePreset: '', dateFrom: '', dateTo: '' })).toEqual({});
+    expect(dateRange({ status: '', kind: '', role: '', centerId: '', datePreset: 'today', dateFrom: '', dateTo: '' }).from).toBeTruthy();
+    expect(dateRange({ status: '', kind: '', role: '', centerId: '', datePreset: 'custom', dateFrom: '2026-11-01', dateTo: '2026-11-02' })).toEqual({
+      from: new Date('2026-11-01T00:00:00').toISOString(),
+      to: new Date('2026-11-02T23:59:59.999').toISOString(),
+    });
+  });
+});
 
 describe('buildHoliday', () => {
   it('normaliza comunidad a minúsculas y solo si el ámbito es comunidad', () => {
@@ -51,6 +76,6 @@ describe('revokeErrorText', () => {
   it('traduce errores de RLS a mensaje amable', () => {
     expect(revokeErrorText(new Error('new row violates row-level security policy'))).toContain('responsable del equipo');
     expect(revokeErrorText(null)).toBe('');
-    expect(revokeErrorText(new Error('otra cosa'))).toContain('No se pudo eliminar');
+    expect(revokeErrorText(new Error('otra cosa'))).toContain('No se pudo revocar');
   });
 });
