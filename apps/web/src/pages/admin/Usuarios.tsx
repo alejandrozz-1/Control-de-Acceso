@@ -45,7 +45,7 @@ import { supabase } from '../../services/supabase';
 
 type UserStatus = 'activo' | 'inactivo' | 'bloqueado' | 'pendiente_activacion';
 type Center = { id: string; name: string; active: boolean };
-type UserDirectory = { profiles: ManagedUser[]; centers: Center[] };
+type UserDirectory = { profiles: ManagedUser[]; centers: Center[]; degraded?: boolean };
 type FormFields = {
   givenName: string;
   familyName: string;
@@ -212,6 +212,7 @@ export default function AdminUsuarios() {
             last_sign_in_at: null,
           })) as ManagedUser[],
           centers: centersResult.data,
+          degraded: true,
         };
       }
     },
@@ -361,7 +362,7 @@ export default function AdminUsuarios() {
       {feedback && (
         <Alert severity={feedback.severity} sx={{ mb: 2 }} onClose={() => setFeedback(null)}>{feedback.text}</Alert>
       )}
-      {!directory.isError && directory.data && (
+      {directory.data?.degraded && (
         <Alert severity="warning" sx={{ mb: 2 }}>
           {FUNCTION_DEPLOYMENT_MESSAGE}
         </Alert>
